@@ -104,7 +104,7 @@ perkMax = 1
 while w < m:
     if w in [0, 4, 6, 10]:
         # フォントと背景画像の準備
-        baseImg = Image.open("./banshee_bg.jpg").convert("RGBA")
+        baseImg = Image.open("./img/banshee_bg.jpg").convert("RGBA")
         draw = ImageDraw.Draw(baseImg)
             
         # タイトルと日付挿入

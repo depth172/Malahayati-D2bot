@@ -79,13 +79,13 @@ tweet = open('tweet_text.txt', 'w', encoding="utf-8")
 location = vendor[0]['Response']['vendor']['data']['vendorLocationIndex']
 if (location == 0) :
     locationText = 'タワー，ハンガー'
-    baseImg = Image.open("./xur_tower.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_tower.jpg").convert("RGBA")
 elif (location == 1) :
     locationText = 'EDZ，屈曲の細道'
-    baseImg = Image.open("./xur_edz.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_edz.jpg").convert("RGBA")
 elif (location == 2) :
     locationText = 'ネッスス，監視者の墓'
-    baseImg = Image.open("./xur_nessus.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_nessus.jpg").convert("RGBA")
 draw = ImageDraw.Draw(baseImg)
 
 draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
@@ -128,7 +128,7 @@ tweet.write("武器: " + eWeaponName + "\n")
 ### エキゾチック武器の画像生成 ###
 
 ## 背景画像の準備
-baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
 draw = ImageDraw.Draw(baseImg)
 
 ## タイトルと日付挿入
@@ -235,7 +235,7 @@ for c in range(3):
 
     ### 画像生成
     # フォントと背景画像の準備
-    baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
     draw = ImageDraw.Draw(baseImg)
     # タイトルと日付挿入
     draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
@@ -314,7 +314,7 @@ tweet.write("＜週替わりパーク武器＞\n")
 
 ## ホークムーン
 # 背景画像の準備
-baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
 draw = ImageDraw.Draw(baseImg)
 
 # タイトルと日付挿入
@@ -386,7 +386,7 @@ resImg.save("./tmp/xur_2_weekly_perk_hm.jpg")
 
 ## デッドマンズテイル
 # 背景画像の準備
-baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
 draw = ImageDraw.Draw(baseImg)
 
 # タイトルと日付挿入
@@ -476,7 +476,7 @@ perkMax = 1
 while w < m:
     if w in [0, 4]:
         # フォントと背景画像の準備
-        baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
         draw = ImageDraw.Draw(baseImg)
             
         # タイトルと日付挿入
@@ -622,7 +622,7 @@ lArmorSetName = []
 for c in range(3):
     ### 画像生成
     # フォントと背景画像の準備
-    baseImg = Image.open("./xur_bg.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
     draw = ImageDraw.Draw(baseImg)
     
     # タイトルと日付挿入
