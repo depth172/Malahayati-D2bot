@@ -1,2 +1,8 @@
-# Malahayati-D2bot
-A Twitter bot that periodically tweets information about Destiny 2.
+# Malahayati
+Destiny 2 の日間・週間更新の内容をBungie APIより取得し、画像を生成して自動的につぶやくTwitter botです。
+## ツイートする内容
+- バンシー44が販売する武器について
+- シュールが販売する内容について
+## 今後実装予定
+- 自動ツイート（APIが通り次第）
+- 今週のオシリスの試練のマップと、獲得できる新・武器のツイート

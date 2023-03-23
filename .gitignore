@@ -127,3 +127,10 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+# リフレッシュトークンを格納するファイル
+refresh_token
+
+# 毎日・毎週更新されるファイル、フォルダ
+/tmp
+tweet_text.txt
