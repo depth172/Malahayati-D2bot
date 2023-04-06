@@ -129,8 +129,7 @@ dmypy.json
 .pyre/
 
 # リフレッシュトークンを格納するファイル
-refresh_token
+/tokens
 
 # 毎日・毎週更新されるファイル、フォルダ
 /tmp
-tweet_text.txt
