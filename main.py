@@ -12,7 +12,7 @@ TimeZone = ZoneInfo("Asia/Tokyo")
 print("定期実行を開始します。")
 
 currentStatus = redis.from_url(url=os.getenv('REDIS_URL'))
-    
+
 currentTime = datetime.datetime.now(TimeZone)
     
 # 毎日2時に取得フラグをリセット
@@ -26,6 +26,9 @@ if currentTime.hour == 2:
 elif currentTime.hour == 9:
     currentStatus.set('gotBansheeDaily', 'False')
     recatch = True
+    # 木曜日だった場合は週間フラグもリセット
+    if currentTime.weekday() == 3:
+        currentStatus.set('gotBansheeWeekly', 'False')
 
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
 if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'False':
