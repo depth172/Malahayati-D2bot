@@ -331,155 +331,94 @@ def getXur():
     tweetText = "＜週替わりパーク武器＞\n"
 
     ## ホークムーン
-    # 背景画像の準備
-    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
-    resImg = io.BytesIO()
-    draw = ImageDraw.Draw(baseImg)
-
-    # タイトルと日付挿入
-    draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
-    draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
-    draw.multiline_text((30, 120), "<週替わりパークのエキゾチック武器>", fill=(255, 255, 255), font=fontB1)
-
-    ## 武器画像挿入
-    # パスから画像を取得
-    hmBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/bc462cdde2fa00c808ff4f15802cb3b4.jpg").content))
-    hmBaseImg.putalpha(255)
-    hmWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/2347cc2407b51e1debbac020bfcd0224.png").content)).convert("RGBA")
-    # 武器画像とウォーターマークを合成
-    hmImg = Image.alpha_composite(hmBaseImg, hmWM)
-    # リサイズして挿入
-    hmImg = hmImg.resize((120, 120), 1)
-    baseImg.paste(hmImg, (50, 185))
-
-    ## 武器名挿入
-    draw.multiline_text((210, 180), "ホークムーン", fill=(255, 255, 255), font=fontB3)
+    
+    for w in range(31, 31):
+        epHash = vendor[0]['Response']['sales']['data'][str(w)]['itemHash']
+        epData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()
         
-    ## 武器種挿入
-    draw.multiline_text((210, 250), "ハンドキャノン", fill=(255, 255, 255), font=fontB1)
+        # 背景画像の準備
+        baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+        resImg = io.BytesIO()
+        draw = ImageDraw.Draw(baseImg)
 
-    ## 内在特性挿入
-    # 画像挿入
-    hmInstImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/db83b69527ca8373f2803386e3d0a086.png").content)).convert("RGBA")
+        # タイトルと日付挿入
+        draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
+        draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
+        draw.multiline_text((30, 120), "<週替わりパークのエキゾチック武器>", fill=(255, 255, 255), font=fontB1)
 
-    hmInstImg = hmInstImg.resize((100, 100), 1)
-    baseImg.paste(hmInstImg, (60, 335), hmInstImg)
-    draw.multiline_text((180, 358), "因果律超越ショット", fill=(255, 255, 255), font=fontB1)
+        ## 武器画像挿入
+        # パスから画像を取得
+        epImgPath = epData['Response']['displayProperties']['icon']
+        epWMPath = epData['Response']['quality']['displayVersionWatermarkIcons'][0]
+        epBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epImgPath).content))
+        epBaseImg.putalpha(255)
+        epWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epWMPath).content)).convert("RGBA")
+        # 武器画像とウォーターマークを合成
+        epImg = Image.alpha_composite(epBaseImg, epWM)
+        # リサイズして挿入
+        epImg = epImg.resize((120, 120), 1)
+        baseImg.paste(epImg, (50, 185))
 
-    # パーク挿入
-    print("ホークムーン:")
-    tweetText = "ホークムーン:\n"
-    for i in range(1, 5):
-        hmPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data']['31']['sockets'][i]['plugHash']
-        hmPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(hmPerkHash) + "/?lc=ja", headers=headers).json()
-        hmPerkPath = hmPerkData['Response']['displayProperties']['icon']
-        hmPerkName = hmPerkData['Response']['displayProperties']['name']
-        print("　" + hmPerkName)
-        tweetText += "- " + hmPerkName + "\n"
-        hmPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + hmPerkPath).content)).convert("RGBA").resize((80, 80), 1)
-        baseImg.paste(hmPerkImg, (73, 450 + 93 * (i - 1)), hmPerkImg)
-        draw.multiline_text((180, 465 + 93 * (i - 1)), hmPerkName, fill=(255, 255, 255), font=fontB1)
+        ## 武器名挿入
+        epName = epData['Response']['displayProperties']['name']
+        draw.multiline_text((210, 180), epName, fill=(255, 255, 255), font=fontB3)
+            
+        ## 武器種挿入
+        epArchName = epData['Response']['itemTypeDisplayName']
+        draw.multiline_text((210, 250), epArchName, fill=(255, 255, 255), font=fontB1)
 
-    ## ステータスグラフ挿入
-    hmStats = vendor[0]['Response']['itemComponents']['stats']['data']['31']['stats']
-    hmDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/3856705927/?lc=ja", headers=headers).json()['Response']['stats']['stats']
-    draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
-    draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
-    for s in range(4):
-        draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
-        if hmStats[weaponStatsTable[s]]['value'] > hmDefStats[weaponStatsTable[s]]['value']:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (hmStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(154, 255, 80))
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (hmDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        elif hmStats[weaponStatsTable[s]]['value'] < hmDefStats[weaponStatsTable[s]]['value']:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (hmDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(180, 59, 35))
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (hmStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        else:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (hmStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        draw.multiline_text((855, 436 + 50 * s), str(hmStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
-        statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
-        draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
+        ## 内在特性挿入
+        # 画像挿入
+        epInstHash = epData['Response']['sockets']['socketEntries'][0]['singleInitialItemHash']
+        epInstData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epInstHash) + "/?lc=ja", headers=headers).json()
+        epInstPath = epInstData['Response']['displayProperties']['icon']
+        epInstImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epInstPath).content)).convert("RGBA")
 
-    # 表示（テスト用）
-    cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
-    cropImg.save(resImg, format='JPEG')
-    mediaList.append(tw.postImage(resImg.getvalue()))
-    tweetText += "\n"
-
-    ## デッドマンズテイル
-    # 背景画像の準備
-    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
-    resImg = io.BytesIO()
-    draw = ImageDraw.Draw(baseImg)
-
-    # タイトルと日付挿入
-    draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
-    draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
-    draw.multiline_text((30, 120), "<週替わりパークのエキゾチック武器>", fill=(255, 255, 255), font=fontB1)
-
-    ## 武器画像挿入
-    # パスから画像を取得
-    dmtBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/67634d7a01d7dca3aef90b4612d58489.jpg").content))
-    dmtBaseImg.putalpha(255)
-    dmtWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/6a52f7cd9099990157c739a8260babea.png").content)).convert("RGBA")
-    # 武器画像とウォーターマークを合成
-    dmtImg = Image.alpha_composite(dmtBaseImg, dmtWM)
-    # リサイズして挿入
-    dmtImg = dmtImg.resize((120, 120), 1)
-    baseImg.paste(dmtImg, (50, 185))
-
-    ## 武器名挿入
-    draw.multiline_text((210, 180), "デッドマンズテイル", fill=(255, 255, 255), font=fontB3)
+        epInstImg = epInstImg.resize((100, 100), 1)
+        baseImg.paste(epInstImg, (60, 335), epInstImg)
         
-    ## 武器種挿入
-    draw.multiline_text((210, 250), "スカウトライフル", fill=(255, 255, 255), font=fontB1)
+        ## 特性名・説明文挿入
+        epInstName = epInstData['Response']['displayProperties']['name']
+        draw.multiline_text((180, 358), epInstName, fill=(255, 255, 255), font=fontB1)
 
-    ## 内在特性挿入
-    # 画像挿入
-    dmtInstImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/0e171b3269c4796acad0c0b11c7fbc27.png").content)).convert("RGBA")
+        # パーク挿入
+        print(epName + ":")
+        tweetText = "ホークムーン:\n"
+        for i in range(1, 5):
+            epPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data'][str(w)]['sockets'][i]['plugHash']
+            epPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epPerkHash) + "/?lc=ja", headers=headers).json()
+            epPerkPath = epPerkData['Response']['displayProperties']['icon']
+            epPerkName = epPerkData['Response']['displayProperties']['name']
+            print("　" + epPerkName)
+            tweetText += "- " + epPerkName + "\n"
+            epPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epPerkPath).content)).convert("RGBA").resize((80, 80), 1)
+            baseImg.paste(epPerkImg, (73, 450 + 93 * (i - 1)), epPerkImg)
+            draw.multiline_text((180, 465 + 93 * (i - 1)), epPerkName, fill=(255, 255, 255), font=fontB1)
 
-    dmtInstImg = dmtInstImg.resize((100, 100), 1)
-    baseImg.paste(dmtInstImg, (60, 335), dmtInstImg)
-    draw.multiline_text((180, 358), "クラニアル・スパイク", fill=(255, 255, 255), font=fontB1)
+        ## ステータスグラフ挿入
+        epStats = vendor[0]['Response']['itemComponents']['stats']['data'][str(w)]['stats']
+        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/3856705927/?lc=ja", headers=headers).json()['Response']['stats']['stats']
+        draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
+        draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
+        for s in range(4):
+            draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
+            if epStats[weaponStatsTable[s]]['value'] > epDefStats[weaponStatsTable[s]]['value']:
+                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(154, 255, 80))
+                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+            elif epStats[weaponStatsTable[s]]['value'] < epDefStats[weaponStatsTable[s]]['value']:
+                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(180, 59, 35))
+                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+            else:
+                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+            draw.multiline_text((855, 436 + 50 * s), str(epStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
+            statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
+            draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
-    ## パーク挿入
-    dmtPerkList = list(vendor[0]['Response']['itemComponents']['sockets']['data']['32']['sockets'])
-
-    print("デッドマンズテイル:")
-    tweetText = "デッドマンズテイル:\n"
-    for i in range(1, 5):
-        dmtPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data']['32']['sockets'][i]['plugHash']
-        dmtPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(dmtPerkHash) + "/?lc=ja", headers=headers).json()
-        dmtPerkPath = dmtPerkData['Response']['displayProperties']['icon']
-        dmtPerkName = dmtPerkData['Response']['displayProperties']['name']
-        print("　" + dmtPerkName)
-        tweetText += "- " + dmtPerkName + "\n"
-        dmtPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + dmtPerkPath).content)).convert("RGBA").resize((80, 80), 1)
-        baseImg.paste(dmtPerkImg, (73, 450 + 93 * (i - 1)), dmtPerkImg)
-        draw.multiline_text((180, 465 + 93 * (i - 1)), dmtPerkName, fill=(255, 255, 255), font=fontB1)
-
-    ## ステータスグラフ挿入
-    dmtStats = vendor[0]['Response']['itemComponents']['stats']['data']['32']['stats']
-    dmtDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/3654674561/?lc=ja", headers=headers).json()['Response']['stats']['stats']
-    draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
-    draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
-    for s in range(4):
-        draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
-        if dmtStats[weaponStatsTable[s]]['value'] > dmtDefStats[weaponStatsTable[s]]['value']:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (dmtStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(154, 255, 80))
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (dmtDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        elif dmtStats[weaponStatsTable[s]]['value'] < dmtDefStats[weaponStatsTable[s]]['value']:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (dmtDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(180, 59, 35))
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (dmtStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        else:
-            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (dmtStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        draw.multiline_text((855, 436 + 50 * s), str(dmtStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
-        statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
-        draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
-
-    # 表示（テスト用）
-    cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
-    cropImg.save(resImg, format='JPEG')
-    mediaList.append(tw.postImage(resImg.getvalue()))
+        # 表示
+        cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
+        cropImg.save(resImg, format='JPEG')
+        mediaList.append(tw.postImage(resImg.getvalue()))
+        tweetText += "\n"
 
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content, recentTweet)
