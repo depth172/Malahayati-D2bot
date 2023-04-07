@@ -12,6 +12,7 @@ from . import tweet as tw
 # 細かい処理用
 from time import sleep
 import datetime
+from zoneinfo import ZoneInfo
 import math
 
 def getBanshee(flag="Weekly", isRetry=False):
@@ -60,7 +61,9 @@ def getBanshee(flag="Weekly", isRetry=False):
             break
 
     # 日付データの準備
-    startDate = datetime.datetime.now()
+    TimeZone = ZoneInfo("Asia/Tokyo")
+
+    startDate = datetime.datetime.now(TimeZone)
     startDateStr = startDate.strftime('%Y/%m/%d')
 
     tweetText = ""
