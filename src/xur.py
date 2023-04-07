@@ -395,7 +395,7 @@ def getXur():
 
         ## ステータスグラフ挿入
         epStats = vendor[0]['Response']['itemComponents']['stats']['data'][str(w)]['stats']
-        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/3856705927/?lc=ja", headers=headers).json()['Response']['stats']['stats']
+        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + epHash + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
         draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
         draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
         for s in range(4):
