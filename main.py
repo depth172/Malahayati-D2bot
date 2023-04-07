@@ -18,6 +18,7 @@ currentTime = datetime.datetime.now(TimeZone)
 # 毎日2時に取得フラグをリセット
 if currentTime.hour == 2:
     currentStatus.set('gotBansheeDaily', 'False')
+    currentStatus.set('gotSector', 'False')
     # 水曜日だった場合は週間フラグもリセット
     if currentTime.weekday() == 2:
         currentStatus.set('gotXur', 'False')
@@ -62,6 +63,18 @@ elif currentStatus.get('gotBansheeDaily') == b'False':
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
+        contents = {"text": tweetText}
+        tw.makeTweet(contents)
+
+# 失われたセクターの情報を未取得だった場合は取得
+if currentStatus.get('gotSector') == b'False':
+    print("失われたセクターの情報を取得します。")
+    checkCode = lostsector.getLostSector()
+    if checkCode == 0:
+        currentStatus.set('gotSector', 'True')
+    elif checkCode == 5:
+        timeStr = currentTime.strftime('%Y/%m/%d')
+        tweetText = "【 #失われたセクター 情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 
