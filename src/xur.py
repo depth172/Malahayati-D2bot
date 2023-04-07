@@ -1,16 +1,15 @@
 ### ライブラリのインポート ###
 # 認証関連
 import os
-import src.refreshAuth as refreshAuth
+import src.auth as auth
 # API取得用
 import requests
 # 画像処理用
 from PIL import Image, ImageDraw, ImageFont
 import io
 # ツイート用
-from . import makeTweet as tw
+from . import tweet as tw
 # 細かい処理用
-import sys
 from time import sleep
 import datetime
 import textwrap
@@ -34,13 +33,13 @@ def getXur():
 
     ### アクセスに必要なトークンを取得 ###
 
-    refreshAuth.getBungieAccessToken()
+    auth.getBungieAccessToken()
 
     #### 基本データの取得 ####
 
     # ヘッダーにAPIキーとアクセストークンを設定
     headers = {"X-API-Key": os.getenv('B_API_KEY'),
-            "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
+               "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
     # シュールに関する情報を取得
     # 取得成功可否も確認する
@@ -90,6 +89,7 @@ def getXur():
     elif (location == 2) :
         locationText = 'ネッスス，監視者の墓'
         baseImg = Image.open("./img/xur_nessus.jpg").convert("RGBA")
+    resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
     draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
@@ -105,9 +105,9 @@ def getXur():
     # 表示（テスト用）
     print("シュールの現在位置: " + locationText + "\n")
 
-    resImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
-    resImg.save("./tmp/xur_0_top.jpg")
-    mediaList.append(tw.postImage("./tmp/xur_0_top.jpg"))
+    cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
+    cropImg.save(resImg, format='JPEG')
+    mediaList.append(tw.postImage(resImg.getvalue()))
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content)
     mediaList = []
@@ -137,6 +137,7 @@ def getXur():
 
     ## 背景画像の準備
     baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+    resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
     ## タイトルと日付挿入
@@ -228,8 +229,9 @@ def getXur():
                 eWeaponInstPerkDesc = textwrap.fill(eWeaponInstPerkDesc, 29)
             draw.multiline_text((520, 545 + 22 * cl), eWeaponInstPerkDesc, fill=(255, 255, 255), font=fontN)
 
-    resImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
-    resImg.save("./tmp/xur_1-1_exotic_weapon.jpg")
+    cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
+    cropImg.save(resImg, format='JPEG')
+    mediaList.append(tw.postImage(resImg.getvalue()))
 
     #### 販売しているエキゾチック防具の取得と画像生成 ###
     for c in range(3):
@@ -247,6 +249,7 @@ def getXur():
         ### 画像生成
         # フォントと背景画像の準備
         baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+        resImg = io.BytesIO()
         draw = ImageDraw.Draw(baseImg)
         # タイトルと日付挿入
         draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
@@ -314,9 +317,9 @@ def getXur():
         draw.multiline_text((722, 737), "合計", fill=(255, 255, 255), font=fontN)
         draw.multiline_text((845, 730), str(statsTotal), fill=(255, 255, 255), font=fontB1)
         
-        resImg = baseImg.crop((0, 0, 1280, 820)).convert("RGB")
-        resImg.save("./tmp/xur_1-2_exotic_armor_" + classDictEn[c] + ".jpg")
-        mediaList.append(tw.postImage("./tmp/xur_1-2_exotic_armor_" + classDictEn[c] + ".jpg"))
+        cropImg = baseImg.crop((0, 0, 1280, 820)).convert("RGB")
+        cropImg.save(resImg, format='JPEG')
+        mediaList.append(tw.postImage(resImg.getvalue()))
 
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content, recentTweet)
@@ -330,6 +333,7 @@ def getXur():
     ## ホークムーン
     # 背景画像の準備
     baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+    resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
     # タイトルと日付挿入
@@ -396,14 +400,15 @@ def getXur():
         draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
     # 表示（テスト用）
-    resImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
-    resImg.save("./tmp/xur_2_weekly_perk_hm.jpg")
-    mediaList.append(tw.postImage("./tmp/xur_2_weekly_perk_hm.jpg"))
+    cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
+    cropImg.save(resImg, format='JPEG')
+    mediaList.append(tw.postImage(resImg.getvalue()))
     tweetText += "\n"
 
     ## デッドマンズテイル
     # 背景画像の準備
     baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+    resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
     # タイトルと日付挿入
@@ -472,9 +477,9 @@ def getXur():
         draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
     # 表示（テスト用）
-    resImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
-    resImg.save("./tmp/xur_2_weekly_perk_dmt.jpg")
-    mediaList.append(tw.postImage("./tmp/xur_2_weekly_perk_dmt.jpg"))
+    cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
+    cropImg.save(resImg, format='JPEG')
+    mediaList.append(tw.postImage(resImg.getvalue()))
 
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content, recentTweet)
@@ -496,6 +501,7 @@ def getXur():
         if w in [0, 4]:
             # フォントと背景画像の準備
             baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+            resImg = io.BytesIO()
             draw = ImageDraw.Draw(baseImg)
                 
             # タイトルと日付挿入
@@ -628,9 +634,9 @@ def getXur():
         if w == 3 or w + 1 == m:
             if w + 1 == m and w % 2 == 0:
                 perkCount += perkMax
-            resImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
-            resImg.save("./tmp/xur_3-" + str(p) + "_legendary_weapon.jpg")
-            mediaList.append(tw.postImage("./tmp/xur_3-" + str(p) + "_legendary_weapon.jpg"))
+            cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+            cropImg.save(resImg, format='JPEG')
+            mediaList.append(tw.postImage(resImg.getvalue()))
             p += 1
 
         w += 1
@@ -650,6 +656,7 @@ def getXur():
         ### 画像生成
         # フォントと背景画像の準備
         baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+        resImg = io.BytesIO()
         draw = ImageDraw.Draw(baseImg)
         
         # タイトルと日付挿入
@@ -725,15 +732,15 @@ def getXur():
                 draw.multiline_text((87 + shift_x, 596 + shift_y), "合計", fill=(255, 255, 255), font=fontN)
                 draw.multiline_text((210 + shift_x, 590 + shift_y), str(statsTotal), fill=(255, 255, 255), font=fontB1)
             
-        resImg = baseImg.crop((0, 0, 1280, 1320)).convert("RGB")
-        resImg.save("./tmp/xur_4_legendary_armor_" + classDictEn[c] + ".jpg")
-        mediaList.append(tw.postImage("./tmp/xur_4_legendary_armor_" + classDictEn[c] + ".jpg"))
+        cropImg = baseImg.crop((0, 0, 1280, 1320)).convert("RGB")
+        cropImg.save(resImg, format='JPEG')
+        mediaList.append(tw.postImage(resImg.getvalue()))
 
     if lArmorSetName[0] == lArmorSetName[1] == lArmorSetName[2]:
         tweetText += "\n防具は「" + lArmorSetName[0] + "」セットが販売されています。"
     else:
         tweetText += "\n防具は「" + lArmorSetName[0] + "」「" + lArmorSetName[1] + "」「" + lArmorSetName[2] + "」セットが販売されています。"
 
-    print("\n全工程完了。")
+    print("情報取得の全工程完了。")
     
     return 0

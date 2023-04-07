@@ -1,6 +1,6 @@
 ### ライブラリのインポート ###
 # 認証関連
-import src.refreshAuth as refreshAuth
+import src.auth as auth
 import os
 # API取得用
 import requests
@@ -8,9 +8,8 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 import io
 # ツイート用
-from . import makeTweet as tw
+from . import tweet as tw
 # 細かい処理用
-import sys
 from time import sleep
 import datetime
 import math
@@ -28,13 +27,13 @@ def getBanshee(flag="Weekly", isRetry=False):
 
     ### アクセスに必要なトークンを取得 ###
 
-    refreshAuth.getBungieAccessToken()
+    auth.getBungieAccessToken()
 
     #### 基本データの取得 ####
 
     # ヘッダーにAPIキーとアクセストークンを設定
     headers = {"X-API-Key": os.getenv('B_API_KEY'),
-            "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
+               "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
     # バンシーに関する情報を取得
     # 取得成功可否も確認する
@@ -107,6 +106,7 @@ def getBanshee(flag="Weekly", isRetry=False):
         if w in [0, 4, 6, 10]:
             # フォントと背景画像の準備
             baseImg = Image.open("./img/banshee_bg.jpg").convert("RGBA")
+            resImg = io.BytesIO()
             draw = ImageDraw.Draw(baseImg)
                 
             # タイトルと日付挿入
@@ -247,13 +247,14 @@ def getBanshee(flag="Weekly", isRetry=False):
             if w + 1 == m and w % 2 == 0:
                 perkCount += perkMax
             if isDaily:
-                resImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
-                resImg.save("./tmp/banshee_daily_legendary_weapon" + str(p) + ".jpg")
-                mediaList.append(tw.postImage("./tmp/banshee_daily_legendary_weapon" + str(p) + ".jpg"))
+                cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+                cropImg.save(resImg, format='JPEG')
+                mediaList.append(tw.postImage(resImg.getvalue()))
             else:
-                resImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
-                resImg.save("./tmp/banshee_weekly_legendary_weapon_" + str(p) + ".jpg")
-                mediaList.append(tw.postImage("./tmp/banshee_daily_legendary_weapon" + str(p) + ".jpg"))
+                cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+                cropImg.save(resImg, format='JPEG')
+                mediaList.append(tw.postImage(resImg.getvalue()))
+                
             if w == 5:
                 content = {"text": tweetText, "media": {"media_ids": mediaList}}
                 tw.makeTweet(content)
@@ -270,6 +271,6 @@ def getBanshee(flag="Weekly", isRetry=False):
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)
 
-    print("\n全工程完了。")
+    print("情報取得の全工程完了。")
     
     return 0

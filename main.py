@@ -1,8 +1,9 @@
+import redis
+import os
 from src import *
-import yaml
 from zoneinfo import ZoneInfo
 import datetime
-import src.makeTweet as tw
+import src.tweet as tw
 
 checkCode = 0
 recatch = False
@@ -10,28 +11,28 @@ TimeZone = ZoneInfo("Asia/Tokyo")
 
 print("定期実行を開始します。")
 
-with open('./operationStatus.yml') as file:
-    currentStatus = yaml.safe_load(file)
+currentStatus = redis.from_url(url=os.getenv('REDIS_URL'))
     
 currentTime = datetime.datetime.now(TimeZone)
     
 # 毎日2時に取得フラグをリセット
 if currentTime.hour == 2:
-    currentStatus['Banshee']['gotDaily'] = False
+    currentStatus.set('gotBansheeDaily', 'False')
+    # 水曜日だった場合は週間フラグもリセット
     if currentTime.weekday() == 2:
-        currentStatus['gotXur'] = False
-        currentStatus['Banshee']['gotWeekly'] = False
+        currentStatus.set('gotXur', 'False')
+        currentStatus.set('gotBansheeWeekly', 'False')
 # 毎日9時はパーク更新があるため、取得フラグをもう一度リセットする
 elif currentTime.hour == 9:
-    currentStatus['Banshee']['gotDaily'] = False
+    currentStatus.set('gotBansheeDaily', 'False')
     recatch = True
 
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
-if currentTime.weekday() in [0, 1, 5, 6] and not currentStatus['gotXur']:
+if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'False':
     print("シュールの情報を取得します。")
-    checkCode = getXurSell.getXur()
+    checkCode = xur.getXur()
     if checkCode == 0:
-        currentStatus['gotXur'] = True
+        currentStatus.set('gotXur', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、シュールの販売アイテムに関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
@@ -39,26 +40,26 @@ if currentTime.weekday() in [0, 1, 5, 6] and not currentStatus['gotXur']:
         tw.makeTweet(contents)
 
 # バンシー44の販売武器に関する情報を未取得だった場合は取得
-if not currentStatus['Banshee']['gotWeekly']:
+if currentStatus.get('gotBansheeWeekly') == b'False':
     print("バンシー44の「ウェポン」「おすすめ」情報を取得します。")
-    checkCode = getBansheeSell.getBanshee("Weekly", recatch)
+    checkCode = banshee.getBanshee("Weekly", recatch)
     if checkCode == 0:
-        currentStatus['Banshee']['gotWeekly'] = True
-elif not currentStatus['Banshee']['gotDaily']:
+        currentStatus.set('gotBansheeWeekly', 'True')
+        currentStatus.set('gotBansheeDaily', 'True')
+    elif checkCode == 5:
+        timeStr = currentTime.strftime('%Y/%m/%d')
+        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
+        contents = {"text": tweetText}
+        tw.makeTweet(contents)
+elif currentStatus.get('gotBansheeDaily') == b'False':
     print("バンシー44の「ウェポン」情報を取得します。")
-    checkCode = getBansheeSell.getBanshee("Daily", recatch)
+    checkCode = banshee.getBanshee("Daily", recatch)
     if checkCode == 0:
-        currentStatus['Banshee']['gotDaily'] = True
+        currentStatus.set('gotBansheeDaily', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 
-finishedTime = datetime.datetime.now()
-currentStatus['lastActive'] = finishedTime.strftime('%Y/%m/%d %I:%M:%S')
-
-print("定期実行完了。")
-
-with open('operationStatus.yml', 'w') as file:
-    yaml.dump(currentStatus, file)
+print("\n定期実行完了。")

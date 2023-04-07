@@ -1,2 +1,2 @@
-from . import getBansheeSell, getXurSell
-__all__ = ['getBansheeSell', 'getXurSell']
+from . import banshee, xur
+__all__ = ['banshee', 'xur']
