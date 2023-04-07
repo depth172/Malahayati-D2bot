@@ -1,5 +1,6 @@
 # Malahayati
 Destiny 2 の日間・週間更新の内容をBungie APIより取得し、画像を生成して自動的につぶやくTwitter botです。
+実際の運用は以下のアカウントで行われています。→[@MalahayatiD2bot](https://twitter.com/MalahayatiD2bot)
 ## ツイートする内容
 - バンシー44が販売する武器について
 - シュールが販売する内容について
