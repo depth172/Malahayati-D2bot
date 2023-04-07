@@ -381,7 +381,7 @@ def getXur():
 
         # パーク挿入
         print(epName + ":")
-        tweetText = epName + ":\n"
+        tweetText += epName + ":\n"
         for i in range(1, 5):
             epPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data'][str(w)]['sockets'][i]['plugHash']
             epPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epPerkHash) + "/?lc=ja", headers=headers).json()
@@ -678,6 +678,10 @@ def getXur():
     else:
         tweetText += "\n防具は「" + lArmorSetName[0] + "」「" + lArmorSetName[1] + "」「" + lArmorSetName[2] + "」セットが販売されています。"
 
+    content = {"text": tweetText, "media": {"media_ids": mediaList}}
+    recentTweet = tw.makeThread(content, recentTweet)
+    mediaList = []
+    
     print("情報取得の全工程完了。")
     
     return 0
