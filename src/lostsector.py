@@ -1,6 +1,6 @@
 ### ライブラリのインポート ###
 # 認証関連
-import auth as auth
+import src.auth as auth
 import os
 # API取得用
 import requests
@@ -8,7 +8,7 @@ import requests
 from PIL import Image, ImageDraw, ImageFont
 import io
 # ツイート用
-import tweet as tw
+from . import tweet as tw
 # 細かい処理用
 from time import sleep
 import datetime
@@ -152,9 +152,9 @@ def getLostSector():
         shift_x += 140
 
     e = 3
-    if sector[sectorRot][3][0]:
+    if sector[sectorRot][3]:
         e += 1
-    if sector[sectorRot][4][0]:
+    if sector[sectorRot][4]:
         e += 1
     for i in range(3, e):
         elemData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyDamageTypeDefinition/" + str(elemHash[sector[sectorRot][i][0]]) + "/?lc=ja", headers=headers).json()

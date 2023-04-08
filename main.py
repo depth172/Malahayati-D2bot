@@ -52,7 +52,7 @@ if currentStatus.get('gotBansheeWeekly') == b'False':
         currentStatus.set('gotBansheeDaily', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
-        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
+        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の週間販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 elif currentStatus.get('gotBansheeDaily') == b'False':
@@ -62,7 +62,7 @@ elif currentStatus.get('gotBansheeDaily') == b'False':
         currentStatus.set('gotBansheeDaily', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
-        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
+        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の日間販売武器に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 
@@ -74,7 +74,7 @@ if currentStatus.get('gotSector') == b'False':
         currentStatus.set('gotSector', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
-        tweetText = "【 #失われたセクター 情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
+        tweetText = "【失われたセクター情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 
