@@ -23,7 +23,7 @@ def getLostSector():
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
     # 画像生成用のフォント定義
-    fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 20)
+    fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
     fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
