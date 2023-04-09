@@ -113,15 +113,19 @@ def getLostSector():
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatName = threatData['Response']['displayProperties']['name']
 
-    surgeHash = sectorData['Response']['modifiers'][16]['activityModifierHash']
-    surgeData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surgeHash) + "/?lc=ja", headers=headers).json()
-    surgeName = surgeData['Response']['displayProperties']['name']
+    surge1Hash = sectorData['Response']['modifiers'][int(sector[sectorRot][5])]['activityModifierHash']
+    surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
+    surge1Name = surge1Data['Response']['displayProperties']['name']
+
+    surge2Hash = sectorData['Response']['modifiers'][16]['activityModifierHash']
+    surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
+    surge2Name = surge2Data['Response']['displayProperties']['name']
 
     ocHash = sectorData['Response']['modifiers'][17]['activityModifierHash']
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocName = ocData['Response']['displayProperties']['name']
 
-    tweetText += "\n\n戦闘条件: \n" + threatName + ", " + element[sector[sectorRot][5]] + "/" + surgeName + "\n" + ocName
+    tweetText += "\n\n戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
     tweetText += "\n\n#Destiny2"
 
