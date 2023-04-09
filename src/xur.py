@@ -30,6 +30,7 @@ def getXur():
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
     fontB3 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 45)
     fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
 
@@ -105,6 +106,7 @@ def getXur():
     # 表示（テスト用）
     print("シュールの現在位置: " + locationText + "\n")
 
+    baseImg.paste(logoImg, (30, 654), logoImg)
     cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
     cropImg.save(resImg, format='JPEG')
     mediaList.append(tw.postImage(resImg.getvalue()))
@@ -229,6 +231,7 @@ def getXur():
                 eWeaponInstPerkDesc = textwrap.fill(eWeaponInstPerkDesc, 29)
             draw.multiline_text((520, 545 + 22 * cl), eWeaponInstPerkDesc, fill=(255, 255, 255), font=fontN)
 
+    baseImg.paste(logoImg, (30, 654), logoImg)
     cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
     cropImg.save(resImg, format='JPEG')
     mediaList.append(tw.postImage(resImg.getvalue()))
@@ -317,6 +320,7 @@ def getXur():
         draw.multiline_text((722, 737), "合計", fill=(255, 255, 255), font=fontN)
         draw.multiline_text((845, 730), str(statsTotal), fill=(255, 255, 255), font=fontB1)
         
+        baseImg.paste(logoImg, (30, 754), logoImg)
         cropImg = baseImg.crop((0, 0, 1280, 820)).convert("RGB")
         cropImg.save(resImg, format='JPEG')
         mediaList.append(tw.postImage(resImg.getvalue()))
@@ -395,7 +399,7 @@ def getXur():
 
         ## ステータスグラフ挿入
         epStats = vendor[0]['Response']['itemComponents']['stats']['data'][str(w)]['stats']
-        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + epHash + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
+        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
         draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
         draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
         for s in range(4):
@@ -413,6 +417,7 @@ def getXur():
             draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
         # 表示
+        baseImg.paste(logoImg, (950, 784), logoImg)
         cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
         cropImg.save(resImg, format='JPEG')
         mediaList.append(tw.postImage(resImg.getvalue()))
@@ -571,7 +576,9 @@ def getXur():
         if w == 3 or w + 1 == m:
             if w + 1 == m and w % 2 == 0:
                 perkCount += perkMax
-            cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+            imgHeight = 225 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount
+            baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)            
+            cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
             cropImg.save(resImg, format='JPEG')
             mediaList.append(tw.postImage(resImg.getvalue()))
             p += 1
@@ -669,6 +676,7 @@ def getXur():
                 draw.multiline_text((87 + shift_x, 596 + shift_y), "合計", fill=(255, 255, 255), font=fontN)
                 draw.multiline_text((210 + shift_x, 590 + shift_y), str(statsTotal), fill=(255, 255, 255), font=fontB1)
             
+        baseImg.paste(logoImg, (950, 1254), logoImg)            
         cropImg = baseImg.crop((0, 0, 1280, 1320)).convert("RGB")
         cropImg.save(resImg, format='JPEG')
         mediaList.append(tw.postImage(resImg.getvalue()))

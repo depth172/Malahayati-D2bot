@@ -25,10 +25,10 @@ def getLostSector():
     # 画像生成用のフォント定義
     fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
-    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
     fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
     auth.getBungieAccessToken()
@@ -140,8 +140,10 @@ def getLostSector():
     draw.text((490, 40), "(" + todayDateStr + ")", fill=(255, 255, 255), font=fontB2)
     draw.text((1240, 680), sectorName, fill=(255, 255, 255), font=fontTitle, anchor="rb")
     draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontB1, anchor="rb")
+    draw.multiline_text((25, 400), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
     draw.text((25, 600), "伝説:", fill=(255, 255, 255), font=fontN)
     draw.text((25, 660), "達人:", fill=(255, 255, 255), font=fontN)
+    baseImg.paste(logoImg, (935, 45), logoImg)
 
     for i in range(1, 3):
         icon = Image.open("./img/" + sector[sectorRot][i][0] + ".png").resize((70, 70))

@@ -25,6 +25,7 @@ def getBanshee(flag="Weekly", isRetry=False):
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
     fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
 
@@ -109,7 +110,7 @@ def getBanshee(flag="Weekly", isRetry=False):
         if w in [0, 4, 6, 10]:
             # フォントと背景画像の準備
             resImg = io.BytesIO()
-                
+
             # タイトルと日付挿入
             if isDaily == False:
                 baseImg = Image.open("./img/banshee_weekly_bg.jpg").convert("RGBA")
@@ -252,14 +253,16 @@ def getBanshee(flag="Weekly", isRetry=False):
             if w + 1 == m and w % 2 == 0:
                 perkCount += perkMax
             if isDaily:
-                cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+                imgHeight = 225 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount
+                baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
+                cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
                 cropImg.save(resImg, format='JPEG')
-                cropImg.show()
                 mediaList.append(tw.postImage(resImg.getvalue()))
             else:
-                cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
+                imgHeight = 225 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount
+                baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
+                cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
                 cropImg.save(resImg, format='JPEG')
-                cropImg.show()
                 mediaList.append(tw.postImage(resImg.getvalue()))
                 
             if w == 5:
