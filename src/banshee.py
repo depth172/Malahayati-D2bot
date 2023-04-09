@@ -108,17 +108,19 @@ def getBanshee(flag="Weekly", isRetry=False):
     while w < m:
         if w in [0, 4, 6, 10]:
             # フォントと背景画像の準備
-            baseImg = Image.open("./img/banshee_bg.jpg").convert("RGBA")
             resImg = io.BytesIO()
-            draw = ImageDraw.Draw(baseImg)
                 
             # タイトルと日付挿入
             if isDaily == False:
+                baseImg = Image.open("./img/banshee_weekly_bg.jpg").convert("RGBA")
+                draw = ImageDraw.Draw(baseImg)
                 draw.multiline_text((30, 25), "今週のバンシー44", fill=(255, 255, 255), font=fontTitle)
                 draw.multiline_text((520, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
                 draw.multiline_text((30, 120), "<週替わり武器 (" + str(p) + "/2)>", fill=(255, 255, 255), font=fontB1)
                 draw.multiline_text((400, 130), "＊「ウェポン」の欄に販売される武器は週替わりとなります。", fill=(255, 255, 255), font=fontN)
             else:
+                baseImg = Image.open("./img/banshee_daily_bg.jpg").convert("RGBA")
+                draw = ImageDraw.Draw(baseImg)
                 draw.multiline_text((30, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
                 draw.multiline_text((520, 40), "(" + startDateStr + ")", fill=(255, 255, 255), font=fontB2)
                 draw.multiline_text((30, 120), "<日替わり武器 (" + str(p) + "/2)>", fill=(255, 255, 255), font=fontB1)
@@ -252,10 +254,12 @@ def getBanshee(flag="Weekly", isRetry=False):
             if isDaily:
                 cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
                 cropImg.save(resImg, format='JPEG')
+                cropImg.show()
                 mediaList.append(tw.postImage(resImg.getvalue()))
             else:
                 cropImg = baseImg.crop((0, 0, 1280, 200 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount)).convert("RGB")
                 cropImg.save(resImg, format='JPEG')
+                cropImg.show()
                 mediaList.append(tw.postImage(resImg.getvalue()))
                 
             if w == 5:
