@@ -267,9 +267,9 @@ def getBanshee(flag="Weekly", isRetry=False):
                 tw.makeTweet(content)
                 mediaList = []
                 if not isRetry:
-                    tweetText += "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
+                    tweetText = "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
                 else:
-                    tweetText += "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+                    tweetText = "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
                 print("\n日替わり武器:")
                 isDaily = True
                 p = 1
