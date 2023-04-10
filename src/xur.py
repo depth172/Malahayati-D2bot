@@ -101,7 +101,7 @@ def getXur():
     draw.text((1240, 580), locationText, fill=(255, 255, 255), anchor="rt", font=fontTitle)
     draw.text((1240, 660), "▼アイテム詳細はツリーを確認", fill=(255, 255, 255), anchor="rt", font=fontB0)
 
-    tweetText += "【ベンダー情報】\n今日は土曜日です。シュールが “" + locationText + "” にて出没していることが確認されています。\n\n#Destiny2"
+    tweetText += "【 #シュール 情報】\n今日は土曜日です。シュールが “" + locationText + "” にて出没していることが確認されています。\n\n#Destiny2"
 
     # 表示（テスト用）
     print("シュールの現在位置: " + locationText + "\n")
