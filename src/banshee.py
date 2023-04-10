@@ -82,9 +82,9 @@ def getBanshee(flag="Weekly", isRetry=False):
     if flag == "Weekly":
         # 週替わり武器の取得
         if startDate.weekday() == 2:
-            tweetText += "【ベンダー情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "、週間リセットの日です。\nバンシー44が販売する週替わり武器は以下のようになっています。\nこちらのパーク構成は、木曜日の午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
+            tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "、週間リセットの日です。\nバンシー44が販売する週替わり武器は以下のようになっています。\nこちらのパーク構成は、木曜日の午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
         else:
-            tweetText += "【ベンダー情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+            tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
         print("週替わり武器:")
         endDate = startDate + datetime.timedelta(days=6)
         endDateStr = endDate.strftime('%Y/%m/%d')
@@ -93,9 +93,9 @@ def getBanshee(flag="Weekly", isRetry=False):
     else:
         # 日替わり武器の取得
         if not isRetry:
-            tweetText += "【ベンダー情報 / 毎日更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
+            tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
         else:
-            tweetText += "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+            tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
         print("日替わり武器:")
         isDaily = True
         w = 6
@@ -270,9 +270,9 @@ def getBanshee(flag="Weekly", isRetry=False):
                 tw.makeTweet(content)
                 mediaList = []
                 if not isRetry:
-                    tweetText = "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
+                    tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
                 else:
-                    tweetText = "【ベンダー情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+                    tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
                 print("\n日替わり武器:")
                 isDaily = True
                 p = 1
