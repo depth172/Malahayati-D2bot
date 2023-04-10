@@ -174,6 +174,17 @@ def getLostSector():
         draw.text((180 + shift_x, 662), "×" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
         shift_x += 140
 
+    if sectorData['Response']['modifiers'][9]:
+        modHash = sectorData['Response']['modifiers'][9]['activityModifierHash']
+        modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
+        modName = modData['Response']['displayProperties']['name']
+        modDesc = modData['Response']['displayProperties']['description']
+        modPath = modData['Response']['displayProperties']['icon']
+        modImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + modPath).content)).convert("RGBA").resize((60, 60), 1)
+        baseImg.paste(modImg, (25, 283), modImg)
+        draw.text((102, 288), modName, fill=(255, 255, 255), font=fontB1)
+        draw.text((40, 356), modDesc, fill=(255, 255, 255), font=fontN)
+
     baseImg.convert("RGB").save(resImg, format='JPEG')
 
     mediaList.append(tw.postImage(resImg.getvalue()))
