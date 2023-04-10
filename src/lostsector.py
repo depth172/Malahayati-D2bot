@@ -73,6 +73,7 @@ def getLostSector():
     # ローテーション取得
     sectorRot = seasonal[0][elapsedDate % len(seasonal[0])]
     armorRot = armor[elapsedDate % 4]
+    surgeRot = 14 + elapsedDate // 7 % 2
 
     sectorHash = sector[sectorRot][0]
 
@@ -113,7 +114,7 @@ def getLostSector():
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatName = threatData['Response']['displayProperties']['name']
 
-    surge1Hash = sectorData['Response']['modifiers'][int(sector[sectorRot][5])]['activityModifierHash']
+    surge1Hash = sectorData['Response']['modifiers'][surgeRot]['activityModifierHash']
     surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
     surge1Name = surge1Data['Response']['displayProperties']['name']
 
@@ -125,7 +126,7 @@ def getLostSector():
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocName = ocData['Response']['displayProperties']['name']
 
-    tweetText += "\n\n戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
+    tweetText += "\n\n本日の戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
     tweetText += "\n\n#Destiny2"
 
