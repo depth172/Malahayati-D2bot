@@ -12,6 +12,7 @@ from . import tweet as tw
 # 細かい処理用
 from time import sleep
 import datetime
+from zoneinfo import ZoneInfo
 import textwrap
 import math
 
@@ -20,7 +21,6 @@ def getXur():
     statsTable = ['2996146975', '392767087', '1943323491', '1735777505', '144602215', '4244567218']
     weaponStatsTable = ['1240592695', '155624089', '943549884', '4188031367']
     classDict = {0: "ハンター", 1:"タイタン", 2:"ウォーロック"}
-    classDictEn = {0: "hunter", 1:"titan", 2:"warlock"}
     partsOrder = [17, 14, 15, 18, 16]
 
     # 画像生成用のフォント定義
@@ -70,7 +70,9 @@ def getXur():
             break
 
     # 日付データの準備
-    startDate = datetime.datetime.now()
+    TimeZone = ZoneInfo("Asia/Tokyo")
+    
+    startDate = datetime.datetime.now(TimeZone)
     endDate = startDate + datetime.timedelta(days=3)
     startDateStr = startDate.strftime('%Y/%m/%d')
     endDateStr = endDate.strftime('%Y/%m/%d')
@@ -144,11 +146,6 @@ def getXur():
 
     ## タイトルと日付挿入
     draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
-
-    startDate = datetime.datetime.now()
-    endDate = startDate + datetime.timedelta(days=3)
-    startDateStr = startDate.strftime('%Y/%m/%d')
-    endDateStr = endDate.strftime('%Y/%m/%d')
 
     draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
     draw.multiline_text((30, 120), "<エキゾチック武器>", fill=(255, 255, 255), font=fontB1)

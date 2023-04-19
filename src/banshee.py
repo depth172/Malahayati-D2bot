@@ -81,7 +81,7 @@ def getBanshee(flag="Weekly", isRetry=False):
 
     if flag == "Weekly":
         # 週替わり武器の取得
-        if startDate.weekday() == 2:
+        if not isRetry:
             tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "、週間リセットの日です。\nバンシー44が販売する週替わり武器は以下のようになっています。\nこちらのパーク構成は、木曜日の午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
         else:
             tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器のパークが以下のように更新されました。\n\n#Destiny2"

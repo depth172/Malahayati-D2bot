@@ -5,11 +5,12 @@ from zoneinfo import ZoneInfo
 import datetime
 import src.tweet as tw
 
+gotInfo = False
 checkCode = 0
 recatch = False
 TimeZone = ZoneInfo("Asia/Tokyo")
 
-print("定期実行を開始します。")
+print("定期実行を開始します。\n")
 
 currentStatus = redis.from_url(url=os.getenv('REDIS_URL'))
 
@@ -33,6 +34,7 @@ elif currentTime.hour == 9:
 
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
 if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'False':
+    gotInfo = True
     print("シュールの情報を取得します。")
     checkCode = xur.getXur()
     if checkCode == 0:
@@ -45,6 +47,7 @@ if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'Fa
 
 # バンシー44の販売武器に関する情報を未取得だった場合は取得
 if currentStatus.get('gotBansheeWeekly') == b'False':
+    gotInfo = True
     print("バンシー44の「ウェポン」「おすすめ」情報を取得します。")
     checkCode = banshee.getBanshee("Weekly", recatch)
     if checkCode == 0:
@@ -56,6 +59,7 @@ if currentStatus.get('gotBansheeWeekly') == b'False':
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 elif currentStatus.get('gotBansheeDaily') == b'False':
+    gotInfo = True
     print("バンシー44の「ウェポン」情報を取得します。")
     checkCode = banshee.getBanshee("Daily", recatch)
     if checkCode == 0:
@@ -68,6 +72,7 @@ elif currentStatus.get('gotBansheeDaily') == b'False':
 
 # 失われたセクターの情報を未取得だった場合は取得
 if currentStatus.get('gotSector') == b'False':
+    gotInfo = True
     print("失われたセクターの情報を取得します。")
     checkCode = lostsector.getLostSector()
     if checkCode == 0:
@@ -77,5 +82,8 @@ if currentStatus.get('gotSector') == b'False':
         tweetText = "【失われたセクター情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。1時間後に再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        
+if not gotInfo:
+    print("新しく取得する情報はありませんでした。")
 
 print("\n定期実行完了。")
