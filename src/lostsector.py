@@ -19,7 +19,6 @@ def getLostSector():
     # 頻出する辞書とリストの定義
     armor = {0: 'チェストアーマー', 1: 'ヘルメット', 2: 'レッグアーマー', 3: 'ガントレット'}
     champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
-    element = {'solar': "ソーラー", 'arc': "アーク", 'void': "ボイド", 'stasis': "ステイシス", 'strand': "ストランド"}
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
     # 画像生成用のフォント定義
@@ -73,7 +72,7 @@ def getLostSector():
     # ローテーション取得
     sectorRot = seasonal[0][elapsedDate % len(seasonal[0])]
     armorRot = armor[elapsedDate % 4]
-    surgeRot = 14 + elapsedDate // 7 % 2
+    surgeRot = 16 + elapsedDate // 7 % 2
 
     sectorHash = sector[sectorRot][0]
 
@@ -110,7 +109,7 @@ def getLostSector():
     tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
     tweetText += "\n\n報酬部位: " + armorRot
 
-    threatHash = sectorData['Response']['modifiers'][8]['activityModifierHash']
+    threatHash = sectorData['Response']['modifiers'][10]['activityModifierHash']
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatName = threatData['Response']['displayProperties']['name']
 
@@ -118,11 +117,11 @@ def getLostSector():
     surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
     surge1Name = surge1Data['Response']['displayProperties']['name']
 
-    surge2Hash = sectorData['Response']['modifiers'][16]['activityModifierHash']
+    surge2Hash = sectorData['Response']['modifiers'][18]['activityModifierHash']
     surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
     surge2Name = surge2Data['Response']['displayProperties']['name']
 
-    ocHash = sectorData['Response']['modifiers'][17]['activityModifierHash']
+    ocHash = sectorData['Response']['modifiers'][19]['activityModifierHash']
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocName = ocData['Response']['displayProperties']['name']
 
@@ -174,8 +173,8 @@ def getLostSector():
         draw.text((180 + shift_x, 662), "×" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
         shift_x += 140
 
-    if sectorData['Response']['modifiers'][9]:
-        modHash = sectorData['Response']['modifiers'][9]['activityModifierHash']
+    if not sectorData['Response']['modifiers'][11]['activityModifierHash'] in [1783825372]:
+        modHash = sectorData['Response']['modifiers'][11]['activityModifierHash']
         modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
         modName = modData['Response']['displayProperties']['name']
         modDesc = modData['Response']['displayProperties']['description']
