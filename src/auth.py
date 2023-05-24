@@ -2,7 +2,6 @@ import base64
 import redis
 import os
 import requests
-from requests_oauthlib import OAuth1Session
 
 ## アクセスに必要なトークンを取得
 def getBungieAccessToken():
