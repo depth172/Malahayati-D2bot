@@ -24,6 +24,7 @@ def getLostSector():
     # 画像生成用のフォント定義
     fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
+    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
     fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
@@ -38,7 +39,7 @@ def getLostSector():
             "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
     # CSVデータの準備
-    with open('data/season20.csv') as f:
+    with open('data/season21.csv') as f:
         reader = csv.reader(f)
         seasonal = [row for row in reader]
     with open('data/sectorBase.csv') as f:
@@ -66,13 +67,16 @@ def getLostSector():
     todayDate = datetime.datetime.now(TimeZone).date()
     todayDateStr = todayDate.strftime('%Y/%m/%d')
 
+    baseDate = datetime.date(2023, 3, 1)
     seasonStartDate = datetime.date(int(seasonal[1][0]), int(seasonal[1][1]), int(seasonal[1][2]))
-    elapsedDate = (todayDate - seasonStartDate).days
+    
+    seasonElapsedDate = (todayDate - seasonStartDate).days
+    totalElapsedDate = (todayDate - baseDate).days
 
     # ローテーション取得
-    sectorRot = seasonal[0][elapsedDate % len(seasonal[0])]
-    armorRot = armor[elapsedDate % 4]
-    surgeRot = 16 + elapsedDate // 7 % 2
+    sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
+    armorRot = armor[totalElapsedDate % 4]
+    surgeRot = 16 + seasonElapsedDate // 7 % 2
 
     sectorHash = sector[sectorRot][0]
 
@@ -101,6 +105,10 @@ def getLostSector():
 
     sectorName = sectorData['Response']['originalDisplayProperties']['name']
 
+    sectorPlanetHash = sectorData['Response']['placeHash']
+    sectorPlanetData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyPlaceDefinition/" + str(sectorPlanetHash) + "/?lc=ja", headers=headers).json()
+    sectorPlanetName = sectorPlanetData['Response']['displayProperties']['name']
+
     sectorLocHash = sectorData['Response']['destinationHash']
     sectorLocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyDestinationDefinition/" + str(sectorLocHash) + "/?lc=ja", headers=headers).json()
     sectorLocName = sectorLocData['Response']['displayProperties']['name']
@@ -128,6 +136,8 @@ def getLostSector():
     tweetText += "\n\n本日の戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
     tweetText += "\n\n#Destiny2"
+    
+    print(tweetText + "\n")
 
     # 画像生成
     imageURL = sectorData['Response']['pgcrImage']
@@ -143,7 +153,13 @@ def getLostSector():
     draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontTitle)
     draw.text((490, 40), "(" + todayDateStr + ")", fill=(255, 255, 255), font=fontB2)
     draw.text((1240, 680), sectorName, fill=(255, 255, 255), font=fontTitle, anchor="rb")
-    draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontB1, anchor="rb")
+    
+    if sectorLocName == sectorPlanetName:
+        draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontB0, anchor="rb")
+    else:
+        sectorDestName = sectorPlanetName + ", " + sectorLocName
+        draw.text((1235, 600), sectorDestName, fill=(255, 255, 255), font=fontB0, anchor="rb")
+    
     draw.multiline_text((25, 400), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
     draw.text((25, 600), "伝説:", fill=(255, 255, 255), font=fontN)
     draw.text((25, 660), "達人:", fill=(255, 255, 255), font=fontN)
@@ -190,7 +206,6 @@ def getLostSector():
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)
 
-    print(tweetText + "\n")
     print("情報取得の全工程完了。")
     
     return 0

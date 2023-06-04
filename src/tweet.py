@@ -37,7 +37,7 @@ def getTwitterAccessToken():
     access_token = oauth_tokens["oauth_token"]
     access_token_secret = oauth_tokens["oauth_token_secret"]
     
-    # アクセストークンをファイルに保存
+    # アクセストークンを環境変数に保存
     data.set('twitter_access_token', access_token)
     data.set('twitter_access_token_secret', access_token_secret)
 
