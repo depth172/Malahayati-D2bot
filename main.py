@@ -32,6 +32,9 @@ elif currentTime.hour == 9:
     if currentTime.weekday() == 3:
         currentStatus.set('gotBansheeWeekly', 'False')
 
+# シーズンはじめの一時処理
+currentStatus.set('gotSector', 'True')
+
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
 if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'False':
     gotInfo = True
