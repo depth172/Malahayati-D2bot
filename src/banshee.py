@@ -15,7 +15,7 @@ import datetime
 from zoneinfo import ZoneInfo
 import math
 
-def getBanshee(flag="Weekly", isRetry=False):
+def getBanshee(flag="Weekly"):
     # 頻出する辞書とリストの定義
     weekday = {0: '月曜日', 1: '火曜日', 2: '水曜日', 3: '木曜日', 4: '金曜日', 5: '土曜日', 6: '日曜日'}
 
@@ -67,6 +67,9 @@ def getBanshee(flag="Weekly", isRetry=False):
     startDate = datetime.datetime.now(TimeZone)
     startDateStr = startDate.strftime('%Y/%m/%d')
 
+    endDate = startDate + datetime.timedelta(days = 8 - startDate.weekday())
+    endDateStr = endDate.strftime('%Y/%m/%d')
+
     tweetText = ""
     mediaList = []
 
@@ -81,21 +84,15 @@ def getBanshee(flag="Weekly", isRetry=False):
 
     if flag == "Weekly":
         # 週替わり武器の取得
-        if not isRetry:
-            tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "、週間リセットの日です。\nバンシー44が販売する週替わり武器は以下のようになっています。\nこちらのパーク構成は、木曜日の午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
-        else:
-            tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+        tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器が以下のように更新されました。\n\n#Destiny2"
         print("週替わり武器:")
-        endDate = startDate + datetime.timedelta(days=6)
+        endDate = startDate + datetime.timedelta(days = 3 - startDate.weekday())
         endDateStr = endDate.strftime('%Y/%m/%d')
         isDaily = False
         w = 0
     else:
         # 日替わり武器の取得
-        if not isRetry:
-            tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
-        else:
-            tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+        tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器が以下のように更新されました。\n\n#Destiny2"
         print("日替わり武器:")
         isDaily = True
         w = 6
@@ -125,7 +122,7 @@ def getBanshee(flag="Weekly", isRetry=False):
                 draw.multiline_text((30, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
                 draw.multiline_text((520, 40), "(" + startDateStr + ")", fill=(255, 255, 255), font=fontB2)
                 draw.multiline_text((30, 120), "<日替わり武器 (" + str(p) + "/2)>", fill=(255, 255, 255), font=fontB1)
-                draw.multiline_text((400, 130), "＊「おすすめ」の欄に販売される武器は日替わりとなります。", fill=(255, 255, 255), font=fontN)
+                draw.multiline_text((400, 130), "＊「注目」の欄に販売される武器は日替わりとなります。", fill=(255, 255, 255), font=fontN)
 
             shift_x = 0
             shift_y = 0
@@ -269,10 +266,7 @@ def getBanshee(flag="Weekly", isRetry=False):
                 content = {"text": tweetText, "media": {"media_ids": mediaList}}
                 tw.makeTweet(content)
                 mediaList = []
-                if not isRetry:
-                    tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器は以下のようになっています。\nこちらのパーク構成は、本日午前9時にて別のものに更新されるためご注意ください。\n\n#Destiny2"
-                else:
-                    tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器のパークが以下のように更新されました。\n\n#Destiny2"
+                tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器が以下のように更新されました。\n\n#Destiny2"
                 print("\n日替わり武器:")
                 isDaily = True
                 p = 1

@@ -16,18 +16,16 @@ currentStatus = redis.from_url(url=os.getenv('REDIS_URL'))
 
 currentTime = datetime.datetime.now(TimeZone)
 
-# 毎日2時に取得フラグをリセット
+# 毎日2時にセクター取得フラグをリセット
 if currentTime.hour == 2:
-    currentStatus.set('gotBansheeDaily', 'False')
     currentStatus.set('gotSector', 'False')
     # 水曜日だった場合は週間フラグもリセット
     if currentTime.weekday() == 2:
         currentStatus.set('gotXur', 'False')
         currentStatus.set('gotBansheeWeekly', 'False')
-# 毎日9時はパーク更新があるため、取得フラグをもう一度リセットする
+# 毎日9時のバンシー取得フラグをリセットする
 elif currentTime.hour == 9:
     currentStatus.set('gotBansheeDaily', 'False')
-    recatch = True
     # 木曜日だった場合は週間フラグもリセット
     if currentTime.weekday() == 3:
         currentStatus.set('gotBansheeWeekly', 'False')
@@ -52,7 +50,7 @@ if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'Fa
 if currentStatus.get('gotBansheeWeekly') == b'False':
     gotInfo = True
     print("バンシー44の「ウェポン」「おすすめ」情報を取得します。")
-    checkCode = banshee.getBanshee("Weekly", recatch)
+    checkCode = banshee.getBanshee("Weekly")
     if checkCode == 0:
         currentStatus.set('gotBansheeWeekly', 'True')
         currentStatus.set('gotBansheeDaily', 'True')
@@ -64,7 +62,7 @@ if currentStatus.get('gotBansheeWeekly') == b'False':
 elif currentStatus.get('gotBansheeDaily') == b'False':
     gotInfo = True
     print("バンシー44の「ウェポン」情報を取得します。")
-    checkCode = banshee.getBanshee("Daily", recatch)
+    checkCode = banshee.getBanshee("Daily")
     if checkCode == 0:
         currentStatus.set('gotBansheeDaily', 'True')
     elif checkCode == 5:

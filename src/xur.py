@@ -21,7 +21,7 @@ def getXur():
     statsTable = ['2996146975', '392767087', '1943323491', '1735777505', '144602215', '4244567218']
     weaponStatsTable = ['1240592695', '155624089', '943549884', '4188031367']
     classDict = {0: "ハンター", 1:"タイタン", 2:"ウォーロック"}
-    partsOrder = [17, 14, 15, 18, 16]
+    partsOrder = [16, 13, 14, 17, 15]
 
     # 画像生成用のフォント定義
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
@@ -73,8 +73,9 @@ def getXur():
     TimeZone = ZoneInfo("Asia/Tokyo")
     
     startDate = datetime.datetime.now(TimeZone)
-    endDate = startDate + datetime.timedelta(days=3)
     startDateStr = startDate.strftime('%Y/%m/%d')
+ 
+    endDate = startDate + datetime.timedelta(days = 8 - startDate.weekday())
     endDateStr = endDate.strftime('%Y/%m/%d')
 
     tweetText = ""
@@ -236,7 +237,7 @@ def getXur():
     #### 販売しているエキゾチック防具の取得と画像生成 ###
     for c in range(3):
         ### データ取得
-        eArmorHash = vendor[0]['Response']['sales']['data'][salesList[0][c + 4]]['itemHash']
+        eArmorHash = vendor[0]['Response']['sales']['data'][salesList[0][c + 3]]['itemHash']
         eArmorData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(eArmorHash) + "/?lc=ja", headers=headers).json()
         # データを文字列に変換
         eArmorName = eArmorData['Response']['displayProperties']['name']
@@ -296,7 +297,7 @@ def getXur():
         draw.multiline_text((180, 410), eArmorInstDesc, fill=(255, 255, 255), font=fontN)
         
         ## ステータスグラフ挿入
-        eArmorStats = vendor[0]['Response']['itemComponents']['stats']['data'][salesList[0][c + 4]]['stats']
+        eArmorStats = vendor[0]['Response']['itemComponents']['stats']['data'][salesList[0][c + 3]]['stats']
 
         draw.multiline_text((720, 360), "防具のステータス値", fill=(255, 255, 255), font=fontB1)
         draw.line(((715, 415), (1235, 415)), (255, 255, 255), 2)
@@ -328,97 +329,96 @@ def getXur():
 
     print("")
 
-    #### ホークムーン、デッドマンズテイルのパークの取得 ####
+    #### ホークムーンのパークの取得 ####
     tweetText = "＜週替わりパーク武器＞\n"
     
-    for w in range(31, 33):
-        epHash = vendor[0]['Response']['sales']['data'][str(w)]['itemHash']
-        epData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()
+    epHash = vendor[0]['Response']['sales']['data']['31']['itemHash']
+    epData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()
+    
+    # 背景画像の準備
+    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
+    resImg = io.BytesIO()
+    draw = ImageDraw.Draw(baseImg)
+
+    # タイトルと日付挿入
+    draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
+    draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
+    draw.multiline_text((30, 120), "<週替わりパークのエキゾチック武器>", fill=(255, 255, 255), font=fontB1)
+
+    ## 武器画像挿入
+    # パスから画像を取得
+    epImgPath = epData['Response']['displayProperties']['icon']
+    epWMPath = epData['Response']['quality']['displayVersionWatermarkIcons'][0]
+    epBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epImgPath).content))
+    epBaseImg.putalpha(255)
+    epWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epWMPath).content)).convert("RGBA")
+    # 武器画像とウォーターマークを合成
+    epImg = Image.alpha_composite(epBaseImg, epWM)
+    # リサイズして挿入
+    epImg = epImg.resize((120, 120), 1)
+    baseImg.paste(epImg, (50, 185))
+
+    ## 武器名挿入
+    epName = epData['Response']['displayProperties']['name']
+    draw.multiline_text((210, 180), epName, fill=(255, 255, 255), font=fontB3)
         
-        # 背景画像の準備
-        baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
-        resImg = io.BytesIO()
-        draw = ImageDraw.Draw(baseImg)
+    ## 武器種挿入
+    epArchName = epData['Response']['itemTypeDisplayName']
+    draw.multiline_text((210, 250), epArchName, fill=(255, 255, 255), font=fontB1)
 
-        # タイトルと日付挿入
-        draw.multiline_text((30, 25), "今週のシュール", fill=(255, 255, 255), font=fontTitle)
-        draw.multiline_text((430, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
-        draw.multiline_text((30, 120), "<週替わりパークのエキゾチック武器>", fill=(255, 255, 255), font=fontB1)
+    ## 内在特性挿入
+    # 画像挿入
+    epInstHash = epData['Response']['sockets']['socketEntries'][0]['singleInitialItemHash']
+    epInstData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epInstHash) + "/?lc=ja", headers=headers).json()
+    epInstPath = epInstData['Response']['displayProperties']['icon']
+    epInstImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epInstPath).content)).convert("RGBA")
 
-        ## 武器画像挿入
-        # パスから画像を取得
-        epImgPath = epData['Response']['displayProperties']['icon']
-        epWMPath = epData['Response']['quality']['displayVersionWatermarkIcons'][0]
-        epBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epImgPath).content))
-        epBaseImg.putalpha(255)
-        epWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epWMPath).content)).convert("RGBA")
-        # 武器画像とウォーターマークを合成
-        epImg = Image.alpha_composite(epBaseImg, epWM)
-        # リサイズして挿入
-        epImg = epImg.resize((120, 120), 1)
-        baseImg.paste(epImg, (50, 185))
+    epInstImg = epInstImg.resize((100, 100), 1)
+    baseImg.paste(epInstImg, (60, 335), epInstImg)
+    
+    ## 特性名・説明文挿入
+    epInstName = epInstData['Response']['displayProperties']['name']
+    draw.multiline_text((180, 358), epInstName, fill=(255, 255, 255), font=fontB1)
 
-        ## 武器名挿入
-        epName = epData['Response']['displayProperties']['name']
-        draw.multiline_text((210, 180), epName, fill=(255, 255, 255), font=fontB3)
-            
-        ## 武器種挿入
-        epArchName = epData['Response']['itemTypeDisplayName']
-        draw.multiline_text((210, 250), epArchName, fill=(255, 255, 255), font=fontB1)
+    # パーク挿入
+    print(epName + ":")
+    tweetText += epName + ":\n"
+    for i in range(1, 5):
+        epPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data']['31']['sockets'][i]['plugHash']
+        epPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epPerkHash) + "/?lc=ja", headers=headers).json()
+        epPerkPath = epPerkData['Response']['displayProperties']['icon']
+        epPerkName = epPerkData['Response']['displayProperties']['name']
+        print("　" + epPerkName)
+        tweetText += "- " + epPerkName + "\n"
+        epPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epPerkPath).content)).convert("RGBA").resize((80, 80), 1)
+        baseImg.paste(epPerkImg, (73, 450 + 93 * (i - 1)), epPerkImg)
+        draw.multiline_text((180, 465 + 93 * (i - 1)), epPerkName, fill=(255, 255, 255), font=fontB1)
 
-        ## 内在特性挿入
-        # 画像挿入
-        epInstHash = epData['Response']['sockets']['socketEntries'][0]['singleInitialItemHash']
-        epInstData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epInstHash) + "/?lc=ja", headers=headers).json()
-        epInstPath = epInstData['Response']['displayProperties']['icon']
-        epInstImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epInstPath).content)).convert("RGBA")
+    ## ステータスグラフ挿入
+    epStats = vendor[0]['Response']['itemComponents']['stats']['data']['31']['stats']
+    epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
+    draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
+    draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
+    for s in range(4):
+        draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
+        if epStats[weaponStatsTable[s]]['value'] > epDefStats[weaponStatsTable[s]]['value']:
+            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(154, 255, 80))
+            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+        elif epStats[weaponStatsTable[s]]['value'] < epDefStats[weaponStatsTable[s]]['value']:
+            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(180, 59, 35))
+            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+        else:
+            draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
+        draw.multiline_text((855, 436 + 50 * s), str(epStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
+        statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
+        draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
-        epInstImg = epInstImg.resize((100, 100), 1)
-        baseImg.paste(epInstImg, (60, 335), epInstImg)
-        
-        ## 特性名・説明文挿入
-        epInstName = epInstData['Response']['displayProperties']['name']
-        draw.multiline_text((180, 358), epInstName, fill=(255, 255, 255), font=fontB1)
-
-        # パーク挿入
-        print(epName + ":")
-        tweetText += epName + ":\n"
-        for i in range(1, 5):
-            epPerkHash = vendor[0]['Response']['itemComponents']['sockets']['data'][str(w)]['sockets'][i]['plugHash']
-            epPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epPerkHash) + "/?lc=ja", headers=headers).json()
-            epPerkPath = epPerkData['Response']['displayProperties']['icon']
-            epPerkName = epPerkData['Response']['displayProperties']['name']
-            print("　" + epPerkName)
-            tweetText += "- " + epPerkName + "\n"
-            epPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epPerkPath).content)).convert("RGBA").resize((80, 80), 1)
-            baseImg.paste(epPerkImg, (73, 450 + 93 * (i - 1)), epPerkImg)
-            draw.multiline_text((180, 465 + 93 * (i - 1)), epPerkName, fill=(255, 255, 255), font=fontB1)
-
-        ## ステータスグラフ挿入
-        epStats = vendor[0]['Response']['itemComponents']['stats']['data'][str(w)]['stats']
-        epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
-        draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
-        draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
-        for s in range(4):
-            draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
-            if epStats[weaponStatsTable[s]]['value'] > epDefStats[weaponStatsTable[s]]['value']:
-                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(154, 255, 80))
-                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-            elif epStats[weaponStatsTable[s]]['value'] < epDefStats[weaponStatsTable[s]]['value']:
-                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epDefStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(180, 59, 35))
-                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-            else:
-                draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-            draw.multiline_text((855, 436 + 50 * s), str(epStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
-            statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
-            draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
-
-        # 表示
-        baseImg.paste(logoImg, (950, 784), logoImg)
-        cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
-        cropImg.save(resImg, format='JPEG')
-        mediaList.append(tw.postImage(resImg.getvalue()))
-        tweetText += "\n"
+    # 表示
+    baseImg.paste(logoImg, (950, 784), logoImg)
+    cropImg = baseImg.crop((0, 0, 1280, 850)).convert("RGB")
+    cropImg.save(resImg, format='JPEG')
+    mediaList.append(tw.postImage(resImg.getvalue()))
+    tweetText += "\n"
 
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content, recentTweet)
@@ -453,7 +453,7 @@ def getXur():
             perkCount = 0
 
         # データ取得
-        lWeaponHash = vendor[c]['Response']['sales']['data'][salesList[c][w + 7 - c]]['itemHash']
+        lWeaponHash = vendor[c]['Response']['sales']['data'][salesList[c][w + 6 - c]]['itemHash']
         lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
         lWeaponName = lWeaponData['Response']['displayProperties']['name']
         
@@ -515,7 +515,7 @@ def getXur():
 
         ## マスターワークアイコン挿入
         # パスから画像・ウォーターマークを取得
-        lWeaponMWHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 7 - c]]['plugs']['7'][0]['plugItemHash']
+        lWeaponMWHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 6 - c]]['plugs']['7'][0]['plugItemHash']
         lWeaponMWData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponMWHash) + "/?lc=ja", headers=headers).json()
         lWeaponMWPath = lWeaponMWData['Response']['displayProperties']['icon']
         lWeaponMWWMPath = lWeaponMWData['Response']['iconWatermark']
@@ -531,7 +531,7 @@ def getXur():
         # パーク挿入
         for i in range(1, 6):
             try:
-                perkQuantity = len(vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 7 - c]]['plugs'][str(i)])
+                perkQuantity = len(vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 6 - c]]['plugs'][str(i)])
                 if perkQuantity > perkMax: perkMax = perkQuantity
             except KeyError:
                 perkQuantity = 1
@@ -542,9 +542,9 @@ def getXur():
                     s = i
                 try:
                     if perkQuantity == 1:
-                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['sockets']['data'][salesList[c][w + 7 - c]]['sockets'][s]['plugHash']
+                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['sockets']['data'][salesList[c][w + 6 - c]]['sockets'][s]['plugHash']
                     else:
-                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 7 - c]]['plugs'][str(s)][r]['plugItemHash']
+                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 6 - c]]['plugs'][str(s)][r]['plugItemHash']
                     if lWeaponPerkHash not in [2302094943, 2931483505, 4248210736]:
                         lWeaponPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponPerkHash) + "/?lc=ja", headers=headers).json()
                         lWeaponPerkPath = lWeaponPerkData['Response']['displayProperties']['icon']
@@ -556,7 +556,7 @@ def getXur():
                     pass
             
         # クラス剣専用のループ
-        if salesList[0][w + 7] == '198' or c > 0:
+        if salesList[0][w + 6] == '198' or c > 0:
             m = 9
             c += 1
         
