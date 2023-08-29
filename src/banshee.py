@@ -233,7 +233,7 @@ def getBanshee(flag="Weekly"):
                     pass
             
         # クラス剣専用のループ
-        if salesList[0][w + 2] == '102' or c > 0:
+        if salesList[0][w + 2] == '114' or c > 0:
             m = 13
             c += 1
         
