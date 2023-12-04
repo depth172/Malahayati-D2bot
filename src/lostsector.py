@@ -14,10 +14,12 @@ from time import sleep
 import datetime
 from zoneinfo import ZoneInfo
 import csv
+import math
 
 def getLostSector():
     # 頻出する辞書とリストの定義
     armor = {0: 'チェストアーマー', 1: 'ヘルメット', 2: 'レッグアーマー', 3: 'ガントレット'}
+    armorIcon = {0: 'chest_armor', 1: 'helmet', 2: 'boots', 3: 'gauntlet'}
     champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
@@ -39,10 +41,7 @@ def getLostSector():
             "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
     # CSVデータの準備
-    with open('data/season21.csv') as f:
-        reader = csv.reader(f)
-        seasonal = [row for row in reader]
-    with open('data/sectorBase.csv') as f:
+    with open('data/sector_base.csv') as f:
         reader = csv.reader(f)
         sectorRaw = [row for row in reader]
         sector = {}
@@ -61,13 +60,22 @@ def getLostSector():
                                 sector[sectorRaw[i][0]][j - 1].append(splited)
                     else:
                         sector[sectorRaw[i][0]].append(sectorRaw[i][j])
+    with open('data/drop_exotic.csv') as f:
+        reader = csv.reader(f)
+        exotics = [row for row in reader]
+    with open('data/sector_season23.csv') as f:
+        reader = csv.reader(f)
+        seasonal = [row for row in reader]
+    with open('data/drop_season23.csv') as f:
+        reader = csv.reader(f)
+        lDrops = [row for row in reader]
 
     # 日付データの準備
     TimeZone = ZoneInfo("Asia/Tokyo")
     todayDate = datetime.datetime.now(TimeZone).date()
     todayDateStr = todayDate.strftime('%Y/%m/%d')
 
-    baseDate = datetime.date(2023, 3, 1)
+    baseDate = datetime.date(2023, 3, 4)
     seasonStartDate = datetime.date(int(seasonal[1][0]), int(seasonal[1][1]), int(seasonal[1][2]))
     
     seasonElapsedDate = (todayDate - seasonStartDate).days
@@ -76,8 +84,9 @@ def getLostSector():
     # ローテーション取得
     sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
     armorRot = armor[totalElapsedDate % 4]
-    surgeRot = 16 + seasonElapsedDate // 7 % 2
-
+    
+    isSurgeRot = seasonal[2][0]
+    
     sectorHash = sector[sectorRot][0]
 
     # セクターに関する情報を取得
@@ -99,8 +108,16 @@ def getLostSector():
         else:
             break
 
+    if isSurgeRot:
+        surgeRot1 = 18 + seasonElapsedDate % 2
+        surgeRot2 = 18 + (seasonElapsedDate + 1) % 2
+        surge1Hash = sectorData['Response']['modifiers'][surgeRot1]['activityModifierHash']
+        surge2Hash = sectorData['Response']['modifiers'][surgeRot2]['activityModifierHash']
+    else:
+        surge1Hash = seasonal[2][1]
+        surge2Hash = seasonal[2][2]
+        
     tweetText = ""
-    resImg = io.BytesIO()
     mediaList = []
 
     sectorName = sectorData['Response']['originalDisplayProperties']['name']
@@ -114,25 +131,22 @@ def getLostSector():
     sectorLocName = sectorLocData['Response']['displayProperties']['name']
 
     # ツイート用の文章を整形
-    tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
-    tweetText += "\n\n報酬部位: " + armorRot
+    tweetText = "【テストツイート】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
     threatHash = sectorData['Response']['modifiers'][10]['activityModifierHash']
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatName = threatData['Response']['displayProperties']['name']
 
-    surge1Hash = sectorData['Response']['modifiers'][surgeRot]['activityModifierHash']
     surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
     surge1Name = surge1Data['Response']['displayProperties']['name']
 
-    surge2Hash = sectorData['Response']['modifiers'][18]['activityModifierHash']
     surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
     surge2Name = surge2Data['Response']['displayProperties']['name']
-
-    ocHash = sectorData['Response']['modifiers'][19]['activityModifierHash']
+    
+    ocHash = sectorData['Response']['modifiers'][20]['activityModifierHash']
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocName = ocData['Response']['displayProperties']['name']
-
+    
     tweetText += "\n\n本日の戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
     tweetText += "\n\n#Destiny2"
@@ -145,7 +159,7 @@ def getLostSector():
     mask = Image.open("./img/mask.png")
 
     baseImg = Image.alpha_composite(image, mask)
-    resImg = io.BytesIO()
+    resImg1 = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
     shift_x = 0
@@ -200,9 +214,117 @@ def getLostSector():
         draw.text((102, 288), modName, fill=(255, 255, 255), font=fontB1)
         draw.text((40, 356), modDesc, fill=(255, 255, 255), font=fontN)
 
-    baseImg.convert("RGB").save(resImg, format='JPEG')
+    baseImg.convert("RGB").save(resImg1, format='JPEG')
 
-    mediaList.append(tw.postImage(resImg.getvalue()))
+    mediaList.append(tw.postImage(resImg1.getvalue()))
+
+    baseImg = Image.alpha_composite(image, mask)
+    resImg2 = io.BytesIO()
+    draw = ImageDraw.Draw(baseImg)
+    baseImg.paste(logoImg, (935, 45), logoImg)
+
+    shift_x = 0
+    shift_y = 0
+
+    draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontB1)
+    draw.text((45, 65), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
+    draw.text((65, 185), "防具の部位:", fill=(255, 255, 255), font=fontB2)
+    draw.text((400, 185), armorRot, fill=(255, 255, 255), font=fontB2)
+    draw.text((30, 300), "<ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
+    draw.text((1240, 680), "＊ ソロでクリア時のみドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
+    
+    ## 部位アイコン挿入
+    armorIconImg = Image.open("./img/" + armorIcon[totalElapsedDate % 4] + ".png").convert("RGBA").resize((70, 70), 1)
+    baseImg.paste(armorIconImg, (305, 183), armorIconImg)
+    
+    ## 防具アイコン挿入
+    for i in range(len(exotics[totalElapsedDate % 4])):
+        eArmorData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyCollectibleDefinition/" + str(exotics[totalElapsedDate % 4][i]) + "/?lc=ja", headers=headers).json()
+        eArmorImgPath = eArmorData['Response']['displayProperties']['icon']
+        eArmorImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + eArmorImgPath).content))
+        # リサイズして挿入
+        eArmorImg = eArmorImg.resize((110, 110), 1)
+        baseImg.paste(eArmorImg, (65 + shift_x, 360 + shift_y))
+        
+        shift_x += 130
+        if ((i + 1) % 9 == 0):
+            shift_x = 0
+            shift_y += 130
+            
+    baseImg.convert("RGB").save(resImg2, format='JPEG')
+    mediaList.append(tw.postImage(resImg2.getvalue()))
+
+    baseImg = Image.alpha_composite(image, mask)
+    resImg3 = io.BytesIO()
+    draw = ImageDraw.Draw(baseImg)
+    baseImg.paste(logoImg, (935, 45), logoImg)
+
+    shift_x = 0
+    shift_y = 0
+
+    draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontB1)
+    draw.text((45, 65), "本日のドロップアイテム (2/2)", fill=(255, 255, 255), font=fontTitle)
+    draw.text((30, 150), "<追加ドロップするレジェンダリー武器>", fill=(255, 255, 255), font=fontB1)
+    draw.text((1240, 680), "＊ ソロでクリア時のみドロップ。達人クリアの場合、パークが複数個つく可能性があります。", fill=(255, 255, 255), font=fontN, anchor='rb')
+        
+    ## 武器アイコン挿入
+    for i in range(4):
+        # データ取得
+        lWeaponHash = lDrops[totalElapsedDate % 4][i]
+        lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
+        lWeaponName = lWeaponData['Response']['displayProperties']['name']
+
+        ## 武器アイコン挿入
+        # パスから画像・ウォーターマークを取得
+        lWeaponImgPath = lWeaponData['Response']['displayProperties']['icon']
+        lWeaponWMPath = lWeaponData['Response']['quality']['displayVersionWatermarkIcons'][-1]
+        lWeaponBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + lWeaponImgPath).content))
+        lWeaponBaseImg.putalpha(255)
+        lWeaponWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + lWeaponWMPath).content)).convert("RGBA")
+        # 武器画像とウォーターマークを合成
+        lWeaponImg = Image.alpha_composite(lWeaponBaseImg, lWeaponWM)
+        # リサイズして挿入
+        lWeaponImg = lWeaponImg.resize((100, 100), 1)
+        baseImg.paste(lWeaponImg, (85 + shift_x, 260 + shift_y))
+
+        ## 武器名挿入
+        draw.multiline_text((205 + shift_x, 265 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
+
+        ## 属性アイコン挿入
+        lWeaponElemHash = lWeaponData['Response']['damageTypeHashes'][0]
+        if lWeaponElemHash != 3373582085:
+            # 属性アイコンがある場合は間隔を空ける
+            elementShift = 42
+            lWeaponElemData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyDamageTypeDefinition/" + str(lWeaponElemHash) + "/?lc=ja", headers=headers).json()
+            lWeaponElemPath = lWeaponElemData['Response']['displayProperties']['icon']
+            lWeaponElemImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + lWeaponElemPath).content)).convert("RGBA").resize((30, 30), 1)
+            baseImg.paste(lWeaponElemImg, (205 + shift_x, 312 + shift_y), lWeaponElemImg)
+        else:
+            elementShift = 0
+        
+        ## 弾薬アイコン挿入
+        if lWeaponData['Response']['equippingBlock']['ammoType'] == 1:
+            lWeaponAmmoImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/99f3733354862047493d8550e46a45ec.png").content)).convert("RGBA").resize((50, 50), 1)
+        elif lWeaponData['Response']['equippingBlock']['ammoType'] == 2:
+            lWeaponAmmoImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/d920203c4fd4571ae7f39eb5249eaecb.png").content)).convert("RGBA").resize((50, 50), 1)
+        elif lWeaponData['Response']['equippingBlock']['ammoType'] == 3:
+            lWeaponAmmoImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/78ef0e2b281de7b60c48920223e0f9b1.png").content)).convert("RGBA").resize((50, 50), 1)
+        baseImg.paste(lWeaponAmmoImg, (200 + elementShift + shift_x, 302 + shift_y), lWeaponAmmoImg)
+
+        ## 武器種挿入
+        lWeaponArchName = lWeaponData['Response']['itemTypeDisplayName']
+        draw.multiline_text((255 + elementShift + shift_x, 307 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
+
+        # 部位ごとにずらす
+        if (i % 2) == 0:
+            shift_x = 620
+        else:
+            shift_x = 0
+            shift_y += 180
+    
+    baseImg.convert("RGB").save(resImg3, format='JPEG')
+    mediaList.append(tw.postImage(resImg3.getvalue()))
+    
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)
 

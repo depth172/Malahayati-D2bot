@@ -15,7 +15,7 @@ import datetime
 from zoneinfo import ZoneInfo
 import math
 
-def getBanshee(flag="Weekly"):
+def getBanshee():
     # 頻出する辞書とリストの定義
     weekday = {0: '月曜日', 1: '火曜日', 2: '水曜日', 3: '木曜日', 4: '金曜日', 5: '土曜日', 6: '日曜日'}
 
@@ -64,11 +64,8 @@ def getBanshee(flag="Weekly"):
     # 日付データの準備
     TimeZone = ZoneInfo("Asia/Tokyo")
 
-    startDate = datetime.datetime.now(TimeZone)
-    startDateStr = startDate.strftime('%Y/%m/%d')
-
-    endDate = startDate + datetime.timedelta(days = 8 - startDate.weekday())
-    endDateStr = endDate.strftime('%Y/%m/%d')
+    date = datetime.datetime.now(TimeZone)
+    dateStr = date.strftime('%Y/%m/%d')
 
     tweetText = ""
     mediaList = []
@@ -82,51 +79,43 @@ def getBanshee(flag="Weekly"):
 
     # ツイート用の文章を整形
 
-    if flag == "Weekly":
-        # 週替わり武器の取得
-        tweetText += "【 #バンシー 情報 / 毎週更新】" + startDateStr + "\n本日は" + weekday[startDate.weekday()] + "です。\nバンシー44が販売する週替わり武器が以下のように更新されました。\n\n#Destiny2"
-        print("週替わり武器:")
-        endDate = startDate + datetime.timedelta(days = 3 - startDate.weekday())
-        endDateStr = endDate.strftime('%Y/%m/%d')
-        isDaily = False
-        w = 0
-    else:
-        # 日替わり武器の取得
-        tweetText += "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器が以下のように更新されました。\n\n#Destiny2"
-        print("日替わり武器:")
-        isDaily = True
-        w = 6
+    # 日替わり武器の取得
+    tweetText += "【 #バンシー 情報 / 毎日更新】" + dateStr + "\nバンシー44が販売する日替わり武器が以下のように更新されました。\n\n#Destiny2"
+    print("日替わり武器:")
 
     ### 画像生成
 
+    # c: 現在のキャラクターを記憶する変数(0: ハンター)
+    # p: 画像のページ数
+    # w: 現在取得中の武器が何番目か
+    # m: 武器情報を取得する最大数
     c = 0
     p = 1
-    m = 11
+    w = 0
+    m = 5
+    
+    formFeed = True
+    hasClassSword = False
     perkMax = 1
+    
     while w < m:
-        if w in [0, 4, 6, 10]:
+        # 改ページ時の処理
+        if formFeed:
             # フォントと背景画像の準備
             resImg = io.BytesIO()
 
             # タイトルと日付挿入
-            if isDaily == False:
-                baseImg = Image.open("./img/banshee_weekly_bg.jpg").convert("RGBA")
-                draw = ImageDraw.Draw(baseImg)
-                draw.multiline_text((30, 25), "今週のバンシー44", fill=(255, 255, 255), font=fontTitle)
-                draw.multiline_text((520, 40), "(" + startDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB2)
-                draw.multiline_text((30, 120), "<週替わり武器 (" + str(p) + "/2)>", fill=(255, 255, 255), font=fontB1)
-                draw.multiline_text((400, 130), "＊「ウェポン」の欄に販売される武器は週替わりとなります。", fill=(255, 255, 255), font=fontN)
-            else:
-                baseImg = Image.open("./img/banshee_daily_bg.jpg").convert("RGBA")
-                draw = ImageDraw.Draw(baseImg)
-                draw.multiline_text((30, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
-                draw.multiline_text((520, 40), "(" + startDateStr + ")", fill=(255, 255, 255), font=fontB2)
-                draw.multiline_text((30, 120), "<日替わり武器 (" + str(p) + "/2)>", fill=(255, 255, 255), font=fontB1)
-                draw.multiline_text((400, 130), "＊「注目」の欄に販売される武器は日替わりとなります。", fill=(255, 255, 255), font=fontN)
+            baseImg = Image.open("./img/banshee_daily_bg.jpg").convert("RGBA")
+            draw = ImageDraw.Draw(baseImg)
+            draw.multiline_text((30, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
+            draw.multiline_text((520, 40), "(" + dateStr + ")", fill=(255, 255, 255), font=fontB2)
+            draw.multiline_text((30, 120), "<日替わり武器>", fill=(255, 255, 255), font=fontB1)
 
             shift_x = 0
             shift_y = 0
             perkCount = 0
+            
+            formFeed = False
 
         # データ取得
         lWeaponHash = vendor[c]['Response']['sales']['data'][salesList[c][w + 2 - c]]['itemHash']
@@ -134,7 +123,7 @@ def getBanshee(flag="Weekly"):
         lWeaponName = lWeaponData['Response']['displayProperties']['name']
         
         print("　" + lWeaponName)
-            
+        
         ## 武器アイコン挿入
         # パスから画像・ウォーターマークを取得
         lWeaponImgPath = lWeaponData['Response']['displayProperties']['icon']
@@ -204,6 +193,7 @@ def getBanshee(flag="Weekly"):
             lWeaponMW = lWeaponMW.resize((80, 80), 1)
             baseImg.paste(lWeaponMW, (505 + shift_x, 295 + shift_y))
         except KeyError:
+            # マスターワークが存在しない場合はpass
             pass
 
         # パーク挿入
@@ -232,10 +222,11 @@ def getBanshee(flag="Weekly"):
                     # 起源特性が存在しなければpass
                     pass
             
-        # クラス剣専用のループ
-        if salesList[0][w + 2] == '114' or c > 0:
-            m = 13
-            c += 1
+        # クラス剣専用のループ ハンター剣のID(58)が当たったら列を増やす
+        if salesList[0][w + 2 - c] == '58':
+            m += 2
+            hasClassSword = True
+            formFeed = True
         
         # 部位ごとにずらす
         if (w % 2) == 0:
@@ -246,35 +237,25 @@ def getBanshee(flag="Weekly"):
             perkCount += perkMax
             perkMax = 1
         
-        if w in [3, 5, 9] or w + 1 == m:
-            if w + 1 == m and w % 2 == 0:
-                perkCount += perkMax
-            if isDaily:
-                imgHeight = 225 + 245 * math.ceil((w - 5 - (p - 1) * 4) / 2) + 90 * perkCount
-                baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
-                cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
-                cropImg.save(resImg, format='JPEG')
-                mediaList.append(tw.postImage(resImg.getvalue()))
-            else:
-                imgHeight = 225 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount
-                baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
-                cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
-                cropImg.save(resImg, format='JPEG')
-                mediaList.append(tw.postImage(resImg.getvalue()))
+        if w + 1 == m and w % 2 == 0:
+            perkCount += perkMax
+            imgHeight = 225 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount
+            baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
+            cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
+            cropImg.save(resImg, format='JPEG')
+            mediaList.append(tw.postImage(resImg.getvalue()))
                 
-            if w == 5:
-                content = {"text": tweetText, "media": {"media_ids": mediaList}}
-                tw.makeTweet(content)
-                mediaList = []
-                tweetText = "【 #バンシー 情報 / 毎日更新】" + startDateStr + "\nバンシー44が販売する日替わり武器が以下のように更新されました。\n\n#Destiny2"
-                print("\n日替わり武器:")
-                isDaily = True
-                p = 1
-            else:
-                p += 1
+            p += 1
         
-        w += 1
-
+        if hasClassSword == False:
+            w += 1
+        elif c == 2:
+            c == 0
+            hasClassSword = False
+            w += 1
+        else: 
+            c += 1
+        
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)
 

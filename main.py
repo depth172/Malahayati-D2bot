@@ -22,13 +22,9 @@ if currentTime.hour == 2:
     # 水曜日だった場合は週間フラグもリセット
     if currentTime.weekday() == 2:
         currentStatus.set('gotXur', 'False')
-        currentStatus.set('gotBansheeWeekly', 'False')
 # 毎日9時のバンシー取得フラグをリセットする
 elif currentTime.hour == 9:
-    currentStatus.set('gotBansheeDaily', 'False')
-    # 木曜日だった場合は週間フラグもリセット
-    if currentTime.weekday() == 3:
-        currentStatus.set('gotBansheeWeekly', 'False')
+    currentStatus.set('gotBansheeDaily', 'True')
 
 # シーズンはじめの一時処理
 currentStatus.set('gotSector', 'True')
@@ -47,24 +43,12 @@ if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'Fa
         tw.makeTweet(contents)
 
 # バンシー44の販売武器に関する情報を未取得だった場合は取得
-if currentStatus.get('gotBansheeWeekly') == b'False':
+elif currentStatus.get('gotBanshee') == b'False':
     gotInfo = True
-    print("バンシー44の「ウェポン」「おすすめ」情報を取得します。")
-    checkCode = banshee.getBanshee("Weekly")
+    print("バンシー44の「注目」武器情報を取得します。")
+    checkCode = banshee.getBanshee()
     if checkCode == 0:
-        currentStatus.set('gotBansheeWeekly', 'True')
-        currentStatus.set('gotBansheeDaily', 'True')
-    elif checkCode == 5:
-        timeStr = currentTime.strftime('%Y/%m/%d')
-        tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の週間販売武器に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
-        contents = {"text": tweetText}
-        tw.makeTweet(contents)
-elif currentStatus.get('gotBansheeDaily') == b'False':
-    gotInfo = True
-    print("バンシー44の「ウェポン」情報を取得します。")
-    checkCode = banshee.getBanshee("Daily")
-    if checkCode == 0:
-        currentStatus.set('gotBansheeDaily', 'True')
+        currentStatus.set('gotBanshee', 'True')
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の日間販売武器に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
