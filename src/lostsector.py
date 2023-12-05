@@ -75,7 +75,7 @@ def getLostSector():
     todayDate = datetime.datetime.now(TimeZone).date()
     todayDateStr = todayDate.strftime('%Y/%m/%d')
 
-    baseDate = datetime.date(2023, 3, 4)
+    baseDate = datetime.date(2023, 3, 2)
     seasonStartDate = datetime.date(int(seasonal[1][0]), int(seasonal[1][1]), int(seasonal[1][2]))
     
     seasonElapsedDate = (todayDate - seasonStartDate).days
@@ -131,7 +131,7 @@ def getLostSector():
     sectorLocName = sectorLocData['Response']['displayProperties']['name']
 
     # ツイート用の文章を整形
-    tweetText = "【テストツイート】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
+    tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
     threatHash = sectorData['Response']['modifiers'][10]['activityModifierHash']
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
@@ -171,7 +171,7 @@ def getLostSector():
     if sectorLocName == sectorPlanetName:
         draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontB0, anchor="rb")
     else:
-        sectorDestName = sectorPlanetName + ", " + sectorLocName
+        sectorDestName = sectorPlanetName + "、" + sectorLocName
         draw.text((1235, 600), sectorDestName, fill=(255, 255, 255), font=fontB0, anchor="rb")
     
     draw.multiline_text((25, 400), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
@@ -230,7 +230,7 @@ def getLostSector():
     draw.text((45, 65), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
     draw.text((65, 185), "防具の部位:", fill=(255, 255, 255), font=fontB2)
     draw.text((400, 185), armorRot, fill=(255, 255, 255), font=fontB2)
-    draw.text((30, 300), "<ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
+    draw.text((30, 300), "<セクター限定で本日ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
     draw.text((1240, 680), "＊ ソロでクリア時のみドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
     
     ## 部位アイコン挿入

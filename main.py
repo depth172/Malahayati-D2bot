@@ -24,7 +24,7 @@ if currentTime.hour == 2:
         currentStatus.set('gotXur', 'False')
 # 毎日9時のバンシー取得フラグをリセットする
 elif currentTime.hour == 9:
-    currentStatus.set('gotBansheeDaily', 'True')
+    currentStatus.set('gotBanshee', 'True')
 
 # シーズンはじめの一時処理
 currentStatus.set('gotSector', 'True')
