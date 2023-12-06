@@ -7,7 +7,6 @@ import src.tweet as tw
 
 gotInfo = False
 checkCode = 0
-recatch = False
 TimeZone = ZoneInfo("Asia/Tokyo")
 
 print("定期実行を開始します。\n")
@@ -23,8 +22,8 @@ if currentTime.hour == 2:
     if currentTime.weekday() == 2:
         currentStatus.set('gotXur', 'False')
 # 毎日9時のバンシー取得フラグをリセットする
-elif currentTime.hour == 9:
-    currentStatus.set('gotBanshee', 'True')
+elif currentTime.hour == 12:
+    currentStatus.set('gotBanshee', 'False')
 
 # シーズンはじめの一時処理
 currentStatus.set('gotSector', 'True')
