@@ -22,7 +22,7 @@ if currentTime.hour == 2:
     if currentTime.weekday() == 2:
         currentStatus.set('gotXur', 'False')
 # 毎日9時のバンシー取得フラグをリセットする
-elif currentTime.hour == 12:
+elif currentTime.hour == 9:
     currentStatus.set('gotBanshee', 'False')
 
 # シーズンはじめの一時処理
