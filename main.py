@@ -26,7 +26,7 @@ elif currentTime.hour == 9:
     currentStatus.set('gotBanshee', 'False')
 
 # シーズンはじめの一時処理
-currentStatus.set('gotSector', 'True')
+# currentStatus.set('gotSector', 'True')
 
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
 if currentTime.weekday() in [0, 1, 5, 6] and currentStatus.get('gotXur') == b'False':
