@@ -107,7 +107,7 @@ def getLostSector():
         else:
             break
 
-    surge1Hash = seasonal[2][1]
+    surge1Hash = seasonal[2][0]
     surge2Hash = seasonal[2][(elapsedWeek % 2) + 1]
         
     tweetText = ""
