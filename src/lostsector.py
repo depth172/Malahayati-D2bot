@@ -84,7 +84,7 @@ def getLostSector():
     # ローテーション取得
     sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
     armorRot = armor[totalElapsedDate % 4]
-    surgeRot = seasonElapsedDate // 7
+    elapsedWeek = seasonElapsedDate // 7
     
     sectorHash = sector[sectorRot][0]
 
@@ -107,8 +107,8 @@ def getLostSector():
         else:
             break
 
-    surge1Hash = seasonal[2][surgeRot % 3]
-    surge2Hash = seasonal[2][(surgeRot + 1) % 3]
+    surge1Hash = seasonal[2][1]
+    surge2Hash = seasonal[2][(elapsedWeek % 2) + 1]
         
     tweetText = ""
     mediaList = []
