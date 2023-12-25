@@ -204,6 +204,8 @@ def getLostSector():
         e += 1
     if sector[sectorRot][4]:
         e += 1
+    if sector[sectorRot][5]:
+        e += 1
     for i in range(3, e):
         elemData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyDamageTypeDefinition/" + str(elemHash[sector[sectorRot][i][0]]) + "/?lc=ja", headers=headers).json()
         elemName = elemData['Response']['displayProperties']['name']
@@ -229,6 +231,7 @@ def getLostSector():
     baseImg.convert("RGB").save(resImg1, format='JPEG')
 
     mediaList.append(tw.postImage(resImg1.getvalue()))
+    baseImg.show()
 
     baseImg = Image.alpha_composite(image, mask)
     resImg2 = io.BytesIO()
@@ -338,7 +341,7 @@ def getLostSector():
     mediaList.append(tw.postImage(resImg3.getvalue()))
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
-    tw.makeTweet(content)
+    # tw.makeTweet(content)
 
     print("情報取得の全工程完了。")
     
