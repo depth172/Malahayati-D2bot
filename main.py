@@ -17,16 +17,14 @@ data = redis.from_url(url=os.getenv('REDIS_URL'))
 currentTime = datetime.datetime.now(TimeZone)
 
 # 直前実行時の時間を取得
-lastHour = re.findall(r'\d+', str(data.get('lastHour')))[0]
+lastHour = int(re.findall(r'\d+', str(data.get('lastHour')))[0])
 
 # 実行時の時間を取得
 currentHour = currentTime.hour
 
 if lastHour != currentHour:
-    data.set('lastHour', currentHour)
     # 毎日2時にデイリー取得フラグをリセット
     if currentHour == 2:
-        data.set('lastHour', currentHour)
         # 水曜日だった場合は週間フラグもリセット
         if currentTime.weekday() == 2:
             data.set('gotXur', 'False')
@@ -94,5 +92,7 @@ if data.get('gotBanshee') == b'False':
         
 if not gotInfo:
     print("新しく取得する情報はありませんでした。")
+else:
+    data.set('lastHour', currentHour)
 
 print("\n定期実行完了。")
