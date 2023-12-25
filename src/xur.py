@@ -430,7 +430,13 @@ def getXur():
     tweetText = "＜レジェンダリー武器＞\n"
 
     ### 画像生成
+    
+    hasClassSword = False
 
+    # c: 現在のキャラクターを記憶する変数(0: ハンター)
+    # p: 画像のページ数
+    # w: 現在取得中の武器が何番目か
+    # m: 武器情報を取得する最大数
     c = 0
     w = 0
     p = 1
@@ -555,10 +561,15 @@ def getXur():
                     # 起源特性が存在しなければpass
                     pass
             
-        # クラス剣専用のループ
-        if salesList[0][w + 6] == '198' or c > 0:
-            m = 9
+        # クラス剣専用のループ ハンター剣のハッシュ(2782325300)が当たったら列を増やす
+        if lWeaponHash == 2782325300:
+            m += 2
+            hasClassSword = True
+        
+        if hasClassSword == True and c != 2:
             c += 1
+            
+        print(hasClassSword)
         
         # 部位ごとにずらす
         if (w % 2) == 0:
@@ -576,6 +587,7 @@ def getXur():
             baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)            
             cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
             cropImg.save(resImg, format='JPEG')
+            cropImg.show()
             mediaList.append(tw.postImage(resImg.getvalue()))
             p += 1
 

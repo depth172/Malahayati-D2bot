@@ -118,7 +118,7 @@ def getBanshee():
             formFeed = False
 
         # データ取得
-        lWeaponHash = vendor[c]['Response']['sales']['data'][salesList[c][w + 2 - c]]['itemHash']
+        lWeaponHash = vendor[c]['Response']['sales']['data'][salesList[c][w + 2]]['itemHash']
         lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
         lWeaponName = lWeaponData['Response']['displayProperties']['name']
         
@@ -180,7 +180,7 @@ def getBanshee():
         ## マスターワークアイコン挿入
         # パスから画像・ウォーターマークを取得
         try:
-            lWeaponMWHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2 - c]]['plugs']['7'][0]['plugItemHash']
+            lWeaponMWHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2]]['plugs']['7'][0]['plugItemHash']
             lWeaponMWData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponMWHash) + "/?lc=ja", headers=headers).json()
             lWeaponMWPath = lWeaponMWData['Response']['displayProperties']['icon']
             lWeaponMWWMPath = lWeaponMWData['Response']['iconWatermark']
@@ -199,7 +199,7 @@ def getBanshee():
         # パーク挿入
         for i in range(1, 6):
             try:
-                perkQuantity = len(vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2 - c]]['plugs'][str(i)])
+                perkQuantity = len(vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2]]['plugs'][str(i)])
                 if perkQuantity > perkMax: perkMax = perkQuantity
             except KeyError:
                 perkQuantity = 1
@@ -210,9 +210,9 @@ def getBanshee():
                     s = i
                 try:
                     if perkQuantity == 1:
-                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['sockets']['data'][salesList[c][w + 2 - c]]['sockets'][s]['plugHash']
+                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['sockets']['data'][salesList[c][w + 2]]['sockets'][s]['plugHash']
                     else:
-                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2 - c]]['plugs'][str(s)][r]['plugItemHash']
+                        lWeaponPerkHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2]]['plugs'][str(s)][r]['plugItemHash']
                     if lWeaponPerkHash not in [2302094943, 2931483505, 4248210736, 905869860]:
                         lWeaponPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponPerkHash) + "/?lc=ja", headers=headers).json()
                         lWeaponPerkPath = lWeaponPerkData['Response']['displayProperties']['icon']
@@ -222,8 +222,8 @@ def getBanshee():
                     # 起源特性が存在しなければpass
                     pass
             
-        # クラス剣専用のループ ハンター剣のID(58)が当たったら列を増やす
-        if salesList[0][w + 2 - c] == '58':
+        # クラス剣専用のループ ハンター剣のハッシュ(2782325300)が当たったら列を増やす
+        if lWeaponHash == 2782325300:
             m += 2
             hasClassSword = True
             formFeed = True

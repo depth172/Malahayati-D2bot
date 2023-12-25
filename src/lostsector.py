@@ -26,6 +26,7 @@ def getLostSector():
     # 画像生成用のフォント定義
     fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
+    fontLoc = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 22)
     fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
@@ -84,7 +85,6 @@ def getLostSector():
     # ローテーション取得
     sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
     armorRot = armor[totalElapsedDate % 4]
-    elapsedWeek = seasonElapsedDate // 7
     
     sectorHash = sector[sectorRot][0]
 
@@ -106,10 +106,29 @@ def getLostSector():
             return sectorData['ErrorCode']
         else:
             break
-
-    surge1Hash = seasonal[2][0]
-    surge2Hash = seasonal[2][(elapsedWeek % 2) + 1]
-        
+    
+    # マイルストーン情報取得
+    # サージの情報を得るため、ナイトフォールの戦闘条件を流用する
+    for i in range(3):
+        activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
+        if 'Response' not in sectorData:
+            for j in range(3):
+                if sectorData['ErrorCode'] == 5:
+                    print("現在APIサービスはメンテナンス中です。処理を中断します。")
+            if i != 2:
+                print("API取得に失敗しました。3秒後にリトライします…")
+                sleep(3)
+                continue
+            else:
+                print("APIが取得できませんでした。処理を中断します。")
+                print("エラーコード - " + str(sectorData['ErrorCode']) + "\n" + sectorData['Message'])
+            return sectorData['ErrorCode']
+        else:
+            break
+    
+    surge1Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][13]
+    surge2Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][14]
+    
     tweetText = ""
     mediaList = []
 
@@ -161,11 +180,11 @@ def getLostSector():
     draw.text((490, 40), "(" + todayDateStr + ")", fill=(255, 255, 255), font=fontB2)
     draw.text((1240, 680), sectorName, fill=(255, 255, 255), font=fontTitle, anchor="rb")
     
-    if sectorLocName == sectorPlanetName:
-        draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontB0, anchor="rb")
+    if sectorLocName in sectorPlanetName:
+        draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
     else:
         sectorDestName = sectorPlanetName + "、" + sectorLocName
-        draw.text((1235, 600), sectorDestName, fill=(255, 255, 255), font=fontB0, anchor="rb")
+        draw.text((1235, 600), sectorDestName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
     
     draw.multiline_text((25, 400), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
     draw.text((25, 600), "伝説:", fill=(255, 255, 255), font=fontN)
