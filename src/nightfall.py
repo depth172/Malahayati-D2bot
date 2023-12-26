@@ -74,29 +74,29 @@ def getNightfall():
     shieldData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(shieldHash) + "/?lc=ja", headers=headers).json()
     shieldPath = shieldData['Response']['displayProperties']['icon']
 
-    championHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][4]
+    championHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-12]
     championData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(championHash) + "/?lc=ja", headers=headers).json()
     championPath = championData['Response']['displayProperties']['icon']
 
-    specialModHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][10]
+    specialModHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-6]
     specialModData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(specialModHash) + "/?lc=ja", headers=headers).json()
     specialModPath = specialModData['Response']['displayProperties']['icon']
     specialModName = specialModData['Response']['displayProperties']['name']
     specialModDesc = specialModData['Response']['displayProperties']['description']
 
-    threatHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][6]
+    threatHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-10]
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatPath = threatData['Response']['displayProperties']['icon']
 
-    surge1Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][13]
+    surge1Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-3]
     surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
     surge1Path = surge1Data['Response']['displayProperties']['icon']
 
-    surge2Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][14]
+    surge2Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-2]
     surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
     surge2Path = surge2Data['Response']['displayProperties']['icon']
 
-    ocHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][15]
+    ocHash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-1]
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocPath = ocData['Response']['displayProperties']['icon']
 
@@ -225,7 +225,6 @@ def getNightfall():
     
     draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新 ・ ”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
 
-    baseImg.show()
     baseImg.convert("RGB").save(resImg, format='JPEG')
     mediaList.append(tw.postImage(resImg.getvalue()))
     

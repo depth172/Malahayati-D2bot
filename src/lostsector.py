@@ -126,8 +126,8 @@ def getLostSector():
         else:
             break
     
-    surge1Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][13]
-    surge2Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][14]
+    surge1Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-3]
+    surge2Hash = activityData['Response']['2029743966']['activities'][3]['modifierHashes'][-2]
     
     tweetText = ""
     mediaList = []
@@ -231,7 +231,6 @@ def getLostSector():
     baseImg.convert("RGB").save(resImg1, format='JPEG')
 
     mediaList.append(tw.postImage(resImg1.getvalue()))
-    baseImg.show()
 
     baseImg = Image.alpha_composite(image, mask)
     resImg2 = io.BytesIO()
@@ -341,7 +340,7 @@ def getLostSector():
     mediaList.append(tw.postImage(resImg3.getvalue()))
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
-    # tw.makeTweet(content)
+    tw.makeTweet(content)
 
     print("情報取得の全工程完了。")
     

@@ -29,6 +29,7 @@ if lastHour != currentHour:
         if currentTime.weekday() == 2:
             data.set('gotXur', 'False')
             data.set('gotNightfall', 'False')
+            data.set('gotSector', 'False')
     # 毎日9時にバンシー取得フラグをリセットする
     elif currentHour == 9:
         data.set('gotBanshee', 'False')
