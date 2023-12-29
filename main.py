@@ -6,6 +6,7 @@ import datetime
 import src.tweet as tw
 import re
 
+noData = False
 gotInfo = False
 checkCode = 0
 TimeZone = ZoneInfo("Asia/Tokyo")
@@ -25,14 +26,16 @@ currentHour = currentTime.hour
 if lastHour != currentHour:
     # 毎日2時にデイリー取得フラグをリセット
     if currentHour == 2:
+        data.set('gotSector', 'False')
         # 水曜日だった場合は週間フラグもリセット
         if currentTime.weekday() == 2:
             data.set('gotXur', 'False')
             data.set('gotNightfall', 'False')
-            data.set('gotSector', 'False')
     # 毎日9時にバンシー取得フラグをリセットする
     elif currentHour == 9:
         data.set('gotBanshee', 'False')
+    else:
+        noData = True
 else:
     print("情報の更新はまだ行いません。")
 
@@ -93,7 +96,7 @@ if data.get('gotBanshee') == b'False':
         
 if not gotInfo:
     print("新しく取得する情報はありませんでした。")
-else:
+elif noData or gotInfo:
     data.set('lastHour', currentHour)
 
 print("\n定期実行完了。")
