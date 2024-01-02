@@ -113,16 +113,14 @@ def getNightfall():
     searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + weaponNameEng + "/", headers=headers).json()
     
     # 検索で得た武器が今シーズンのもの、かつ新版でないか確認
-    # シーズン確認のためにwatermarkを比較するのはさすがにアレなのでもっといい案を考えたい
-    i = 0
-    while (1):
+    # indexを比較し、新しいほうを保存する
+    for i in range(len(searchRes['Response']['results']['results'])):
         weaponHash = searchRes['Response']['results']['results'][i]['hash']
         weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash), headers=headers).json()
-        if weaponData['Response']['iconWatermark'] == "/common/destiny2_content/icons/a2fb48090c8bc0e5785975fab9596ab5.png" and weaponData['Response']['displayProperties']['name'] not in "(Adept)":
-            break
-        else:
-            i += 1 
+        if i == 0 or (weaponData['Response']['index'] > newestWeaponData['Response']['index'] and "(Adept)" not in weaponData['Response']['displayProperties']['name']):
+            newestWeaponData = weaponData
     
+    weaponHash = newestWeaponData['Response']['hash']
     weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash) + "/?lc=ja", headers=headers).json()
 
     weaponName = weaponData['Response']['displayProperties']['name']

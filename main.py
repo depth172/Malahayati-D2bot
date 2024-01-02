@@ -34,6 +34,7 @@ if lastHour != currentHour:
     # 毎日9時にバンシー取得フラグをリセットする
     elif currentHour == 9:
         data.set('gotBanshee', 'False')
+    # 取得する情報がない時間の場合、フラグを有効化
     else:
         noData = True
 else:
