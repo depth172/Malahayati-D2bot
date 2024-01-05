@@ -569,8 +569,6 @@ def getXur():
         if hasClassSword == True and c != 2:
             c += 1
             
-        print(hasClassSword)
-        
         # 部位ごとにずらす
         if (w % 2) == 0:
             shift_x = 620
@@ -584,10 +582,9 @@ def getXur():
             if w + 1 == m and w % 2 == 0:
                 perkCount += perkMax
             imgHeight = 225 + 245 * math.ceil((w + 1 - (p - 1) * 4) / 2) + 90 * perkCount
-            baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)            
+            baseImg.paste(logoImg, (950, imgHeight - 66), logoImg)
             cropImg = baseImg.crop((0, 0, 1280, imgHeight)).convert("RGB")
             cropImg.save(resImg, format='JPEG')
-            cropImg.show()
             mediaList.append(tw.postImage(resImg.getvalue()))
             p += 1
 
