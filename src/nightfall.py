@@ -50,9 +50,9 @@ def getNightfall():
     for i in range(3):
         activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
         if 'Response' not in activityData:
-            for j in range(3):
-                if activityData['ErrorCode'] == 5:
-                    print("現在APIサービスはメンテナンス中です。処理を中断します。")
+            if activityData['ErrorCode'] == 5:
+                print("現在APIサービスはメンテナンス中です。処理を中断します。")
+                return activityData['ErrorCode']
             if i != 2:
                 print("API取得に失敗しました。3秒後にリトライします…")
                 sleep(3)
@@ -60,7 +60,7 @@ def getNightfall():
             else:
                 print("APIが取得できませんでした。処理を中断します。")
                 print("エラーコード - " + str(activityData['ErrorCode']) + "\n" + activityData['Message'])
-            return activityData['ErrorCode']
+                return activityData['ErrorCode']
         else:
             break
         
@@ -101,7 +101,24 @@ def getNightfall():
     ocPath = ocData['Response']['displayProperties']['icon']
 
     # 報酬武器の取得
-    vendorData = requests.get("https://www.bungie.net/Platform/Destiny2/3/Profile/4611686018482984497/Character/2305843009405135001/Vendors/2232145065/?components=401,402", headers=headers).json()
+    for i in range(3):
+        vendorData = requests.get("https://www.bungie.net/Platform/Destiny2/3/Profile/4611686018482984497/Character/2305843009405135001/Vendors/2232145065/?components=401,402", headers=headers).json()
+        if 'Response' not in vendorData:
+            for j in range(3):
+                if vendorData['ErrorCode'] == 5:
+                    print("現在APIサービスはメンテナンス中です。処理を中断します。")
+                    break
+                elif i != 2:
+                    print("API取得に失敗しました。3秒後にリトライします…")
+                    sleep(3)
+                    continue
+                else:
+                    print("APIが取得できませんでした。処理を中断します。")
+                    print("エラーコード - " + str(vendorData['ErrorCode']) + "\n" + vendorData['Message'])
+            return vendorData['ErrorCode']
+        else:
+            break
+
     weaponOrder = vendorData['Response']['categories']['data']['categories'][1]['itemIndexes'][-1]
     weaponAdeptHash = vendorData['Response']['sales']['data'][str(weaponOrder)]['itemHash']
     

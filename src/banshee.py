@@ -56,7 +56,7 @@ def getBanshee():
                 continue
             else:
                 print("APIが取得できませんでした。処理を中断します。")
-                print("エラーコード - " + str(vendor[0]['ErrorCode']) + "\n" + vendor[j]['Message'])
+                print("エラーコード - " + str(vendor[0]['ErrorCode']) + "\n" + vendor[0]['Message'])
                 return vendor[0]['ErrorCode']
         else:
             break

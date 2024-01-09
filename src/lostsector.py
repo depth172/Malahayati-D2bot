@@ -93,9 +93,9 @@ def getLostSector():
     for i in range(3):
         sectorData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityDefinition/" + str(sectorHash) + "/?lc=ja", headers=headers).json()
         if 'Response' not in sectorData:
-            for j in range(3):
-                if sectorData['ErrorCode'] == 5:
-                    print("現在APIサービスはメンテナンス中です。処理を中断します。")
+            if sectorData['ErrorCode'] == 5:
+                print("現在APIサービスはメンテナンス中です。処理を中断します。")
+                return sectorData['ErrorCode']
             if i != 2:
                 print("API取得に失敗しました。3秒後にリトライします…")
                 sleep(3)
@@ -112,9 +112,9 @@ def getLostSector():
     for i in range(3):
         activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
         if 'Response' not in sectorData:
-            for j in range(3):
-                if sectorData['ErrorCode'] == 5:
-                    print("現在APIサービスはメンテナンス中です。処理を中断します。")
+            if sectorData['ErrorCode'] == 5:
+                print("現在APIサービスはメンテナンス中です。処理を中断します。")
+                return sectorData['ErrorCode']
             if i != 2:
                 print("API取得に失敗しました。3秒後にリトライします…")
                 sleep(3)
