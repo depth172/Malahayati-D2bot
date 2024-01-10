@@ -5,7 +5,7 @@ import os
 # API取得用
 import requests
 # 画像処理用
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 import io
 # ツイート用
 from . import tweet as tw
@@ -168,6 +168,7 @@ def getLostSector():
     # 画像生成
     imageURL = sectorData['Response']['pgcrImage']
     image = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + imageURL).content)).convert('RGBA')
+    image = ImageEnhance.Brightness(image).enhance(0.78)
     mask = Image.open("./img/mask.png")
 
     baseImg = Image.alpha_composite(image, mask)

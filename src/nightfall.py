@@ -5,7 +5,7 @@ import os
 # API取得用
 import requests
 # 画像処理用
-from PIL import Image, ImageDraw, ImageFont
+from PIL import Image, ImageDraw, ImageFont, ImageEnhance
 import io
 # ツイート用
 from . import tweet as tw
@@ -22,12 +22,11 @@ def getNightfall():
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
     # 画像生成用のフォント定義
-    fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
     fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
     fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
     fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
     fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
-    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 59)
+    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 56)
     logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
@@ -154,6 +153,7 @@ def getNightfall():
     # 画像生成
     imageURL = nightfallData['Response']['pgcrImage']
     image = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + imageURL).content)).convert('RGBA')
+    image = ImageEnhance.Brightness(image).enhance(0.78)
     mask = Image.open("./img/mask.png")
 
     baseImg = Image.alpha_composite(image, mask)
