@@ -29,6 +29,7 @@ if lastHour != currentHour:
         data.set('gotSector', 'False')
         # 水曜日だった場合は週間フラグもリセット
         if currentTime.weekday() == 2:
+            tw.pinTweet()
             data.set('gotXur', 'False')
             data.set('gotNightfall', 'False')
     # 毎日9時にバンシー取得フラグをリセットする

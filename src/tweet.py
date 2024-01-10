@@ -73,6 +73,10 @@ def makeTweet(payload):
         )
 
     print("ツイート投稿完了。")
+    
+    # 投稿したツイートのIDを返す
+    json_response = response.json()
+    return json_response["data"]["id"]
 
 # スレッド形式のツイートを投稿する
 def makeThread(payload, recent_id=0):
@@ -156,3 +160,48 @@ def postImage(image):
     # アップロードした画像のIDを返す
     json_response = response.json()
     return json_response["media_id_string"]
+
+# ツイートをプロフィール画面に固定する
+# idを渡さなかった場合、固定したツイートを固定解除する
+def pinTweet(id=0):
+    data = redis.from_url(url=os.getenv('REDIS_URL'))
+
+    if data.exists('twitter_access_token') == 0 or data.exists('twitter_access_token_secret') == 0:
+        getTwitterAccessToken()
+    
+    consumer_key = os.environ.get("T_CONSUMER_KEY")
+    consumer_secret = os.environ.get("T_CONSUMER_SECRET")
+    access_token = data.get('twitter_access_token')
+    access_token_secret = data.get('twitter_access_token_secret')
+    
+    oauth = OAuth1Session(
+        consumer_key,
+        client_secret=consumer_secret,
+        resource_owner_key=access_token,
+        resource_owner_secret=access_token_secret,
+    )
+    
+    # 固定
+    if id != 0:
+        unpin = False
+        response = oauth.post(
+            "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
+        )
+    else:
+        id = data.get('pinned_tweet_id').decode('utf-8')
+        unpin = True
+        response = oauth.post(
+            "https://api.twitter.com/1.1/account/unpin_tweet.json?id=" + id
+        )
+
+    if response.status_code != 200:
+        raise Exception(
+            "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
+        )
+    else:
+        if not unpin:
+            data.set('pinned_tweet_id', id)
+            print("ツイートの固定完了。")
+        else:
+            data.set('pinned_tweet_id', 0)
+            print("ツイートの固定解除完了。")

@@ -115,6 +115,7 @@ def getXur():
     mediaList.append(tw.postImage(resImg.getvalue()))
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content)
+    tw.pinTweet(recentTweet)
     mediaList = []
 
     # 販売アイテムリストを生成
