@@ -183,10 +183,12 @@ def pinTweet(id=0):
     
     # 固定
     if id != 0:
-        unpin = False
-        response = oauth.post(
-            "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
-        )
+        id = data.get('pinned_tweet_id').decode('utf-8')
+        if id != 0:
+            unpin = False
+            response = oauth.post(
+                "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
+            )
     else:
         id = data.get('pinned_tweet_id').decode('utf-8')
         unpin = True
@@ -199,9 +201,14 @@ def pinTweet(id=0):
             "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
         )
     else:
-        if not unpin:
+        if not unpin and int(id) != 0:
             data.set('pinned_tweet_id', id)
             print("ツイートの固定完了。")
-        else:
+        elif unpin:
             data.set('pinned_tweet_id', 0)
             print("ツイートの固定解除完了。")
+        elif int(id) == 0:
+            print("固定されているツイートはありませんでした。")
+        else:
+            # 例外
+            pass

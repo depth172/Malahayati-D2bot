@@ -244,7 +244,8 @@ def getNightfall():
     mediaList.append(tw.postImage(resImg.getvalue()))
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
-    tw.makeTweet(content)
+    tweetID = tw.makeTweet(content)
+    tw.pinTweet(tweetID)
 
     print("情報取得の全工程完了。")
     
