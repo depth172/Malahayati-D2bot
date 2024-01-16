@@ -44,13 +44,12 @@ def getTwitterAccessToken():
 # 通常のツイートを投稿する
 def makeTweet(payload):
     data = redis.from_url(url=os.getenv('REDIS_URL'))
-    
-    consumer_key = os.environ.get("T_CONSUMER_KEY")
-    consumer_secret = os.environ.get("T_CONSUMER_SECRET")
-    
+
     if data.exists('twitter_access_token') == 0 or data.exists('twitter_access_token_secret') == 0:
         getTwitterAccessToken()
-    
+        
+    consumer_key = os.environ.get("T_CONSUMER_KEY")
+    consumer_secret = os.environ.get("T_CONSUMER_SECRET")
     access_token = data.get('twitter_access_token')
     access_token_secret = data.get('twitter_access_token_secret')
 
@@ -60,8 +59,8 @@ def makeTweet(payload):
         resource_owner_key=access_token,
         resource_owner_secret=access_token_secret,
     )
-
-    # ツイートする
+    
+    # ツイート
     response = oauth.post(
         "https://api.twitter.com/2/tweets",
         json=payload,
@@ -73,9 +72,10 @@ def makeTweet(payload):
         )
 
     print("ツイート投稿完了。")
-    
+        
     # 投稿したツイートのIDを返す
     json_response = response.json()
+    print("ID: " + json_response["data"]["id"])
     return json_response["data"]["id"]
 
 # スレッド形式のツイートを投稿する
@@ -183,11 +183,14 @@ def pinTweet(id=0):
     
     # 固定
     if id != 0:
-        id = data.get('pinned_tweet_id').decode('utf-8')
         unpin = False
         response = oauth.post(
             "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
         )
+        if response.status_code != 200:
+            raise Exception(
+                "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
+            )
     else:
         id = data.get('pinned_tweet_id').decode('utf-8')
         if int(id) != 0:
@@ -195,22 +198,21 @@ def pinTweet(id=0):
             response = oauth.post(
                 "https://api.twitter.com/1.1/account/unpin_tweet.json?id=" + id
             )
+            if response.status_code != 200:
+                raise Exception(
+                    "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
+                )
         else:
             unpin = False
 
-    if response.status_code != 200:
-        raise Exception(
-            "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
-        )
+    if not unpin and int(id) != 0:
+        data.set('pinned_tweet_id', id)
+        print("ツイートの固定完了。")
+    elif unpin:
+        data.set('pinned_tweet_id', 0)
+        print("ツイートの固定解除完了。")
+    elif int(id) == 0:
+        print("固定されているツイートはありませんでした。")
     else:
-        if not unpin and int(id) != 0:
-            data.set('pinned_tweet_id', id)
-            print("ツイートの固定完了。")
-        elif unpin:
-            data.set('pinned_tweet_id', 0)
-            print("ツイートの固定解除完了。")
-        elif int(id) == 0:
-            print("固定されているツイートはありませんでした。")
-        else:
-            # 例外
-            pass
+        # 例外
+        pass
