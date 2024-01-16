@@ -184,17 +184,19 @@ def pinTweet(id=0):
     # 固定
     if id != 0:
         id = data.get('pinned_tweet_id').decode('utf-8')
-        if id != 0:
-            unpin = False
-            response = oauth.post(
-                "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
-            )
+        unpin = False
+        response = oauth.post(
+            "https://api.twitter.com/1.1/account/pin_tweet.json?id=" + id
+        )
     else:
         id = data.get('pinned_tweet_id').decode('utf-8')
-        unpin = True
-        response = oauth.post(
-            "https://api.twitter.com/1.1/account/unpin_tweet.json?id=" + id
-        )
+        if int(id) != 0:
+            unpin = True
+            response = oauth.post(
+                "https://api.twitter.com/1.1/account/unpin_tweet.json?id=" + id
+            )
+        else:
+            unpin = False
 
     if response.status_code != 200:
         raise Exception(
