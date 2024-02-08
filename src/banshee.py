@@ -16,15 +16,12 @@ from zoneinfo import ZoneInfo
 import math
 
 def getBanshee():
-    # 頻出する辞書とリストの定義
-    weekday = {0: '月曜日', 1: '火曜日', 2: '水曜日', 3: '木曜日', 4: '金曜日', 5: '土曜日', 6: '日曜日'}
-
     # 画像生成用のフォント定義
-    fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
-    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
-    fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
-    fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
-    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
+    fontB0 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 28)
+    fontB1 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 32)
+    fontB2 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 40)
+    fontTitle = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 55)
     logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
@@ -107,9 +104,9 @@ def getBanshee():
             # タイトルと日付挿入
             baseImg = Image.open("./img/banshee_daily_bg.jpg").convert("RGBA")
             draw = ImageDraw.Draw(baseImg)
-            draw.multiline_text((30, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
-            draw.multiline_text((520, 40), "(" + dateStr + ")", fill=(255, 255, 255), font=fontB2)
-            draw.multiline_text((30, 120), "<日替わり武器>", fill=(255, 255, 255), font=fontB1)
+            draw.multiline_text((33, 25), "今日のバンシー44", fill=(255, 255, 255), font=fontTitle)
+            draw.multiline_text((523, 40), "(" + dateStr + ")", fill=(255, 255, 255), font=fontB2)
+            draw.multiline_text((33, 125), "<日替わり武器>", fill=(255, 255, 255), font=fontB1)
 
             shift_x = 0
             shift_y = 0
@@ -138,7 +135,7 @@ def getBanshee():
         baseImg.paste(lWeaponImg, (75 + shift_x, 180 + shift_y))
 
         ## 武器名挿入
-        draw.multiline_text((195 + shift_x, 190 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
+        draw.multiline_text((195 + shift_x, 195 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
 
         ## 属性アイコン挿入
         lWeaponElemHash = lWeaponData['Response']['damageTypeHashes'][0]
@@ -163,7 +160,7 @@ def getBanshee():
 
         ## 武器種挿入
         lWeaponArchName = lWeaponData['Response']['itemTypeDisplayName']
-        draw.multiline_text((245 + elementShift + shift_x, 232 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((248 + elementShift + shift_x, 236 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
 
         ## 内在特性挿入
         # 画像挿入
@@ -175,7 +172,7 @@ def getBanshee():
 
         lWeaponFrameImg = lWeaponFrameImg.resize((80, 80), 1)
         baseImg.paste(lWeaponFrameImg, (85 + shift_x, 295 + shift_y), lWeaponFrameImg)
-        draw.multiline_text((175 + shift_x, 312 + shift_y), lWeaponFrameName, fill=(255, 255, 255), font=fontB0)
+        draw.multiline_text((178 + shift_x, 317 + shift_y), lWeaponFrameName, fill=(255, 255, 255), font=fontB0)
 
         ## マスターワークアイコン挿入
         # パスから画像・ウォーターマークを取得

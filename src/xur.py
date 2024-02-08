@@ -24,12 +24,12 @@ def getXur():
     partsOrder = [16, 13, 14, 17, 15]
 
     # 画像生成用のフォント定義
-    fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
-    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
-    fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
-    fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
-    fontB3 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 45)
-    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
+    fontB0 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 28)
+    fontB1 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 32)
+    fontB2 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 40)
+    fontB3 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 45)
+    fontTitle = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 55)
     logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
@@ -112,6 +112,7 @@ def getXur():
     baseImg.paste(logoImg, (30, 654), logoImg)
     cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
     cropImg.save(resImg, format='JPEG')
+    
     mediaList.append(tw.postImage(resImg.getvalue()))
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     recentTweet = tw.makeThread(content)
@@ -166,7 +167,7 @@ def getXur():
     baseImg.paste(eWeaponImg, (50, 185))
 
     ## 武器名挿入
-    draw.multiline_text((230, 190), eWeaponName, fill=(255, 255, 255), font=fontB3)
+    draw.multiline_text((233, 198), eWeaponName, fill=(255, 255, 255), font=fontB3)
 
     ## 属性アイコン挿入
     eWeaponElemHash = eWeaponData['Response']['damageTypeHashes'][0]
@@ -182,9 +183,9 @@ def getXur():
     eWeaponArchName = eWeaponData['Response']['itemTypeDisplayName']
     # 属性アイコンがある場合は間隔を空ける
     if hasElement == True:
-        draw.multiline_text((290, 270), eWeaponArchName, fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((290, 277), eWeaponArchName, fill=(255, 255, 255), font=fontB1)
     else:
-        draw.multiline_text((230, 270), eWeaponArchName, fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((233, 277), eWeaponArchName, fill=(255, 255, 255), font=fontB1)
 
     ## 内在特性挿入
     # 画像挿入
@@ -198,14 +199,14 @@ def getXur():
 
     ## 特性名・説明文挿入
     eWeaponInstName = eWeaponInstData['Response']['displayProperties']['name']
-    draw.multiline_text((180, 360), eWeaponInstName, fill=(255, 255, 255), font=fontB1)
+    draw.multiline_text((183, 365), eWeaponInstName, fill=(255, 255, 255), font=fontB1)
     eWeaponInstDesc = eWeaponInstData['Response']['displayProperties']['description']
     eWeaponInstDesc = eWeaponInstDesc.replace("[代替武器アクション]を:", "[リロード]を長押しすると、")
     eWeaponInstDesc = eWeaponInstDesc.replace("を: ", "を押すと")
     # 長い場合は改行を入れる
     if eWeaponInstDesc.count("\n", 0, 42) == 0:
         eWeaponInstDesc = textwrap.fill(eWeaponInstDesc, 42)
-    draw.multiline_text((180, 425), eWeaponInstDesc, fill=(255, 255, 255), font=fontN)
+    draw.multiline_text((183, 417), eWeaponInstDesc, fill=(255, 255, 255), font=fontN)
     # 改行回数をカウント（パーク一覧を下にずらすため）
     cl = eWeaponInstDesc.count('\n')
 
@@ -222,13 +223,13 @@ def getXur():
         # 3列目のパークのみ、パーク名と説明文を挿入
         if i == 2:
             eWeaponInstPerkName = eWeaponPerkData['Response']['displayProperties']['name']
-            draw.multiline_text((520, 500 + 22 * cl), eWeaponInstPerkName, fill=(255, 255, 255), font=fontB1)
+            draw.multiline_text((523, 505 + 22 * cl), eWeaponInstPerkName, fill=(255, 255, 255), font=fontB1)
             eWeaponInstPerkDesc = eWeaponPerkData['Response']['displayProperties']['description']
             eWeaponInstPerkDesc = eWeaponInstPerkDesc.replace("[代替武器アクション]を: ", "[リロード]を長押しすると、")
             eWeaponInstPerkDesc = eWeaponInstPerkDesc.replace("を: ", "を押すと、")
             if eWeaponInstPerkDesc.count("\n", 0, 29) == 0:
                 eWeaponInstPerkDesc = textwrap.fill(eWeaponInstPerkDesc, 29)
-            draw.multiline_text((520, 545 + 22 * cl), eWeaponInstPerkDesc, fill=(255, 255, 255), font=fontN)
+            draw.multiline_text((523, 550 + 22 * cl), eWeaponInstPerkDesc, fill=(255, 255, 255), font=fontN)
 
     baseImg.paste(logoImg, (30, 654), logoImg)
     cropImg = baseImg.crop((0, 0, 1280, 720)).convert("RGB")
@@ -272,11 +273,11 @@ def getXur():
         baseImg.paste(eArmorImg, (50, 185))
 
         ## 防具名挿入
-        draw.multiline_text((230, 190), eArmorName, fill=(255, 255, 255), font=fontB3)
+        draw.multiline_text((233, 198), eArmorName, fill=(255, 255, 255), font=fontB3)
 
         ## 防具種挿入
         eArmorArchName = eArmorData['Response']['itemTypeDisplayName']
-        draw.multiline_text((230, 270), eArmorArchName, fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((233, 275), eArmorArchName, fill=(255, 255, 255), font=fontB1)
 
         ## 内在特性挿入
         # 画像挿入
@@ -290,34 +291,31 @@ def getXur():
 
         ## 特性名・説明文挿入
         eArmorInstName = eArmorInstData['Response']['displayProperties']['name']
-        draw.multiline_text((180, 360), eArmorInstName, fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((183, 365), eArmorInstName, fill=(255, 255, 255), font=fontB1)
         eArmorInstDesc = eArmorInstData['Response']['displayProperties']['description']
         # 長い場合は改行を入れる
         if eArmorInstDesc.count("\n", 0, 19) == 0:
             eArmorInstDesc = textwrap.fill(eArmorInstDesc, 19)
-        draw.multiline_text((180, 410), eArmorInstDesc, fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((183, 415), eArmorInstDesc, fill=(255, 255, 255), font=fontN)
         
         ## ステータスグラフ挿入
         eArmorStats = vendor[0]['Response']['itemComponents']['stats']['data'][salesList[0][c + 3]]['stats']
 
-        draw.multiline_text((720, 360), "防具のステータス値", fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((723, 365), "防具のステータス値", fill=(255, 255, 255), font=fontB1)
         draw.line(((715, 415), (1235, 415)), (255, 255, 255), 2)
         statsTotal = 0
         for s in range(6):
             draw.rectangle((895, 435 + 50 * s, 1225, 465 + 50 * s), fill=(32, 32, 32))
             draw.rectangle((895, 435 + 50 * s, 895 + (330 * (eArmorStats[statsTable[s]]['value'] / 42)), 465 + 50 * s), fill=(255, 255, 255))
-            if (len(str(eArmorStats[statsTable[s]]['value'])) == 1):
-                draw.multiline_text((867, 431 + 50 * s), str(eArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
-            else:
-                draw.multiline_text((855, 431 + 50 * s), str(eArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
+            draw.text((885, 440 + 50 * s), str(eArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN, anchor='rt')
             statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + statsTable[s] + "/?lc=ja", headers=headers).json()
             statPath = statData['Response']['displayProperties']['icon']
-            draw.multiline_text((722, 431 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
+            draw.multiline_text((723, 433 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
             statImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + statPath).content)).convert("RGBA").resize((36, 36), 1)
-            baseImg.paste(statImg, (808, 433 + 50 * s), statImg)
+            baseImg.paste(statImg, (808, 432 + 50 * s), statImg)
             statsTotal += eArmorStats[statsTable[s]]['value']
-        draw.multiline_text((722, 737), "合計", fill=(255, 255, 255), font=fontN)
-        draw.multiline_text((845, 730), str(statsTotal), fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((725, 742), "合計", fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((848, 735), str(statsTotal), fill=(255, 255, 255), font=fontB1)
         
         baseImg.paste(logoImg, (30, 754), logoImg)
         cropImg = baseImg.crop((0, 0, 1280, 820)).convert("RGB")
@@ -361,11 +359,11 @@ def getXur():
 
     ## 武器名挿入
     epName = epData['Response']['displayProperties']['name']
-    draw.multiline_text((210, 180), epName, fill=(255, 255, 255), font=fontB3)
+    draw.multiline_text((213, 188), epName, fill=(255, 255, 255), font=fontB3)
         
     ## 武器種挿入
     epArchName = epData['Response']['itemTypeDisplayName']
-    draw.multiline_text((210, 250), epArchName, fill=(255, 255, 255), font=fontB1)
+    draw.multiline_text((213, 255), epArchName, fill=(255, 255, 255), font=fontB1)
 
     ## 内在特性挿入
     # 画像挿入
@@ -379,7 +377,7 @@ def getXur():
     
     ## 特性名・説明文挿入
     epInstName = epInstData['Response']['displayProperties']['name']
-    draw.multiline_text((180, 358), epInstName, fill=(255, 255, 255), font=fontB1)
+    draw.multiline_text((183, 363), epInstName, fill=(255, 255, 255), font=fontB1)
 
     # パーク挿入
     print(epName + ":")
@@ -393,12 +391,12 @@ def getXur():
         tweetText += "- " + epPerkName + "\n"
         epPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + epPerkPath).content)).convert("RGBA").resize((80, 80), 1)
         baseImg.paste(epPerkImg, (73, 450 + 93 * (i - 1)), epPerkImg)
-        draw.multiline_text((180, 465 + 93 * (i - 1)), epPerkName, fill=(255, 255, 255), font=fontB1)
+        draw.multiline_text((183, 470 + 93 * (i - 1)), epPerkName, fill=(255, 255, 255), font=fontB1)
 
     ## ステータスグラフ挿入
     epStats = vendor[0]['Response']['itemComponents']['stats']['data']['31']['stats']
     epDefStats = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()['Response']['stats']['stats']
-    draw.multiline_text((680, 365), "ステータス値", fill=(255, 255, 255), font=fontB1)
+    draw.multiline_text((683, 370), "ステータス値", fill=(255, 255, 255), font=fontB1)
     draw.line(((675, 420), (1235, 420)), (255, 255, 255), 2)
     for s in range(4):
         draw.rectangle((895, 440 + 50 * s, 1225, 470 + 50 * s), fill=(32, 32, 32))
@@ -410,9 +408,9 @@ def getXur():
             draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
         else:
             draw.rectangle((895, 440 + 50 * s, 895 + (330 * (epStats[weaponStatsTable[s]]['value'] / 100)), 470 + 50 * s), fill=(255, 255, 255))
-        draw.multiline_text((855, 436 + 50 * s), str(epStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((856, 441 + 50 * s), str(epStats[weaponStatsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
         statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + weaponStatsTable[s] + "/?lc=ja", headers=headers).json()
-        draw.multiline_text((682, 436 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((685, 441 + 50 * s), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
 
     # 表示
     baseImg.paste(logoImg, (950, 784), logoImg)
@@ -481,7 +479,7 @@ def getXur():
         baseImg.paste(lWeaponImg, (75 + shift_x, 180 + shift_y))
 
         ## 武器名挿入
-        draw.multiline_text((195 + shift_x, 190 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
+        draw.multiline_text((195 + shift_x, 195 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
 
         ## 属性アイコン挿入
         lWeaponElemHash = lWeaponData['Response']['damageTypeHashes'][0]
@@ -506,7 +504,7 @@ def getXur():
 
         ## 武器種挿入
         lWeaponArchName = lWeaponData['Response']['itemTypeDisplayName']
-        draw.multiline_text((245 + elementShift + shift_x, 232 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((248 + elementShift + shift_x, 236 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
 
         ## 内在特性挿入
         # 画像挿入
@@ -518,7 +516,7 @@ def getXur():
 
         lWeaponFrameImg = lWeaponFrameImg.resize((80, 80), 1)
         baseImg.paste(lWeaponFrameImg, (85 + shift_x, 295 + shift_y), lWeaponFrameImg)
-        draw.multiline_text((175 + shift_x, 312 + shift_y), lWeaponFrameName, fill=(255, 255, 255), font=fontB0)
+        draw.multiline_text((178 + shift_x, 317 + shift_y), lWeaponFrameName, fill=(255, 255, 255), font=fontB0)
 
         ## マスターワークアイコン挿入
         # パスから画像・ウォーターマークを取得
@@ -655,11 +653,11 @@ def getXur():
             baseImg.paste(lArmorImg, (75 + shift_x, 180 + shift_y))
 
             ## 防具名挿入
-            draw.multiline_text((195 + shift_x, 190 + shift_y), lArmorName, fill=(255, 255, 255), font=fontB0)
+            draw.multiline_text((198 + shift_x, 195 + shift_y), lArmorName, fill=(255, 255, 255), font=fontB0)
 
             ## 防具種挿入
             lArmorArchName = lArmorData['Response']['itemTypeDisplayName']
-            draw.multiline_text((195 + shift_x, 232 + shift_y), lArmorArchName, fill=(255, 255, 255), font=fontN)
+            draw.multiline_text((198 + shift_x, 237 + shift_y), lArmorArchName, fill=(255, 255, 255), font=fontN)
 
             ## ステータスグラフ挿入（クラスアイテム以外）
             if p != 4:
@@ -669,18 +667,15 @@ def getXur():
                 for s in range(6):
                     draw.rectangle((260 + shift_x, 300 + 50 * s + shift_y, 590 + shift_x, 330 + 50 * s + shift_y), fill=(32, 32, 32))
                     draw.rectangle((260 + shift_x, 300 + 50 * s + shift_y, 260 + (330 * (lArmorStats[statsTable[s]]['value'] / 42)) + shift_x, 330 + 50 * s + shift_y), fill=(255, 255, 255))
-                    if (len(str(lArmorStats[statsTable[s]]['value'])) == 1):
-                        draw.multiline_text((232 + shift_x, 296 + 50 * s + shift_y), str(lArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
-                    else:
-                        draw.multiline_text((220 + shift_x, 296 + 50 * s + shift_y), str(lArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN)
+                    draw.text((249 + shift_x, 305 + 50 * s + shift_y), str(lArmorStats[statsTable[s]]['value']), fill=(255, 255, 255), font=fontN, anchor='rt')
                     statData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyStatDefinition/" + statsTable[s] + "/?lc=ja", headers=headers).json()
                     statPath = statData['Response']['displayProperties']['icon']
-                    draw.multiline_text((87 + shift_x, 296 + 50 * s + shift_y), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
+                    draw.multiline_text((87 + shift_x, 300 + 50 * s + shift_y), statData['Response']['displayProperties']['name'], fill=(255, 255, 255), font=fontN)
                     statImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + statPath).content)).convert("RGBA").resize((36, 36), 1)
-                    baseImg.paste(statImg, (173 + shift_x, 298 + 50 * s + shift_y), statImg)
+                    baseImg.paste(statImg, (173 + shift_x, 297 + 50 * s + shift_y), statImg)
                     statsTotal += lArmorStats[statsTable[s]]['value']
-                draw.multiline_text((87 + shift_x, 596 + shift_y), "合計", fill=(255, 255, 255), font=fontN)
-                draw.multiline_text((210 + shift_x, 590 + shift_y), str(statsTotal), fill=(255, 255, 255), font=fontB1)
+                draw.multiline_text((87 + shift_x, 600 + shift_y), "合計", fill=(255, 255, 255), font=fontN)
+                draw.multiline_text((213 + shift_x, 596 + shift_y), str(statsTotal), fill=(255, 255, 255), font=fontB1)
             
         baseImg.paste(logoImg, (950, 1254), logoImg)            
         cropImg = baseImg.crop((0, 0, 1280, 1320)).convert("RGB")

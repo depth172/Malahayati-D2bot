@@ -24,13 +24,13 @@ def getLostSector():
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
     # 画像生成用のフォント定義
-    fontS = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 17)
-    fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
-    fontLoc = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 22)
-    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
-    fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
-    fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
-    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 55)
+    fontS = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 17)
+    fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
+    fontLoc = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 22)
+    fontB0 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 28)
+    fontB1 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 32)
+    fontB2 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 40)
+    fontTitle = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 55)
     logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
@@ -177,27 +177,27 @@ def getLostSector():
 
     shift_x = 0
 
-    draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontTitle)
-    draw.text((490, 40), "(" + todayDateStr + ")", fill=(255, 255, 255), font=fontB2)
-    draw.text((1240, 680), sectorName, fill=(255, 255, 255), font=fontTitle, anchor="rb")
+    draw.text((33, 30), "失われたセクター", fill=(255, 255, 255), font=fontTitle)
+    draw.text((493, 45), "(" + todayDateStr + ")", fill=(255, 255, 255), font=fontB2)
+    draw.text((1243, 685), sectorName, fill=(255, 255, 255), font=fontTitle, anchor="rb")
     
     if sectorLocName in sectorPlanetName:
-        draw.text((1235, 600), sectorLocName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
+        draw.text((1238, 605), sectorLocName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
     else:
         sectorDestName = sectorPlanetName + "、" + sectorLocName
-        draw.text((1235, 600), sectorDestName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
+        draw.text((1238, 605), sectorDestName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
     
-    draw.multiline_text((25, 400), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
-    draw.text((25, 600), "伝説:", fill=(255, 255, 255), font=fontN)
-    draw.text((25, 660), "達人:", fill=(255, 255, 255), font=fontN)
+    draw.multiline_text((28, 405), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
+    draw.text((28, 605), "伝説:", fill=(255, 255, 255), font=fontN)
+    draw.text((28, 665), "達人:", fill=(255, 255, 255), font=fontN)
     baseImg.paste(logoImg, (935, 45), logoImg)
 
     for i in range(1, 3):
         icon = Image.open("./img/" + sector[sectorRot][i][0] + ".png").resize((70, 70))
         baseImg.paste(icon, (145 + shift_x, 500), icon)
-        draw.text((180 + shift_x, 460), champion[sector[sectorRot][i][0]], fill=(255, 255, 255), font=fontS, anchor='mt')
-        draw.text((180 + shift_x, 602), "×" + sector[sectorRot][i][1][0], fill=(255, 255, 255), font=fontB2, anchor='mt')
-        draw.text((180 + shift_x, 662), "×" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
+        draw.text((183 + shift_x, 470), champion[sector[sectorRot][i][0]], fill=(255, 255, 255), font=fontS, anchor='mm')
+        draw.text((183 + shift_x, 602), "x" + sector[sectorRot][i][1][0], fill=(255, 255, 255), font=fontB2, anchor='mt')
+        draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
         shift_x += 140
 
     e = 3
@@ -213,9 +213,9 @@ def getLostSector():
         elemPath = elemData['Response']['displayProperties']['icon']
         elemImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + elemPath).content)).convert("RGBA").resize((70, 70), 1)
         baseImg.paste(elemImg, (145 + shift_x, 500), elemImg)
-        draw.text((180 + shift_x, 460), elemName, fill=(255, 255, 255), font=fontS, anchor='mt')
-        draw.text((180 + shift_x, 602), "×" + sector[sectorRot][i][1][0], fill=(255, 255, 255), font=fontB2, anchor='mt')
-        draw.text((180 + shift_x, 662), "×" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
+        draw.text((183 + shift_x, 470), elemName, fill=(255, 255, 255), font=fontS, anchor='mm')
+        draw.text((183 + shift_x, 602), "x" + sector[sectorRot][i][1][0], fill=(255, 255, 255), font=fontB2, anchor='mt')
+        draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
         shift_x += 140
 
     if not sectorData['Response']['modifiers'][11]['activityModifierHash'] in [1783825372]:
@@ -226,8 +226,8 @@ def getLostSector():
         modPath = modData['Response']['displayProperties']['icon']
         modImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + modPath).content)).convert("RGBA").resize((60, 60), 1)
         baseImg.paste(modImg, (25, 283), modImg)
-        draw.text((102, 288), modName, fill=(255, 255, 255), font=fontB1)
-        draw.text((40, 356), modDesc, fill=(255, 255, 255), font=fontN)
+        draw.text((105, 293), modName, fill=(255, 255, 255), font=fontB1)
+        draw.text((43, 361), modDesc, fill=(255, 255, 255), font=fontN)
 
     baseImg.convert("RGB").save(resImg1, format='JPEG')
 
@@ -241,10 +241,10 @@ def getLostSector():
     shift_x = 0
     shift_y = 0
 
-    draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontB1)
-    draw.text((45, 65), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
-    draw.text((65, 185), "防具の部位:", fill=(255, 255, 255), font=fontB2)
-    draw.text((400, 185), armorRot, fill=(255, 255, 255), font=fontB2)
+    draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
+    draw.text((45, 70), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
+    draw.text((65, 190), "防具の部位:", fill=(255, 255, 255), font=fontB2)
+    draw.text((400, 190), armorRot, fill=(255, 255, 255), font=fontB2)
     draw.text((30, 300), "<セクター限定で本日ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
     draw.text((1240, 680), "＊ ソロでクリア時のみドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
     
@@ -277,8 +277,8 @@ def getLostSector():
     shift_x = 0
     shift_y = 0
 
-    draw.text((30, 25), "失われたセクター", fill=(255, 255, 255), font=fontB1)
-    draw.text((45, 65), "本日のドロップアイテム (2/2)", fill=(255, 255, 255), font=fontTitle)
+    draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
+    draw.text((45, 70), "本日のドロップアイテム (2/2)", fill=(255, 255, 255), font=fontTitle)
     draw.text((30, 150), "<追加ドロップするレジェンダリー武器>", fill=(255, 255, 255), font=fontB1)
     draw.text((1240, 680), "＊ ソロでクリア時のみドロップ。達人クリアの場合、パークが複数個つく可能性があります。", fill=(255, 255, 255), font=fontN, anchor='rb')
         
@@ -303,7 +303,7 @@ def getLostSector():
         baseImg.paste(lWeaponImg, (85 + shift_x, 260 + shift_y))
 
         ## 武器名挿入
-        draw.multiline_text((205 + shift_x, 265 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
+        draw.multiline_text((205 + shift_x, 270 + shift_y), lWeaponName, fill=(255, 255, 255), font=fontB0)
 
         ## 属性アイコン挿入
         lWeaponElemHash = lWeaponData['Response']['damageTypeHashes'][0]
@@ -328,7 +328,7 @@ def getLostSector():
 
         ## 武器種挿入
         lWeaponArchName = lWeaponData['Response']['itemTypeDisplayName']
-        draw.multiline_text((255 + elementShift + shift_x, 307 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
+        draw.multiline_text((258 + elementShift + shift_x, 311 + shift_y), lWeaponArchName, fill=(255, 255, 255), font=fontN)
 
         # 部位ごとにずらす
         if (i % 2) == 0:

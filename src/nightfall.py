@@ -22,11 +22,11 @@ def getNightfall():
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
     # 画像生成用のフォント定義
-    fontN = ImageFont.truetype('./.font/GlowSansSC-Normal-Medium.otf', 25)
-    fontB0 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 28)
-    fontB1 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 32)
-    fontB2 = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 40)
-    fontTitle = ImageFont.truetype('./.font/GlowSansSC-Normal-Bold.otf', 56)
+    fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
+    fontB0 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 28)
+    fontB1 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 32)
+    fontB2 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 40)
+    fontTitle = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 56)
     logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
@@ -161,37 +161,37 @@ def getNightfall():
     resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
-    draw.text((40, 34), "ナイトフォール", fill=(255, 255, 255), font=fontB2)
-    draw.text((350, 45), "(" + todayDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB0)
-    draw.text((40, 113), nightfallName, fill=(255, 255, 255), font=fontTitle)
+    draw.text((43, 39), "ナイトフォール", fill=(255, 255, 255), font=fontB2)
+    draw.text((353, 50), "(" + todayDateStr + " ～ " + endDateStr + ")", fill=(255, 255, 255), font=fontB0)
+    draw.text((43, 118), nightfallName, fill=(255, 255, 255), font=fontTitle)
     baseImg.paste(logoImg, (935, 45), logoImg)
     
     specialModImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + specialModPath).content)).convert("RGBA").resize((60, 60), 1)
     baseImg.paste(specialModImg, (35, 223), specialModImg)
-    draw.text((112, 228), specialModName, fill=(255, 255, 255), font=fontB1)
-    draw.text((50, 296), specialModDesc, fill=(255, 255, 255), font=fontN)
+    draw.text((115, 234), specialModName, fill=(255, 255, 255), font=fontB1)
+    draw.text((53, 304), specialModDesc, fill=(255, 255, 255), font=fontN)
 
     draw.multiline_text((35, 360), "＜戦闘条件＞", fill=(255, 255, 255), font=fontB1)
 
-    draw.text((35, 410), "シールド", fill=(255, 255, 255), font=fontB0)
+    draw.text((35, 415), "シールド", fill=(255, 255, 255), font=fontB0)
     shieldImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + shieldPath).content)).convert("RGBA").resize((80, 80), 1)
     baseImg.paste(shieldImg, (46, 460), shieldImg)
 
-    draw.text((194, 411), "脅威", fill=(255, 255, 255), font=fontB0)
+    draw.text((193, 416), "脅威", fill=(255, 255, 255), font=fontB0)
     threatImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + threatPath).content)).convert("RGBA").resize((80, 80), 1)
     baseImg.paste(threatImg, (180, 460), threatImg)
 
-    draw.text((70, 550), "チャンピオン", fill=(255, 255, 255), font=fontB0)
+    draw.text((70, 555), "チャンピオン", fill=(255, 255, 255), font=fontB0)
     championImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + championPath).content)).convert("RGBA").resize((80, 80), 1)
     baseImg.paste(championImg, (113, 600), championImg)
 
-    draw.text((384, 410), "サージ", fill=(255, 255, 255), font=fontB0)
+    draw.text((384, 415), "サージ", fill=(255, 255, 255), font=fontB0)
     surge1Img = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + surge1Path).content)).convert("RGBA").resize((80, 80), 1)
     surge2Img = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + surge2Path).content)).convert("RGBA").resize((80, 80), 1)
     baseImg.paste(surge1Img, (339, 460), surge1Img)
     baseImg.paste(surge2Img, (429, 460), surge2Img)
 
-    draw.text((314, 550), "オーバーチャージ", fill=(255, 255, 255), font=fontB0)
+    draw.text((314, 555), "オーバーチャージ", fill=(255, 255, 255), font=fontB0)
     ocImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + ocPath).content)).convert("RGBA").resize((80, 80), 1)
     baseImg.paste(ocImg, (384, 600), ocImg)
 
@@ -211,7 +211,7 @@ def getNightfall():
     baseImg.paste(weaponImg, (650, 475))
 
     ## 武器名挿入
-    draw.multiline_text((770, 480), weaponName, fill=(255, 255, 255), font=fontB0)
+    draw.multiline_text((770, 485), weaponName, fill=(255, 255, 255), font=fontB0)
 
     ## 属性アイコン挿入
     weaponElemHash = weaponData['Response']['damageTypeHashes'][0]
@@ -236,16 +236,17 @@ def getNightfall():
 
     ## 武器種挿入
     weaponArchName = weaponData['Response']['itemTypeDisplayName']
-    draw.multiline_text((819 + elementShift, 522), weaponArchName, fill=(255, 255, 255), font=fontN)
+    draw.multiline_text((822 + elementShift, 526), weaponArchName, fill=(255, 255, 255), font=fontN)
     
-    draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新 ・ ”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
+    draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新・”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
 
     baseImg.convert("RGB").save(resImg, format='JPEG')
+    baseImg.show()
     mediaList.append(tw.postImage(resImg.getvalue()))
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
-    tweetID = tw.makeTweet(content)
-    tw.pinTweet(tweetID)
+    # tweetID = tw.makeTweet(content)
+    # tw.pinTweet(tweetID)
 
     print("情報取得の全工程完了。")
     
