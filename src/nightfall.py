@@ -241,12 +241,11 @@ def getNightfall():
     draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新・”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
 
     baseImg.convert("RGB").save(resImg, format='JPEG')
-    baseImg.show()
     mediaList.append(tw.postImage(resImg.getvalue()))
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
-    # tweetID = tw.makeTweet(content)
-    # tw.pinTweet(tweetID)
+    tweetID = tw.makeTweet(content)
+    tw.pinTweet(tweetID)
 
     print("情報取得の全工程完了。")
     
