@@ -18,7 +18,10 @@ data = redis.from_url(url=os.getenv('REDIS_URL'))
 currentTime = datetime.datetime.now(TimeZone)
 
 # 直前実行時の時間を取得
-lastHour = int(re.findall(r'\d+', str(data.get('lastHour')))[0])
+try:
+    lastHour = int(re.findall(r'\d+', str(data.get('lastHour')))[0])
+except IndexError:
+    lastHour = currentTime.hour - 1
 
 # 実行時の時間を取得
 currentHour = currentTime.hour
