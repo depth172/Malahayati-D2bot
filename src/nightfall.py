@@ -1,6 +1,7 @@
 ### ライブラリのインポート ###
 # 認証関連
 import src.auth as auth
+from dotenv import load_dotenv
 import os
 # API取得用
 import requests
@@ -34,6 +35,7 @@ def getNightfall():
 
     #### 基本データの取得 ####
     # ヘッダーにAPIキーとアクセストークンを設定
+    load_dotenv()
     headers = {"X-API-Key": os.getenv('B_API_KEY'),
             "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
@@ -247,6 +249,6 @@ def getNightfall():
     tweetID = tw.makeTweet(content)
     tw.pinTweet(tweetID)
 
-    print("情報取得の全工程完了。")
+    print("\n情報取得の全工程完了。")
     
     return 0

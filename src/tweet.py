@@ -1,9 +1,14 @@
 from requests_oauthlib import OAuth1Session
 import redis
 import os
+from dotenv import load_dotenv
 
 def getTwitterAccessToken():
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
     
     consumer_key = os.environ.get("T_CONSUMER_KEY")
     consumer_secret = os.environ.get("T_CONSUMER_SECRET")
@@ -43,7 +48,11 @@ def getTwitterAccessToken():
 
 # 通常のツイートを投稿する
 def makeTweet(payload):
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
 
     if data.exists('twitter_access_token') == 0 or data.exists('twitter_access_token_secret') == 0:
         getTwitterAccessToken()
@@ -80,7 +89,11 @@ def makeTweet(payload):
 
 # スレッド形式のツイートを投稿する
 def makeThread(payload, recent_id=0):
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
 
     if data.exists('twitter_access_token') == 0 or data.exists('twitter_access_token_secret') == 0:
         getTwitterAccessToken()
@@ -124,7 +137,11 @@ def makeThread(payload, recent_id=0):
 
 # 画像を投稿する
 def postImage(image):
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
     
     consumer_key = os.environ.get("T_CONSUMER_KEY")
     consumer_secret = os.environ.get("T_CONSUMER_SECRET")
@@ -164,7 +181,11 @@ def postImage(image):
 # ツイートをプロフィール画面に固定する
 # idを渡さなかった場合、固定したツイートを固定解除する
 def pinTweet(id=0):
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
 
     if data.exists('twitter_access_token') == 0 or data.exists('twitter_access_token_secret') == 0:
         getTwitterAccessToken()

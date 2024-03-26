@@ -1,3 +1,4 @@
+from dotenv import load_dotenv
 import base64
 import redis
 import os
@@ -5,7 +6,11 @@ import requests
 
 ## アクセスに必要なトークンを取得
 def getBungieAccessToken():
-    data = redis.from_url(url=os.getenv('REDIS_URL'))
+    load_dotenv()
+    data = redis.Redis(
+        host=os.getenv('REDIS_URL'),
+        port=os.getenv('REDIS_PORT'),
+        password=os.getenv('REDIS_PASS'))
     
     raw = os.getenv('B_CLIENT_ID') + ":" + os.getenv('B_CLIENT_SECRET')
     auth = base64.b64encode(raw.encode()).decode()

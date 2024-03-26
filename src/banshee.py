@@ -1,6 +1,8 @@
 ### ライブラリのインポート ###
 # 認証関連
 import src.auth as auth
+import src.auth as auth
+from dotenv import load_dotenv
 import os
 # API取得用
 import requests
@@ -31,6 +33,7 @@ def getBanshee():
     #### 基本データの取得 ####
 
     # ヘッダーにAPIキーとアクセストークンを設定
+    load_dotenv()
     headers = {"X-API-Key": os.getenv('B_API_KEY'),
                "Authorization": "Bearer " + os.environ["BAPI_ACCESS_TOKEN"]}
 
@@ -256,6 +259,6 @@ def getBanshee():
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)
 
-    print("情報取得の全工程完了。")
+    print("\n情報取得の全工程完了。")
     
     return 0
