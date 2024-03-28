@@ -25,13 +25,13 @@ def getXur():
     partsOrder = [16, 13, 14, 17, 15]
 
     # 画像生成用のフォント定義
-    fontN = ImageFont.truetype('.font/GenEiGothicN-Regular.otf', 25)
-    fontB0 = ImageFont.truetype('.font/GenEiGothicN-Bold.otf', 28)
-    fontB1 = ImageFont.truetype('.font/GenEiGothicN-Bold.otf', 32)
-    fontB2 = ImageFont.truetype('.font/GenEiGothicN-Bold.otf', 40)
-    fontB3 = ImageFont.truetype('.font/GenEiGothicN-Bold.otf', 45)
-    fontTitle = ImageFont.truetype('.font/GenEiGothicN-Bold.otf', 55)
-    logoImg = Image.open("img/logo_full.png").resize((300, 46), 1)
+    fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
+    fontB0 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 28)
+    fontB1 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 32)
+    fontB2 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 40)
+    fontB3 = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 45)
+    fontTitle = ImageFont.truetype('./.font/GenEiGothicN-Bold.otf', 55)
+    logoImg = Image.open("./img/logo_full.png").resize((300, 46), 1)
 
     ### アクセスに必要なトークンを取得 ###
 
@@ -88,13 +88,13 @@ def getXur():
     location = vendor[0]['Response']['vendor']['data']['vendorLocationIndex']
     if (location == 0) :
         locationText = 'タワー，ハンガー'
-        baseImg = Image.open("img/xur_tower.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_tower.jpg").convert("RGBA")
     elif (location == 1) :
         locationText = 'EDZ，屈曲の細道'
-        baseImg = Image.open("img/xur_edz.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_edz.jpg").convert("RGBA")
     elif (location == 2) :
         locationText = 'ネッスス，監視者の墓'
-        baseImg = Image.open("img/xur_nessus.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_nessus.jpg").convert("RGBA")
     resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
@@ -145,7 +145,7 @@ def getXur():
     ### エキゾチック武器の画像生成 ###
 
     ## 背景画像の準備
-    baseImg = Image.open("img/xur_bg.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
     resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
@@ -253,7 +253,7 @@ def getXur():
 
         ### 画像生成
         # フォントと背景画像の準備
-        baseImg = Image.open("img/xur_bg.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
         resImg = io.BytesIO()
         draw = ImageDraw.Draw(baseImg)
         # タイトルと日付挿入
@@ -337,7 +337,7 @@ def getXur():
     epData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(epHash) + "/?lc=ja", headers=headers).json()
     
     # 背景画像の準備
-    baseImg = Image.open("img/xur_bg.jpg").convert("RGBA")
+    baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
     resImg = io.BytesIO()
     draw = ImageDraw.Draw(baseImg)
 
@@ -446,7 +446,7 @@ def getXur():
     while w < m:
         if w in [0, 4]:
             # フォントと背景画像の準備
-            baseImg = Image.open("img/xur_bg.jpg").convert("RGBA")
+            baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
             resImg = io.BytesIO()
             draw = ImageDraw.Draw(baseImg)
                 
@@ -555,7 +555,6 @@ def getXur():
                     if lWeaponPerkHash not in [2302094943, 2931483505, 4248210736]:
                         lWeaponPerkData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponPerkHash) + "/?lc=ja", headers=headers).json()
                         lWeaponPerkPath = lWeaponPerkData['Response']['displayProperties']['icon']
-                        lWeaponPerkName = lWeaponPerkData['Response']['displayProperties']['name']
                         lWeaponPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + lWeaponPerkPath).content)).convert("RGBA").resize((80, 80), 1)
                         baseImg.paste(lWeaponPerkImg, (85 + 105 * (i - 1) + shift_x, 480 + 93 * (r - 1) + shift_y), lWeaponPerkImg)
                 except KeyError:
@@ -605,7 +604,7 @@ def getXur():
     for c in range(3):
         ### 画像生成
         # フォントと背景画像の準備
-        baseImg = Image.open("img/xur_bg.jpg").convert("RGBA")
+        baseImg = Image.open("./img/xur_bg.jpg").convert("RGBA")
         resImg = io.BytesIO()
         draw = ImageDraw.Draw(baseImg)
         
