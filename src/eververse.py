@@ -296,23 +296,23 @@ def getEververse():
             ornamentSpec = salesItems[itemOrder['1742617626'][i]]['itemTypeDisplayName']
             draw.multiline_text((75, 380 + shift_y), ornamentSpec, fill=(255, 255, 255), font=fontB1)
             
-            ## 武器アイコン挿入
+            ## 防具アイコン挿入
             # パスから画像・ウォーターマークを取得
-            draw.multiline_text((60, 330 + shift_y), "[装備可能武器]", fill=(255, 255, 255), font=fontS)
+            draw.multiline_text((60, 330 + shift_y), "[装備可能防具]", fill=(255, 255, 255), font=fontS)
             armorImgPath = armorData['Response']['displayProperties']['icon']
             armorWMPath = armorData['Response']['quality']['displayVersionWatermarkIcons'][-1]
             armorBaseImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + armorImgPath).content))
             armorBaseImg.putalpha(255)
             armorWM = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + armorWMPath).content)).convert("RGBA")
-            # 武器画像とウォーターマークを合成
+            # 防具画像とウォーターマークを合成
             armorImg = Image.alpha_composite(armorBaseImg, armorWM)
             # リサイズして挿入
             armorImg = armorImg.resize((80, 80), 1)
             baseImg.paste(armorImg, (85, 360 + shift_y))
-            ## 武器名挿入
+            ## 防具名挿入
             armorName = armorData['Response']['displayProperties']['name']
             draw.multiline_text((180, 367 + shift_y), armorName, fill=(255, 255, 255), font=fontN2)
-            ## 武器種挿入
+            ## 防具種挿入
             armorArchName = armorData['Response']['itemTypeDisplayName']
             draw.multiline_text((180, 409 + shift_y), armorArchName, fill=(255, 255, 255), font=fontS)
             
