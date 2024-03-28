@@ -1,2 +1,2 @@
-from . import banshee, xur, lostsector, nightfall
-__all__ = ['banshee', 'xur', 'lostsector', 'nightfall']
+from . import banshee, xur, lostsector, nightfall, eververse
+__all__ = ['banshee', 'xur', 'lostsector', 'nightfall', 'eververse']

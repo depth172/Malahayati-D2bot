@@ -42,6 +42,7 @@ if lastHour != currentHour:
             tw.pinTweet()
             data.set('gotXur', 'False')
             data.set('gotNightfall', 'False')
+            data.set('gotEververse', 'False')
     # 毎日9時にバンシー取得フラグをリセットする
     elif currentHour == 9:
         print("定期実行を開始します。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n")
@@ -49,12 +50,13 @@ if lastHour != currentHour:
         data.set('gotBanshee', 'False')
     # 取得する情報がない時間の場合、フラグを有効化
     else:
-        print("情報の更新はまだ行いません。")
+        print("情報の更新はまだ行いません。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n----------------------------------------")
         data.set('lastHour', currentHour)
         noData = True
 elif not (
     (currentTime.weekday() in [0, 1, 5, 6] and data.get('gotXur') == b'False') or 
     data.get('gotNightfall') == b'False' or
+    data.get('gotEververse') == b'False' or
     data.get('gotSector') == b'False' or
     data.get('gotBanshee') == b'False'
 ):
@@ -90,6 +92,19 @@ if data.get('gotNightfall') == b'False':
     elif checkCode == 5:
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ナイトフォール情報】" + timeStr + "\nAPIのメンテナンス中につき、ナイトフォールに関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
+        contents = {"text": tweetText}
+        tw.makeTweet(contents)
+
+# エバーバースの情報を未取得だった場合は取得
+if data.get('gotEververse') == b'False':
+    gotInfo = True
+    print("エバーバースの情報を取得します。\n")
+    checkCode = eververse.getEververse()
+    if checkCode == 0:
+        data.set('gotEververse', 'True')
+    elif checkCode == 5:
+        timeStr = currentTime.strftime('%Y/%m/%d')
+        tweetText = "【エバーバース情報】" + timeStr + "\nAPIのメンテナンス中につき、エバーバースに関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
 
