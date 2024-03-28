@@ -50,7 +50,7 @@ if lastHour != currentHour:
         data.set('gotBanshee', 'False')
     # 取得する情報がない時間の場合、フラグを有効化
     else:
-        print("情報の更新はまだ行いません。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n----------------------------------------")
+        print("情報の更新はまだ行いません。")
         data.set('lastHour', currentHour)
         noData = True
 elif not (
