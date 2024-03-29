@@ -76,11 +76,14 @@ def makeTweet(payload):
     )
 
     if response.status_code != 201:
-        raise Exception(
-            "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
-        )
-
-    print("ツイート投稿完了。")
+        if response.status_code == 403:
+            print("ツイート内容が重複しているため、ツイートできませんでした。")
+        else:
+            raise Exception(
+                "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
+            )
+    else:
+        print("ツイート投稿完了。")
         
     # 投稿したツイートのIDを返す
     json_response = response.json()
@@ -122,14 +125,17 @@ def makeThread(payload, recent_id=0):
     )
 
     if response.status_code != 201:
-        raise Exception(
-            "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
-        )
-
-    if recent_id == 0:
-        print("スレッド元ツイートの投稿完了。")
+        if response.status_code == 403:
+            print("ツイート内容が重複しているため、ツイートできませんでした。")
+        else:   
+            raise Exception(
+                "エラーが発生しました。エラーコード: {} {}".format(response.status_code, response.text)
+            )
     else:
-        print("指定のツイートに続けて投稿完了。")
+        if recent_id == 0:
+            print("スレッド元ツイートの投稿完了。")
+        else:
+            print("指定のツイートに続けて投稿完了。")
         
     # 投稿したツイートのIDを返す
     json_response = response.json()
@@ -171,8 +177,8 @@ def postImage(image):
         raise Exception(
             "Request returned an error: {} {}".format(response.status_code, response.text)
         )
-
-    print("画像投稿完了。")
+    else:
+        print("画像投稿完了。")
 
     # アップロードした画像のIDを返す
     json_response = response.json()
