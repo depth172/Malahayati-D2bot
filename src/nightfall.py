@@ -75,29 +75,29 @@ def getNightfall():
     shieldData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(shieldHash) + "/?lc=ja", headers=headers).json()
     shieldPath = shieldData['Response']['displayProperties']['icon']
 
-    championHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][3]
+    championHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-12]
     championData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(championHash) + "/?lc=ja", headers=headers).json()
     championPath = championData['Response']['displayProperties']['icon']
 
-    specialModHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][9]
+    specialModHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-6]
     specialModData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(specialModHash) + "/?lc=ja", headers=headers).json()
     specialModPath = specialModData['Response']['displayProperties']['icon']
     specialModName = specialModData['Response']['displayProperties']['name']
     specialModDesc = specialModData['Response']['displayProperties']['description']
 
-    threatHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][5]
+    threatHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-10]
     threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
     threatPath = threatData['Response']['displayProperties']['icon']
 
-    surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][12]
+    surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-3]
     surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
     surge1Path = surge1Data['Response']['displayProperties']['icon']
 
-    surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][13]
+    surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-2]
     surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
     surge2Path = surge2Data['Response']['displayProperties']['icon']
 
-    ocHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][14]
+    ocHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-1]
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocPath = ocData['Response']['displayProperties']['icon']
 

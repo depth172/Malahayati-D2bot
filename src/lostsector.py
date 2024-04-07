@@ -128,8 +128,8 @@ def getLostSector():
         else:
             break
     
-    surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][12]
-    surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][13]
+    surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-3]
+    surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-2]
     
     tweetText = ""
     mediaList = []
