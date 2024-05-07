@@ -162,19 +162,27 @@ def getEververse():
             weaponDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + itemOrder['3124752623'][i], headers=headers).json()
             weaponNameRaw = weaponDataEng['Response']['displayProperties']['description']
             weaponNameEng = weaponNameRaw[55:-77]
+            print(weaponNameEng)
             
             searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + weaponNameEng + "/", headers=headers).json()
             
             # 検索で得たアイテムが武器であり、今シーズンのもの、かつ新版でないか確認
             # indexを比較し、新しいほうを保存する
+            newestWeaponData = 0
             for j in range(len(searchRes['Response']['results']['results'])):
                 weaponHash = searchRes['Response']['results']['results'][j]['hash']
                 weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash), headers=headers).json()
-                if j == 0 or (weaponData['Response']['index'] > newestWeaponData['Response']['index'] and "(Adept)" not in weaponData['Response']['displayProperties']['name'] and 1 in weaponData['Response']['itemCategoryHashes']):
-                    newestWeaponData = weaponData
+                print(weaponData['Response']['displayProperties']['name'])
+                print(weaponData['Response']['itemCategoryHashes'])
+                if "(Adept)" not in weaponData['Response']['displayProperties']['name'] and 1 in weaponData['Response']['itemCategoryHashes']:
+                    if newestWeaponData == 0:
+                        newestWeaponData = weaponData
+                    elif weaponData['Response']['index'] > newestWeaponData['Response']['index']:
+                        newestWeaponData = weaponData
         
             weaponHash = newestWeaponData['Response']['hash']
             weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash) + "/?lc=ja", headers=headers).json()
+            print(weaponHash)
 
             ## 背景画像挿入
             # パスから画像を取得
