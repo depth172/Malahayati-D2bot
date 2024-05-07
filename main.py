@@ -81,11 +81,13 @@ if currentTime.weekday() in [0, 1, 5, 6] and data.get('gotXur') == b'False':
     checkCode = xur.getXur()
     if checkCode == 0:
         data.set('gotXur', 'True')
-    elif checkCode == 5:
+        data.set('xurFailed', 'False')
+    elif checkCode == 5 and data.get('xurFailed') == b'False':
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、シュールの販売アイテムに関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        data.set('xurFailed', 'True')
         
 # エバーバースの情報を未取得だった場合は取得
 if data.get('gotEververse') == b'False':
@@ -94,11 +96,13 @@ if data.get('gotEververse') == b'False':
     checkCode = eververse.getEververse()
     if checkCode == 0:
         data.set('gotEververse', 'True')
-    elif checkCode == 5:
+        data.set('eververseFailed', 'False')
+    elif checkCode == 5 and data.get('eververseFailed') == b'False':
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【エバーバース情報】" + timeStr + "\nAPIのメンテナンス中につき、エバーバースに関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        data.set('eververseFailed', 'True')
 
 # ナイトフォールの情報を未取得だった場合は取得
 if data.get('gotNightfall') == b'False':
@@ -107,11 +111,13 @@ if data.get('gotNightfall') == b'False':
     checkCode = nightfall.getNightfall()
     if checkCode == 0:
         data.set('gotNightfall', 'True')
-    elif checkCode == 5:
+        data.set('nightfallFailed', 'False')
+    elif checkCode == 5 and data.get('nightfallFailed') == b'False':
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ナイトフォール情報】" + timeStr + "\nAPIのメンテナンス中につき、ナイトフォールに関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        data.set('nightfallFailed', 'True')
 
 # 失われたセクターの情報を未取得だった場合は取得
 if data.get('gotSector') == b'False':
@@ -120,11 +126,13 @@ if data.get('gotSector') == b'False':
     checkCode = lostsector.getLostSector()
     if checkCode == 0:
         data.set('gotSector', 'True')
-    elif checkCode == 5:
+        data.set('lostsectorFailed', 'False')
+    elif checkCode == 5 and data.get('lostsectorFailed') == b'False':
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【失われたセクター情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        data.set('lostsectorFailed', 'True')
         
 # バンシー44の販売武器に関する情報を未取得だった場合は取得
 if data.get('gotBanshee') == b'False':
@@ -133,11 +141,13 @@ if data.get('gotBanshee') == b'False':
     checkCode = banshee.getBanshee()
     if checkCode == 0:
         data.set('gotBanshee', 'True')
-    elif checkCode == 5:
+        data.set('bansheeFailed', 'False')
+    elif checkCode == 5 and data.get('bansheeFailed') == b'False':
         timeStr = currentTime.strftime('%Y/%m/%d')
         tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の日間販売武器に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
         contents = {"text": tweetText}
         tw.makeTweet(contents)
+        data.set('bansheeFailed', 'True')
         
 if not noData and not gotInfo:
     print("新しく取得する情報はありませんでした。")
