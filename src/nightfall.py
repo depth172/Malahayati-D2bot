@@ -132,11 +132,13 @@ def getNightfall():
     
     # 検索で得た武器が今シーズンのもの、かつ新版でないか確認
     # indexを比較し、新しいほうを保存する
+    newestWeaponData = 0
     for i in range(len(searchRes['Response']['results']['results'])):
         weaponHash = searchRes['Response']['results']['results'][i]['hash']
         weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash), headers=headers).json()
-        if i == 0 or (weaponData['Response']['index'] > newestWeaponData['Response']['index'] and "(Adept)" not in weaponData['Response']['displayProperties']['name']):
-            newestWeaponData = weaponData
+        if "(Adept)" not in weaponData['Response']['displayProperties']['name'] and 1 in weaponData['Response']['itemCategoryHashes']:
+            if newestWeaponData == 0 or weaponData['Response']['index'] > newestWeaponData['Response']['index']:
+                newestWeaponData = weaponData
     
     weaponHash = newestWeaponData['Response']['hash']
     weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash) + "/?lc=ja", headers=headers).json()

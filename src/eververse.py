@@ -172,17 +172,12 @@ def getEververse():
             for j in range(len(searchRes['Response']['results']['results'])):
                 weaponHash = searchRes['Response']['results']['results'][j]['hash']
                 weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash), headers=headers).json()
-                print(weaponData['Response']['displayProperties']['name'])
-                print(weaponData['Response']['itemCategoryHashes'])
                 if "(Adept)" not in weaponData['Response']['displayProperties']['name'] and 1 in weaponData['Response']['itemCategoryHashes']:
-                    if newestWeaponData == 0:
-                        newestWeaponData = weaponData
-                    elif weaponData['Response']['index'] > newestWeaponData['Response']['index']:
+                    if newestWeaponData == 0 or weaponData['Response']['index'] > newestWeaponData['Response']['index']:
                         newestWeaponData = weaponData
         
             weaponHash = newestWeaponData['Response']['hash']
             weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash) + "/?lc=ja", headers=headers).json()
-            print(weaponHash)
 
             ## 背景画像挿入
             # パスから画像を取得
