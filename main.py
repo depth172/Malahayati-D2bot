@@ -37,6 +37,7 @@ if lastHour != currentHour:
         print("定期実行を開始します。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n")
         log = True
         data.set('gotSector', 'False')
+        data.set('gotBanshee', 'False')
         # 水曜日だった場合の週間フラグリセット
         if currentTime.weekday() == 2:
             tw.pinTweet()
@@ -46,11 +47,6 @@ if lastHour != currentHour:
         if currentTime.weekday() == 5:
             tw.pinTweet()
             data.set('gotXur', 'False')
-    # 毎日9時にバンシー取得フラグをリセットする
-    elif currentHour == 9:
-        print("定期実行を開始します。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n")
-        log = True
-        data.set('gotBanshee', 'False')
     # 取得する情報がない時間の場合
     else:
         print("情報の更新はまだ行いません。[" + currentTime.strftime('%Y/%m/%d %H:%M:%S') + "]\n----------------------------------------")

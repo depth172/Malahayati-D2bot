@@ -68,9 +68,9 @@ def getEververse():
             salesItemIndexes += vendor[j]['Response']['categories']['data']['categories'][i]['itemIndexes']
     # 重複するアイテムを削除
     salesItemIndexes = list(set(salesItemIndexes))
-    # 濃縮マッタージェム(Index: 769)とグリマーの破片(Index: 770)を削除
-    salesItemIndexes.remove(769)
-    salesItemIndexes.remove(770)
+    # 濃縮マッタージェムとグリマーの破片を削除
+    salesItemIndexes.remove(vendor[0]['Response']['categories']['data']['categories'][2]['itemIndexes'][0])
+    salesItemIndexes.remove(vendor[0]['Response']['categories']['data']['categories'][2]['itemIndexes'][1])
 
     ## インデックスからハッシュ番号を取得
     ## 値段表も同時に作成
@@ -162,7 +162,6 @@ def getEververse():
             weaponDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + itemOrder['3124752623'][i], headers=headers).json()
             weaponNameRaw = weaponDataEng['Response']['displayProperties']['description']
             weaponNameEng = weaponNameRaw[55:-77]
-            print(weaponNameEng)
             
             searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + weaponNameEng + "/", headers=headers).json()
             

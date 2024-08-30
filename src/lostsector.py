@@ -19,8 +19,6 @@ import math
 
 def getLostSector():
     # 頻出する辞書とリストの定義
-    armor = {0: 'チェストアーマー', 1: 'ヘルメット', 2: 'レッグアーマー', 3: 'ガントレット'}
-    armorIcon = {0: 'chest_armor', 1: 'helmet', 2: 'boots', 3: 'gauntlet'}
     champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
     elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
 
@@ -63,13 +61,10 @@ def getLostSector():
                                 sector[sectorRaw[i][0]][j - 1].append(splited)
                     else:
                         sector[sectorRaw[i][0]].append(sectorRaw[i][j])
-    with open('data/drop_exotic.csv') as f:
-        reader = csv.reader(f)
-        exotics = [row for row in reader]
-    with open('data/sector_season23.csv') as f:
+    with open('data/sector_episode_echoes.csv') as f:
         reader = csv.reader(f)
         seasonal = [row for row in reader]
-    with open('data/drop_season23.csv') as f:
+    with open('data/drop_episode_echoes.csv') as f:
         reader = csv.reader(f)
         lDrops = [row for row in reader]
 
@@ -86,7 +81,6 @@ def getLostSector():
 
     # ローテーション取得
     sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
-    armorRot = armor[totalElapsedDate % 4]
     
     sectorHash = sector[sectorRot][0]
 
@@ -244,50 +238,14 @@ def getLostSector():
     shift_y = 0
 
     draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
-    draw.text((45, 70), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
-    draw.text((65, 190), "防具の部位:", fill=(255, 255, 255), font=fontB2)
-    draw.text((400, 190), armorRot, fill=(255, 255, 255), font=fontB2)
-    draw.text((30, 300), "<セクター限定で本日ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
-    draw.text((1240, 680), "＊ ソロでクリア時のみドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
-    
-    ## 部位アイコン挿入
-    armorIconImg = Image.open("./img/" + armorIcon[totalElapsedDate % 4] + ".png").convert("RGBA").resize((70, 70), 1)
-    baseImg.paste(armorIconImg, (305, 183), armorIconImg)
-    
-    ## 防具アイコン挿入
-    for i in range(len(exotics[totalElapsedDate % 4])):
-        eArmorData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyCollectibleDefinition/" + str(exotics[totalElapsedDate % 4][i]) + "/?lc=ja", headers=headers).json()
-        eArmorImgPath = eArmorData['Response']['displayProperties']['icon']
-        eArmorImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + eArmorImgPath).content))
-        # リサイズして挿入
-        eArmorImg = eArmorImg.resize((110, 110), 1)
-        baseImg.paste(eArmorImg, (65 + shift_x, 360 + shift_y))
-        
-        shift_x += 130
-        if ((i + 1) % 9 == 0):
-            shift_x = 0
-            shift_y += 130
-            
-    baseImg.convert("RGB").save(resImg2, format='JPEG')
-    mediaList.append(tw.postImage(resImg2.getvalue()))
-
-    baseImg = Image.alpha_composite(image, mask)
-    resImg3 = io.BytesIO()
-    draw = ImageDraw.Draw(baseImg)
-    baseImg.paste(logoImg, (935, 45), logoImg)
-
-    shift_x = 0
-    shift_y = 0
-
-    draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
-    draw.text((45, 70), "本日のドロップアイテム (2/2)", fill=(255, 255, 255), font=fontTitle)
+    draw.text((45, 70), "本日のドロップアイテム", fill=(255, 255, 255), font=fontTitle)
     draw.text((30, 150), "<追加ドロップするレジェンダリー武器>", fill=(255, 255, 255), font=fontB1)
     draw.text((1240, 680), "＊ ソロでクリア時のみドロップ。達人クリアの場合、パークが複数個つく可能性があります。", fill=(255, 255, 255), font=fontN, anchor='rb')
         
     ## 武器アイコン挿入
     for i in range(4):
         # データ取得
-        lWeaponHash = lDrops[totalElapsedDate % 4][i]
+        lWeaponHash = lDrops[totalElapsedDate % 3][i]
         lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
         lWeaponName = lWeaponData['Response']['displayProperties']['name']
 
@@ -339,8 +297,9 @@ def getLostSector():
             shift_x = 0
             shift_y += 180
     
-    baseImg.convert("RGB").save(resImg3, format='JPEG')
-    mediaList.append(tw.postImage(resImg3.getvalue()))
+    baseImg.convert("RGB").save(resImg2, format='JPEG')
+    mediaList.append(tw.postImage(resImg2.getvalue()))
+
     
     content = {"text": tweetText, "media": {"media_ids": mediaList}}
     tw.makeTweet(content)

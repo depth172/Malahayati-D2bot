@@ -14,8 +14,6 @@ from . import tweet as tw
 from time import sleep
 import datetime
 from zoneinfo import ZoneInfo
-import csv
-import math
 
 def getNightfall():
     # 頻出する辞書とリストの定義
@@ -49,7 +47,7 @@ def getNightfall():
     # ナイトフォールの情報を取得
     # 取得成功可否も確認する
     for i in range(3):
-        activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
+        activityData = requests.get("https://www.bungie.net/Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
         if 'Response' not in activityData:
             if activityData['ErrorCode'] == 5:
                 print("現在APIサービスはメンテナンス中です。処理を中断します。")
