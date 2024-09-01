@@ -151,7 +151,7 @@ def getLostSector():
     surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
     surge2Name = surge2Data['Response']['displayProperties']['name']
     
-    ocHash = sectorData['Response']['modifiers'][20]['activityModifierHash']
+    ocHash = sectorData['Response']['modifiers'][-1]['activityModifierHash']
     ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
     ocName = ocData['Response']['displayProperties']['name']
     

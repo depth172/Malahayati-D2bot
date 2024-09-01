@@ -180,7 +180,7 @@ def getBanshee():
         ## マスターワークアイコン挿入
         # パスから画像・ウォーターマークを取得
         try:
-            lWeaponMWHash = vendor[c]['Response']['itemComponents']['reusablePlugs']['data'][salesList[c][w + 2]]['plugs']['7'][0]['plugItemHash']
+            lWeaponMWHash = vendor[c]['Response']['itemComponents']['sockets']['data'][salesList[c][w + 2]]['sockets'][7]['plugHash']
             lWeaponMWData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponMWHash) + "/?lc=ja", headers=headers).json()
             lWeaponMWPath = lWeaponMWData['Response']['displayProperties']['icon']
             lWeaponMWWMPath = lWeaponMWData['Response']['iconWatermark']
@@ -205,7 +205,7 @@ def getBanshee():
                 perkQuantity = 1
             for r in range(perkQuantity):
                 if i == 5:
-                    s = 8
+                    s = 11
                 else:
                     s = i
                 try:
@@ -218,8 +218,10 @@ def getBanshee():
                         lWeaponPerkPath = lWeaponPerkData['Response']['displayProperties']['icon']
                         lWeaponPerkImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + lWeaponPerkPath).content)).convert("RGBA").resize((80, 80), 1)
                         baseImg.paste(lWeaponPerkImg, (85 + 105 * (i - 1) + shift_x, 480 + 93 * (r - 1) + shift_y), lWeaponPerkImg)
+                # 起源特性が存在しなければpass
                 except KeyError:
-                    # 起源特性が存在しなければpass
+                    pass
+                except IndexError:
                     pass
             
         # クラス剣専用のループ ハンター剣のハッシュ(2782325300)が当たったら列を増やす
