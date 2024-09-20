@@ -17,7 +17,10 @@ from zoneinfo import ZoneInfo
 import csv
 import math
 
-def getLostSector():
+def getLostSector(isTest=False):
+	if isTest:
+		print("テストモードで実行中。")
+	
 	# 頻出する辞書とリストの定義
 	champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
 	elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
@@ -139,9 +142,9 @@ def getLostSector():
 	sectorLocName = sectorLocData['Response']['displayProperties']['name']
 
 	# ツイート用の文章を整形
-	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
+	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
-	threatHash = sectorData['Response']['modifiers'][10]['activityModifierHash']
+	threatHash = sectorData['Response']['modifiers'][-12]['activityModifierHash']
 	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
 	threatName = threatData['Response']['displayProperties']['name']
 
@@ -159,7 +162,8 @@ def getLostSector():
 
 	tweetText += "\n\n#Destiny2"
 	
-	print(tweetText + "\n")
+	print("\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。")
+	print("戦闘条件:\n　" + threatName + ", " + surge1Name + ", " + surge2Name + "\n　" + ocName)
 
 	# 画像生成
 	imageURL = sectorData['Response']['pgcrImage']
@@ -183,8 +187,8 @@ def getLostSector():
 		sectorDestName = sectorPlanetName + "、" + sectorLocName
 		draw.text((1238, 605), sectorDestName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
 	
-	draw.multiline_text((28, 405), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
-	draw.text((28, 605), "伝説:", fill=(255, 255, 255), font=fontN)
+	draw.multiline_text((28, 405), "＜チャンピオン出現数＞", fill=(255, 255, 255), font=fontB1)
+	draw.text((28, 605), "名人:", fill=(255, 255, 255), font=fontN)
 	draw.text((28, 665), "達人:", fill=(255, 255, 255), font=fontN)
 	baseImg.paste(logoImg, (935, 45), logoImg)
 
@@ -197,7 +201,7 @@ def getLostSector():
 		shift_x += 140
 
 	e = 3
-	if sector[sectorRot][-1]:
+	if sector[sectorRot][3]:
 		e += 1
 	if sector[sectorRot][4]:
 		e += 1
@@ -214,8 +218,8 @@ def getLostSector():
 		draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
 		shift_x += 140
 
-	if not sectorData['Response']['modifiers'][11]['activityModifierHash'] in [1783825372]:
-		modHash = sectorData['Response']['modifiers'][11]['activityModifierHash']
+	if not sectorData['Response']['modifiers'][-11]['activityModifierHash'] in [1783825372]:
+		modHash = sectorData['Response']['modifiers'][-11]['activityModifierHash']
 		modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
 		modName = modData['Response']['displayProperties']['name']
 		modDesc = modData['Response']['displayProperties']['description']
@@ -225,9 +229,11 @@ def getLostSector():
 		draw.text((105, 293), modName, fill=(255, 255, 255), font=fontB1)
 		draw.text((43, 361), modDesc, fill=(255, 255, 255), font=fontN)
 
-	baseImg.convert("RGB").save(resImg1, format='JPEG')
-
-	mediaList.append(tw.postImage(resImg1.getvalue()))
+	if not isTest:
+		baseImg.convert("RGB").save(resImg1, format='JPEG')
+		mediaList.append(tw.postImage(resImg1.getvalue()))
+	else:
+		baseImg.show()
 
 	baseImg = Image.alpha_composite(image, mask)
 	resImg2 = io.BytesIO()
@@ -297,12 +303,14 @@ def getLostSector():
 			shift_x = 0
 			shift_y += 180
 	
-	baseImg.convert("RGB").save(resImg2, format='JPEG')
-	mediaList.append(tw.postImage(resImg2.getvalue()))
-
-	
-	content = {"text": tweetText, "media": {"media_ids": mediaList}}
-	tw.makeTweet(content)
+	if not isTest:
+		baseImg.convert("RGB").save(resImg2, format='JPEG')
+		mediaList.append(tw.postImage(resImg2.getvalue()))
+		
+		content = {"text": tweetText, "media": {"media_ids": mediaList}}
+		tw.makeTweet(content)
+	else:
+		baseImg.show()
 
 	print("\n情報取得の全工程完了。")
 	
