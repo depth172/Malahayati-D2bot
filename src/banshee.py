@@ -205,7 +205,7 @@ def getBanshee():
 				perkQuantity = 1
 			for r in range(perkQuantity):
 				if i == 5:
-					s = 11
+					s = 8
 				else:
 					s = i
 				try:

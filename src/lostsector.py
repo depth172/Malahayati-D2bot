@@ -64,10 +64,10 @@ def getLostSector(isTest=False):
 								sector[sectorRaw[i][0]][j - 1].append(splited)
 					else:
 						sector[sectorRaw[i][0]].append(sectorRaw[i][j])
-	with open('data/sector_episode_echoes.csv') as f:
+	with open('data/sector_episode_revenant.csv') as f:
 		reader = csv.reader(f)
 		seasonal = [row for row in reader]
-	with open('data/drop_episode_echoes.csv') as f:
+	with open('data/drop_episode_revenant.csv') as f:
 		reader = csv.reader(f)
 		lDrops = [row for row in reader]
 
@@ -125,8 +125,8 @@ def getLostSector(isTest=False):
 		else:
 			break
 	
-	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-3]
-	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-2]
+	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-7]
+	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-6]
 	
 	tweetText = ""
 	mediaList = []
@@ -144,7 +144,7 @@ def getLostSector(isTest=False):
 	# ツイート用の文章を整形
 	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
-	threatHash = sectorData['Response']['modifiers'][-12]['activityModifierHash']
+	threatHash = sectorData['Response']['modifiers'][-11]['activityModifierHash']
 	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
 	threatName = threatData['Response']['displayProperties']['name']
 
@@ -154,7 +154,7 @@ def getLostSector(isTest=False):
 	surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
 	surge2Name = surge2Data['Response']['displayProperties']['name']
 	
-	ocHash = sectorData['Response']['modifiers'][-1]['activityModifierHash']
+	ocHash = sectorData['Response']['modifiers'][-10]['activityModifierHash']
 	ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
 	ocName = ocData['Response']['displayProperties']['name']
 	
@@ -218,8 +218,8 @@ def getLostSector(isTest=False):
 		draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
 		shift_x += 140
 
-	if not sectorData['Response']['modifiers'][-11]['activityModifierHash'] in [1783825372]:
-		modHash = sectorData['Response']['modifiers'][-11]['activityModifierHash']
+	if not sectorData['Response']['modifiers'][-2]['activityModifierHash'] in [1783825372]:
+		modHash = sectorData['Response']['modifiers'][-2]['activityModifierHash']
 		modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
 		modName = modData['Response']['displayProperties']['name']
 		modDesc = modData['Response']['displayProperties']['description']
@@ -249,9 +249,8 @@ def getLostSector(isTest=False):
 	draw.text((1240, 680), "＊ ソロでクリア時のみドロップ。達人クリアの場合、パークが複数個つく可能性があります。", fill=(255, 255, 255), font=fontN, anchor='rb')
 		
 	## 武器アイコン挿入
-	for i in range(4):
+	for i, lWeaponHash in enumerate(lDrops[totalElapsedDate % 6]):
 		# データ取得
-		lWeaponHash = lDrops[totalElapsedDate % 3][i]
 		lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
 		lWeaponName = lWeaponData['Response']['displayProperties']['name']
 

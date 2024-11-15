@@ -73,29 +73,29 @@ def getNightfall():
 	shieldData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(shieldHash) + "/?lc=ja", headers=headers).json()
 	shieldPath = shieldData['Response']['displayProperties']['icon']
 
-	championHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-12]
+	championHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][4]
 	championData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(championHash) + "/?lc=ja", headers=headers).json()
 	championPath = championData['Response']['displayProperties']['icon']
 
-	specialModHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-6]
+	specialModHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-1]
 	specialModData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(specialModHash) + "/?lc=ja", headers=headers).json()
 	specialModPath = specialModData['Response']['displayProperties']['icon']
 	specialModName = specialModData['Response']['displayProperties']['name']
 	specialModDesc = specialModData['Response']['displayProperties']['description']
 
-	threatHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-10]
+	threatHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][6]
 	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
 	threatPath = threatData['Response']['displayProperties']['icon']
 
-	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-3]
+	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][8]
 	surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
 	surge1Path = surge1Data['Response']['displayProperties']['icon']
 
-	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-2]
+	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][9]
 	surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
 	surge2Path = surge2Data['Response']['displayProperties']['icon']
 
-	ocHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-1]
+	ocHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][7]
 	ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
 	ocPath = ocData['Response']['displayProperties']['icon']
 
@@ -118,27 +118,8 @@ def getNightfall():
 		else:
 			break
 
-	weaponOrder = vendorData['Response']['categories']['data']['categories'][1]['itemIndexes'][-1]
-	weaponAdeptHash = vendorData['Response']['sales']['data'][str(weaponOrder)]['itemHash']
-	
-	# 検索にかけるため、英語名を作る（(Adept)つきで取得→(Adept)を切り落とす）
-	weaponDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponAdeptHash), headers=headers).json()
-	weaponNameRaw = weaponDataEng['Response']['displayProperties']['name']
-	weaponNameEng = weaponNameRaw[:-8]
-	
-	searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + weaponNameEng + "/", headers=headers).json()
-	
-	# 検索で得た武器が今シーズンのもの、かつ新版でないか確認
-	# indexを比較し、新しいほうを保存する
-	newestWeaponData = 0
-	for i in range(len(searchRes['Response']['results']['results'])):
-		weaponHash = searchRes['Response']['results']['results'][i]['hash']
-		weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash), headers=headers).json()
-		if "(Adept)" not in weaponData['Response']['displayProperties']['name'] and 1 in weaponData['Response']['itemCategoryHashes']:
-			if newestWeaponData == 0 or weaponData['Response']['index'] > newestWeaponData['Response']['index']:
-				newestWeaponData = weaponData
-	
-	weaponHash = newestWeaponData['Response']['hash']
+	weaponOrder = vendorData['Response']['categories']['data']['categories'][2]['itemIndexes'][0]
+	weaponHash = vendorData['Response']['sales']['data'][str(weaponOrder)]['itemHash']
 	weaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(weaponHash) + "/?lc=ja", headers=headers).json()
 
 	weaponName = weaponData['Response']['displayProperties']['name']
@@ -214,18 +195,6 @@ def getNightfall():
 
 	## 武器名挿入
 	draw.multiline_text((770, 485), weaponName, fill=(255, 255, 255), font=fontB0)
-
-	## 属性アイコン挿入
-	weaponElemHash = weaponData['Response']['damageTypeHashes'][0]
-	if weaponElemHash != 3373582085:
-		# 属性アイコンがある場合は間隔を空ける
-		elementShift = 42
-		weaponElemData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyDamageTypeDefinition/" + str(weaponElemHash) + "/?lc=ja", headers=headers).json()
-		weaponElemPath = weaponElemData['Response']['displayProperties']['icon']
-		weaponElemImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + weaponElemPath).content)).convert("RGBA").resize((30, 30), 1)
-		baseImg.paste(weaponElemImg, (770, 527), weaponElemImg)
-	else:
-		elementShift = 0
 	
 	## 弾薬アイコン挿入
 	if weaponData['Response']['equippingBlock']['ammoType'] == 1:
@@ -234,11 +203,11 @@ def getNightfall():
 		weaponAmmoImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/d920203c4fd4571ae7f39eb5249eaecb.png").content)).convert("RGBA").resize((50, 50), 1)
 	elif weaponData['Response']['equippingBlock']['ammoType'] == 3:
 		weaponAmmoImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net/common/destiny2_content/icons/78ef0e2b281de7b60c48920223e0f9b1.png").content)).convert("RGBA").resize((50, 50), 1)
-	baseImg.paste(weaponAmmoImg, (764 + elementShift, 517), weaponAmmoImg)
+	baseImg.paste(weaponAmmoImg, (764, 517), weaponAmmoImg)
 
 	## 武器種挿入
 	weaponArchName = weaponData['Response']['itemTypeDisplayName']
-	draw.multiline_text((822 + elementShift, 526), weaponArchName, fill=(255, 255, 255), font=fontN)
+	draw.multiline_text((822, 526), weaponArchName, fill=(255, 255, 255), font=fontN)
 	
 	draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新・”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
 
