@@ -15,7 +15,6 @@ from time import sleep
 import datetime
 from zoneinfo import ZoneInfo
 import csv
-import math
 
 def getLostSector(isTest=False):
 	if isTest:
@@ -24,6 +23,13 @@ def getLostSector(isTest=False):
 	# 頻出する辞書とリストの定義
 	champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
 	elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
+ 
+	ignoreMods = {1783825372, 1174869237, 1486810101, 203094476, 4226469317}
+	shields = { 93790318, 720259466, 1111960127, 1377274412, 1444852954, 1553093202, 1651706850, 2288210988, 2524382624, 2585386105, 2650740350, 2833087500, 2965677044, 3119632620, 3139381566, 3171609188, 3230561446, 3538098588, 3958417570 }
+	champions = {40182179, 197794292, 438106166, 1262171714, 1598783516, 1615778293, 1806568190, 1990363418, 2006149364, 2475764450, 3307318061, 3461252634, 4038464106, 4190795159}
+	threats = {186409259, 512042454, 1598472557, 3517267764, 3652821947}
+	surges = {426976067, 2691200658, 3196075844, 3809788899, 3810297122}
+	overcharges = {95459596, 214700178, 795009574, 929044687, 1282934989, 1326581064, 2178457119, 2626834038, 2743796883, 2984170047, 3132780533, 3320777106, 3406250074, 3758645512}
 
 	# 画像生成用のフォント定義
 	fontS = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 17)
@@ -124,9 +130,11 @@ def getLostSector(isTest=False):
 			return sectorData['ErrorCode']
 		else:
 			break
+
+	currentSurge = list(set(activityData['Response']['2029743966']['activities'][-1]['modifierHashes']) & set(surges))
 	
-	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-7]
-	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-6]
+	surge1Hash = currentSurge[0]
+	surge2Hash = currentSurge[1]
 	
 	tweetText = ""
 	mediaList = []
@@ -144,9 +152,16 @@ def getLostSector(isTest=False):
 	# ツイート用の文章を整形
 	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
-	threatHash = sectorData['Response']['modifiers'][-11]['activityModifierHash']
+	sectorModifiers = {modifier["activityModifierHash"] for modifier in sectorData['Response']['modifiers']}
+	sectorModifiers -= ignoreMods
+	sectorModifiers -= surges
+	sectorModifiers -= shields
+	sectorModifiers -= champions
+
+	threatHash = list(sectorModifiers & threats)[0]
 	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
 	threatName = threatData['Response']['displayProperties']['name']
+	sectorModifiers -= threats
 
 	surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
 	surge1Name = surge1Data['Response']['displayProperties']['name']
@@ -154,10 +169,11 @@ def getLostSector(isTest=False):
 	surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
 	surge2Name = surge2Data['Response']['displayProperties']['name']
 	
-	ocHash = sectorData['Response']['modifiers'][-10]['activityModifierHash']
+	ocHash = list(sectorModifiers & overcharges)[0]
 	ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
 	ocName = ocData['Response']['displayProperties']['name']
-	
+	sectorModifiers -= overcharges
+
 	tweetText += "\n\n本日の戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
 	tweetText += "\n\n#Destiny2"
@@ -218,8 +234,8 @@ def getLostSector(isTest=False):
 		draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
 		shift_x += 140
 
-	if not sectorData['Response']['modifiers'][-2]['activityModifierHash'] in [1783825372]:
-		modHash = sectorData['Response']['modifiers'][-2]['activityModifierHash']
+	if sectorModifiers:
+		modHash = list(sectorModifiers)[0]
 		modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
 		modName = modData['Response']['displayProperties']['name']
 		modDesc = modData['Response']['displayProperties']['description']

@@ -15,10 +15,17 @@ from time import sleep
 import datetime
 from zoneinfo import ZoneInfo
 
-def getNightfall():
+def getNightfall(isTest=False):
+	if isTest:
+		print("テストモードで実行中。")
+
 	# 頻出する辞書とリストの定義
-	champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
-	elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
+	ignoreMods = {4226469317, 1783825372, 745014575, 791047754, 4265630562, 4239965093, 3912996116, 3101164718}
+	shields = { 93790318, 720259466, 1111960127, 1377274412, 1444852954, 1553093202, 1651706850, 2288210988, 2524382624, 2585386105, 2650740350, 2833087500, 2965677044, 3119632620, 3139381566, 3171609188, 3230561446, 3538098588, 3958417570 }
+	champions = {40182179, 197794292, 438106166, 1262171714, 1598783516, 1615778293, 1806568190, 1990363418, 2006149364, 2475764450, 3307318061, 3461252634, 4038464106, 4190795159}
+	threats = {186409259, 512042454, 1598472557, 3517267764, 3652821947}
+	surges = {426976067, 2691200658, 3196075844, 3809788899, 3810297122}
+	overcharges = {95459596, 214700178, 795009574, 929044687, 1282934989, 1326581064, 2178457119, 2626834038, 2743796883, 2984170047, 3132780533, 3320777106, 3406250074, 3758645512}
 
 	# 画像生成用のフォント定義
 	fontN = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 25)
@@ -66,38 +73,52 @@ def getNightfall():
 	nightfallHash = activityData['Response']['2029743966']['activities'][-1]['activityHash']
 	nightfallData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityDefinition/" + str(nightfallHash) + "/?lc=ja", headers=headers).json()
 	
+	modifiers = set(activityData['Response']['2029743966']['activities'][-1]['modifierHashes'])
+	modifiers -= ignoreMods
+	if 1171597537 in modifiers:
+		doubleReward = True
+		modifiers -= {1171597537}
+
 	# 各種情報の取得
 	nightfallName = nightfallData['Response']['displayProperties']['description']
 
-	shieldHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][0]
+	shieldHash = list(modifiers & shields)[0]
 	shieldData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(shieldHash) + "/?lc=ja", headers=headers).json()
 	shieldPath = shieldData['Response']['displayProperties']['icon']
+	modifiers -= modifiers & shields
 
-	championHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][4]
+	championHash = list(modifiers & champions)[0]
 	championData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(championHash) + "/?lc=ja", headers=headers).json()
 	championPath = championData['Response']['displayProperties']['icon']
+	modifiers -= modifiers & champions
 
-	specialModHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-1]
-	specialModData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(specialModHash) + "/?lc=ja", headers=headers).json()
-	specialModPath = specialModData['Response']['displayProperties']['icon']
-	specialModName = specialModData['Response']['displayProperties']['name']
-	specialModDesc = specialModData['Response']['displayProperties']['description']
+	currentThreat = list(modifiers & threats)
+	if currentThreat:
+		threatHash = currentThreat[0]
+		threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
+		threatPath = threatData['Response']['displayProperties']['icon']
+	modifiers -= modifiers & threats
 
-	threatHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][6]
-	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
-	threatPath = threatData['Response']['displayProperties']['icon']
+	currentSurge = list(modifiers & surges)
+	surge1Hash = currentSurge[0]
+	surge2Hash = currentSurge[1]
 
-	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][8]
 	surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
 	surge1Path = surge1Data['Response']['displayProperties']['icon']
 
-	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][9]
 	surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
 	surge2Path = surge2Data['Response']['displayProperties']['icon']
 
-	ocHash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][7]
+	ocHash = list(modifiers & overcharges)[0]
 	ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
 	ocPath = ocData['Response']['displayProperties']['icon']
+
+	specialMods = list(modifiers)
+	for specialModHash in specialMods:
+		specialModData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(specialModHash) + "/?lc=ja", headers=headers).json()
+		specialModPath = specialModData['Response']['displayProperties']['icon']
+		specialModName = specialModData['Response']['displayProperties']['name']
+		specialModDesc = specialModData['Response']['displayProperties']['description']
 
 	# 報酬武器の取得
 	for i in range(3):
@@ -129,7 +150,10 @@ def getNightfall():
 	mediaList = []
 
 	# ツイート用の文章を整形
-	tweetText = "【 #ナイトフォール 情報】" + todayDateStr + "\n今週のナイトフォールは「" + nightfallName + "」です。\n\n報酬: " + weaponName + "（" + weaponSpec + "）\n戦闘条件など、詳細は画像をご確認ください。\n\n#Destiny2"
+	tweetText = "【 #ナイトフォール 情報】" + todayDateStr + "\n今週のナイトフォールは「" + nightfallName + "」です。\n\n報酬: " + weaponName + "（" + weaponSpec + "）"
+	if doubleReward:
+		tweetText += "\n今週はドロップする報酬が2倍となっています。"
+	tweetText += "\n\n戦闘条件など、詳細は画像をご確認ください。\n\n#Destiny2"
 	
 	print(tweetText + "\n")
 
@@ -161,8 +185,9 @@ def getNightfall():
 	baseImg.paste(shieldImg, (46, 460), shieldImg)
 
 	draw.text((193, 416), "脅威", fill=(255, 255, 255), font=fontB0)
-	threatImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + threatPath).content)).convert("RGBA").resize((80, 80), 1)
-	baseImg.paste(threatImg, (180, 460), threatImg)
+	if currentThreat:
+		threatImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + threatPath).content)).convert("RGBA").resize((80, 80), 1)
+		baseImg.paste(threatImg, (180, 460), threatImg)
 
 	draw.text((70, 555), "チャンピオン", fill=(255, 255, 255), font=fontB0)
 	championImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + championPath).content)).convert("RGBA").resize((80, 80), 1)
@@ -211,12 +236,15 @@ def getNightfall():
 	
 	draw.text((1250, 680), "＊ 玄人クリアで、上記武器の“新・”版がドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
 
-	baseImg.convert("RGB").save(resImg, format='JPEG')
-	mediaList.append(tw.postImage(resImg.getvalue()))
-	
-	content = {"text": tweetText, "media": {"media_ids": mediaList}}
-	tweetID = tw.makeTweet(content)
-	tw.pinTweet(tweetID)
+	if not isTest:
+		baseImg.convert("RGB").save(resImg, format='JPEG')
+		mediaList.append(tw.postImage(resImg.getvalue()))
+		
+		content = {"text": tweetText, "media": {"media_ids": mediaList}}
+		tweetID = tw.makeTweet(content)
+		tw.pinTweet(tweetID)
+	else:
+		baseImg.show()
 
 	print("\n情報取得の全工程完了。")
 	
