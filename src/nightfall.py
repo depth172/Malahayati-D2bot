@@ -75,6 +75,7 @@ def getNightfall(isTest=False):
 	
 	modifiers = set(activityData['Response']['2029743966']['activities'][-1]['modifierHashes'])
 	modifiers -= ignoreMods
+	doubleReward = False
 	if 1171597537 in modifiers:
 		doubleReward = True
 		modifiers -= {1171597537}

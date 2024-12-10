@@ -116,18 +116,18 @@ def getLostSector(isTest=False):
 	# サージの情報を得るため、ナイトフォールの戦闘条件を流用する
 	for i in range(3):
 		activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
-		if 'Response' not in sectorData:
-			if sectorData['ErrorCode'] == 5:
+		if 'Response' not in activityData:
+			if activityData['ErrorCode'] == 5:
 				print("現在APIサービスはメンテナンス中です。処理を中断します。")
-				return sectorData['ErrorCode']
+				return activityData['ErrorCode']
 			if i != 2:
 				print("API取得に失敗しました。3秒後にリトライします…")
 				sleep(3)
 				continue
 			else:
 				print("APIが取得できませんでした。処理を中断します。")
-				print("エラーコード - " + str(sectorData['ErrorCode']) + "\n" + sectorData['Message'])
-			return sectorData['ErrorCode']
+				print("エラーコード - " + str(activityData['ErrorCode']) + "\n" + activityData['Message'])
+			return activityData['ErrorCode']
 		else:
 			break
 
