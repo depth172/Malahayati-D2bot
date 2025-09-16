@@ -8,11 +8,12 @@
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "skipLibCheck": true,
-    "baseUrl": ".",
+    "baseUrl": "src",
     "paths": {
-      "@domain/*": ["src/domain/*"],
-      "@adapters/*": ["src/adapters/*"],
-      "@utils/*": ["src/utils/*"]
+      "@domain/*": ["domain/*"],
+      "@adapters/*": ["adapters/*"],
+      "@utils/*": ["utils/*"],
+	  "@api/*": ["api/*"]
     }
   },
   "include": ["src", "test"]

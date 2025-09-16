@@ -1,5 +1,5 @@
 // src/jobs/main.ts
-import { inferFocusedWeapons } from '@domain/inferFocusedWeapons';
+import { inferFocusedWeapons } from '@domain/inferFocused';
 
 async function run() {
   // ここは仮。実際は adapters でAPI呼び出し

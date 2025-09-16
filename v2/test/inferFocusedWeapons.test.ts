@@ -1,14 +1,18 @@
 // test/inferFocusedWeapons.test.ts
 import { describe, it, expect } from 'vitest';
-import { inferFocusedWeapons } from '@domain/inferFocusedWeapons';
+import { inferFocusedWeapons } from '@domain/inferFocused';
+import { getCharacter } from '@api/getCharacter';
 
-describe('inferFocusedWeapons', () => {
-  it('daily_grind_guaranteed を抽出できる', () => {
-    const input = [
-      { uiStyle: 'daily_grind_guaranteed', hash: 111 },
-      { uiStyle: 'other', hash: 222 }
-    ];
+describe('inferFocused', () => {
+  it('アクティビティ一覧から武器とアクティビティのセットを抽出できる', async () => {
+		const input = await getCharacter(0, [204]).then(res => res.activities?.data.availableActivities || []);
     const result = inferFocusedWeapons(input);
-    expect(result).toEqual([111]);
+
+		console.log(result);
+
+		expect(result).toBeInstanceOf(Array);
+		expect(result.length).toBeGreaterThan(0);
+		expect(result[0]).toHaveProperty('weaponHash');
+		expect(result[0]).toHaveProperty('activityHash');
   });
 });

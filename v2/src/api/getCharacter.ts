@@ -1,0 +1,47 @@
+import { BungieResponse, DestinyCharacterResponse, DestinyComponentType } from "type";
+
+enum CharacterClass {
+	HUNTER = 0,
+	TITAN = 1,
+	WARLOCK = 2,
+}
+
+export async function getCharacter(character: CharacterClass, components: DestinyComponentType[]) {
+	const API_KEY = process.env.B_API_KEY;
+	if (!API_KEY) {
+		throw new Error('B_API_KEY is not set in environment variables');
+	}
+	const membershipType = process.env.B_MEMBERSHIP_TYPE;
+	const membershipId = process.env.B_MEMBERSHIP_ID;
+	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
+
+	console.log('Fetching character data for characterId:', characterId);
+
+	if (!membershipType || !membershipId || !characterId) {
+		throw new Error('B_MEMBERSHIP_TYPE, B_MEMBERSHIP_ID, or B_CHARACTER_ID is not set in environment variables');
+	};
+
+	const url = new URL(`https://www.bungie.net/Platform/Destiny2/${membershipType}/Profile/${membershipId}/Character/${characterId}/?lc=ja`);
+	if (components.length > 0) {
+		url.searchParams.append('components', components.join(','));
+	}
+
+	const res = await fetch(url.toString(), {
+		headers: {
+			'X-API-Key': API_KEY,
+			'Content-Type': 'application/json',
+			'Accept': 'application/json',
+		}
+	});
+
+	if (!res.ok) {
+		throw new Error(`Failed to fetch character data: ${res.status} ${res.statusText}`);
+	}
+
+	const json = await res.json() as BungieResponse<DestinyCharacterResponse>;
+	if (json.ErrorCode !== 1) {
+		throw new Error(`Failed to fetch character data: ${json.ErrorStatus} ${json.Message}`);
+	}
+	
+	return json.Response;
+};
