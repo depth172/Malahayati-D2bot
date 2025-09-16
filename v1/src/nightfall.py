@@ -246,6 +246,7 @@ def getNightfall(isTest=False):
 		tw.pinTweet(tweetID)
 	else:
 		baseImg.show()
+		input("Enterを押すと次のページを表示します。")
 
 	print("\n情報取得の全工程完了。")
 	

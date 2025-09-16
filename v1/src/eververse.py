@@ -83,7 +83,7 @@ def getEververse():
 			try:
 				itemHash = vendor[j]['Response']['sales']['data'][str(i)]['itemHash']
 				salesItemHashes.append(itemHash)
-				itemCosts[str(itemHash)] = itemHash = vendor[j]['Response']['sales']['data'][str(i)]['costs'][0]['quantity']
+				itemCosts[str(itemHash)] = vendor[j]['Response']['sales']['data'][str(i)]['costs'][0]['quantity']
 			except KeyError:
 				pass
 	# 重複するアイテムを削除
@@ -145,6 +145,8 @@ def getEververse():
 	# 武器装飾があるか確認、あれば画像化
 	if '3124752623' in itemOrder:
 		hasWeaponOrnaments = True
+		# 武器データベース取得
+	
 		# 背景画像の準備
 		resImg = io.BytesIO()
 		baseImg = Image.open("./img/eververse_bg.jpg").convert("RGBA")
@@ -157,6 +159,7 @@ def getEververse():
 		
 		for i in range(len(itemOrder['3124752623'])):
 			shift_y += 500
+			print(itemOrder['3124752623'][i])
 			
 			# 検索にかけるため、英語名を作る（装飾の説明文から武器名以外を切り落とす）
 			weaponDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + itemOrder['3124752623'][i], headers=headers).json()
@@ -165,6 +168,8 @@ def getEververse():
 			
 			searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + weaponNameEng + "/", headers=headers).json()
 			
+			print(searchRes)
+
 			# 検索で得たアイテムが武器であり、今シーズンのもの、かつ新版でないか確認
 			# indexを比較し、新しいほうを保存する
 			newestWeaponData = 0
@@ -254,12 +259,12 @@ def getEververse():
 			shift_y += 500
 
 			# 検索にかけるため、英語名を作る（装飾の説明文から武器名以外を切り落とす）
-			armorDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + itemOrder['3124752623'][i], headers=headers).json()
+			armorDataEng = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + itemOrder['1742617626'][i], headers=headers).json()
 			armorNameRaw = armorDataEng['Response']['displayProperties']['description']
-			armorNameEng = armorNameRaw[54:-1]
+			armorNameEng = armorNameRaw[48:-76]
 			
 			searchRes = requests.get("https://www.bungie.net/Platform/Destiny2/Armory/Search/DestinyInventoryItemDefinition/" + armorNameEng + "/", headers=headers).json()
-			
+   
 			# indexを比較し、新しいほうを保存する
 			for j in range(len(searchRes['Response']['results']['results'])):
 				armorHash = searchRes['Response']['results']['results'][j]['hash']

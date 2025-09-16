@@ -266,8 +266,8 @@ def getXur(isTest=False):
 		cropImg.save(resImg, format='JPEG')
 		mediaList.append(tw.postImage(resImg.getvalue()))
 	else:
-		# cropImg.show()
-		pass
+		cropImg.show()
+		input("Enterを押すと次のページを表示します。")
 
 	#### スペシャルアイテムの取得 ###
  
@@ -414,7 +414,7 @@ def getXur(isTest=False):
 				mediaList.append(tw.postImage(resImg.getvalue()))
 			else:
 				cropImg.show()
-				pass
+				input("Enterを押すと次のページを表示します。")
 		else:
 			# それ以外は情報が出次第追加
 			pass
@@ -433,7 +433,7 @@ def getXur(isTest=False):
 		mediaList = []
 	else:
 		cropImg.show()
-		pass
+		input("Enterを押すと次のページを表示します。")
 
 	print("")
 	tweetText = "＜エキゾチック防具＞\n"
@@ -529,8 +529,8 @@ def getXur(isTest=False):
 			cropImg.save(resImg, format='JPEG')
 			mediaList.append(tw.postImage(resImg.getvalue()))
 		else:
-			# cropImg.show()
-			pass
+			cropImg.show()
+			input("Enterを押すと次のページを表示します。")
 
 	if not isTest:
 		content = {"text": tweetText, "media": {"media_ids": mediaList}}
@@ -663,8 +663,8 @@ def getXur(isTest=False):
 			cropImg.save(resImg, format='JPEG')
 			mediaList.append(tw.postImage(resImg.getvalue()))
 		else:
-			# cropImg.show()
-			pass
+			cropImg.show()
+			input("Enterを押すと次のページを表示します。")
 
 	#### ホークムーンのパークの取得 ####
 	
@@ -770,7 +770,7 @@ def getXur(isTest=False):
 		recentTweet = tw.makeThread(content, recentTweet)
 		mediaList = []
 	else:
-		# cropImg.show()
+		input("Enterを押すと次のページを表示します。")
 		pass
 
 	# レジェンダリー武器の取得
@@ -946,8 +946,8 @@ def getXur(isTest=False):
 				cropImg.save(resImg, format='JPEG')
 				mediaList.append(tw.postImage(resImg.getvalue()))
 			else:
-				# cropImg.show()
-				pass
+				cropImg.show()
+				input("Enterを押すと次のページを表示します。")
 
 			p += 1
 
@@ -1059,8 +1059,8 @@ def getXur(isTest=False):
 			cropImg.save(resImg, format='JPEG')
 			mediaList.append(tw.postImage(resImg.getvalue()))
 		else:
-			# cropImg.show()
-			pass
+			cropImg.show()
+			input("Enterを押すと次のページを表示します。")
 
 	if not isTest:
 		if lArmorSetName[0] == lArmorSetName[1] == lArmorSetName[2]:

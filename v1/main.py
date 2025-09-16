@@ -75,6 +75,42 @@ else:
 data.set('gotEververse', 'True')
 data.set('gotXur', 'True')
 
+# 失われたセクターの情報を未取得だった場合は取得
+if data.get('gotSector') == b'False':
+	gotInfo = True
+	print("失われたセクターの情報を取得します。\n")
+	checkCode = lostsector.getLostSector()
+	if checkCode == 0:
+		data.set('gotSector', 'True')
+		data.set('lostsectorFailed', 'False')
+	elif checkCode == 5:
+		if data.get('lostsectorFailed') == b'False':
+			timeStr = currentTime.strftime('%Y/%m/%d')
+			tweetText = "【失われたセクター情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
+			contents = {"text": tweetText}
+			tw.makeTweet(contents)
+			data.set('lostsectorFailed', 'True')
+		print("\n----------------------------------------")
+		sys.exit()
+		
+# バンシー44の販売武器に関する情報を未取得だった場合は取得
+if data.get('gotBanshee') == b'False':
+	gotInfo = True
+	print("バンシー44の販売武器情報を取得します。\n")
+	checkCode = banshee.getBanshee()
+	if checkCode == 0:
+		data.set('gotBanshee', 'True')
+		data.set('bansheeFailed', 'False')
+	elif checkCode == 5:
+		if data.get('bansheeFailed') == b'False':
+			timeStr = currentTime.strftime('%Y/%m/%d')
+			tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の日間販売武器に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
+			contents = {"text": tweetText}
+			tw.makeTweet(contents)
+			data.set('bansheeFailed', 'True')
+		print("\n----------------------------------------")
+		sys.exit()
+
 # 土曜～火曜かつ、シュールに関する情報を未取得だった場合は取得
 if currentTime.weekday() in [0, 1, 5, 6] and data.get('gotXur') == b'False':
 	gotInfo = True
@@ -129,42 +165,6 @@ if data.get('gotNightfall') == b'False':
 		print("\n----------------------------------------")
 		sys.exit()
 
-# 失われたセクターの情報を未取得だった場合は取得
-if data.get('gotSector') == b'False':
-	gotInfo = True
-	print("失われたセクターの情報を取得します。\n")
-	checkCode = lostsector.getLostSector()
-	if checkCode == 0:
-		data.set('gotSector', 'True')
-		data.set('lostsectorFailed', 'False')
-	elif checkCode == 5:
-		if data.get('lostsectorFailed') == b'False':
-			timeStr = currentTime.strftime('%Y/%m/%d')
-			tweetText = "【失われたセクター情報】" + timeStr + "\nAPIのメンテナンス中につき、失われたセクター(伝説/達人)に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
-			contents = {"text": tweetText}
-			tw.makeTweet(contents)
-			data.set('lostsectorFailed', 'True')
-		print("\n----------------------------------------")
-		sys.exit()
-		
-# バンシー44の販売武器に関する情報を未取得だった場合は取得
-if data.get('gotBanshee') == b'False':
-	gotInfo = True
-	print("バンシー44の販売武器情報を取得します。\n")
-	checkCode = banshee.getBanshee()
-	if checkCode == 0:
-		data.set('gotBanshee', 'True')
-		data.set('bansheeFailed', 'False')
-	elif checkCode == 5:
-		if data.get('bansheeFailed') == b'False':
-			timeStr = currentTime.strftime('%Y/%m/%d')
-			tweetText = "【ベンダー情報】" + timeStr + "\nAPIのメンテナンス中につき、バンシー44の日間販売武器に関する情報が取得できませんでした。後ほど再試行致しますので、しばらくお待ち下さい。"
-			contents = {"text": tweetText}
-			tw.makeTweet(contents)
-			data.set('bansheeFailed', 'True')
-		print("\n----------------------------------------")
-		sys.exit()
-		
 if not noData and not gotInfo:
 	print("新しく取得する情報はありませんでした。")
 

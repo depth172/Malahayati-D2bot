@@ -15,21 +15,14 @@ from time import sleep
 import datetime
 from zoneinfo import ZoneInfo
 import csv
+import math
 
-def getLostSector(isTest=False):
-	if isTest:
-		print("テストモードで実行中。")
-	
+def getLostSector():
 	# 頻出する辞書とリストの定義
+	armor = {0: 'チェストアーマー', 1: 'ヘルメット', 2: 'レッグアーマー', 3: 'ガントレット'}
+	armorIcon = {0: 'chest_armor', 1: 'helmet', 2: 'boots', 3: 'gauntlet'}
 	champion = {'barrier': "バリア", 'unstoppable': "アンストッパブル", 'overload': "オーバーロード"}
 	elemHash = {'solar': "1847026933", 'arc': "2303181850", 'void': "3454344768", 'stasis': "151347233", 'strand': "3949783978"}
- 
-	ignoreMods = {1783825372, 1174869237, 1486810101, 203094476, 4226469317}
-	shields = { 93790318, 720259466, 1111960127, 1377274412, 1444852954, 1553093202, 1651706850, 2288210988, 2524382624, 2585386105, 2650740350, 2833087500, 2965677044, 3119632620, 3139381566, 3171609188, 3230561446, 3538098588, 3958417570 }
-	champions = {40182179, 197794292, 438106166, 1262171714, 1598783516, 1615778293, 1806568190, 1990363418, 2006149364, 2475764450, 3307318061, 3461252634, 4038464106, 4190795159}
-	threats = {186409259, 512042454, 1598472557, 3517267764, 3652821947}
-	surges = {426976067, 2691200658, 3196075844, 3809788899, 3810297122}
-	overcharges = {95459596, 214700178, 795009574, 929044687, 1282934989, 1326581064, 2178457119, 2626834038, 2743796883, 2984170047, 3132780533, 3320777106, 3406250074, 3758645512}
 
 	# 画像生成用のフォント定義
 	fontS = ImageFont.truetype('./.font/GenEiGothicN-Regular.otf', 17)
@@ -70,10 +63,13 @@ def getLostSector(isTest=False):
 								sector[sectorRaw[i][0]][j - 1].append(splited)
 					else:
 						sector[sectorRaw[i][0]].append(sectorRaw[i][j])
-	with open('data/sector_episode_revenant.csv') as f:
+	with open('data/drop_exotic.csv') as f:
+		reader = csv.reader(f)
+		exotics = [row for row in reader]
+	with open('data/sector_season23.csv') as f:
 		reader = csv.reader(f)
 		seasonal = [row for row in reader]
-	with open('data/drop_episode_revenant.csv') as f:
+	with open('data/drop_season23.csv') as f:
 		reader = csv.reader(f)
 		lDrops = [row for row in reader]
 
@@ -90,6 +86,7 @@ def getLostSector(isTest=False):
 
 	# ローテーション取得
 	sectorRot = seasonal[0][seasonElapsedDate % len(seasonal[0])]
+	armorRot = armor[totalElapsedDate % 4]
 	
 	sectorHash = sector[sectorRot][0]
 
@@ -116,25 +113,23 @@ def getLostSector(isTest=False):
 	# サージの情報を得るため、ナイトフォールの戦闘条件を流用する
 	for i in range(3):
 		activityData = requests.get("https://www.bungie.net//Platform/Destiny2/Milestones/?lc=ja", headers=headers).json()
-		if 'Response' not in activityData:
-			if activityData['ErrorCode'] == 5:
+		if 'Response' not in sectorData:
+			if sectorData['ErrorCode'] == 5:
 				print("現在APIサービスはメンテナンス中です。処理を中断します。")
-				return activityData['ErrorCode']
+				return sectorData['ErrorCode']
 			if i != 2:
 				print("API取得に失敗しました。3秒後にリトライします…")
 				sleep(3)
 				continue
 			else:
 				print("APIが取得できませんでした。処理を中断します。")
-				print("エラーコード - " + str(activityData['ErrorCode']) + "\n" + activityData['Message'])
-			return activityData['ErrorCode']
+				print("エラーコード - " + str(sectorData['ErrorCode']) + "\n" + sectorData['Message'])
+			return sectorData['ErrorCode']
 		else:
 			break
-
-	currentSurge = list(set(activityData['Response']['2029743966']['activities'][-1]['modifierHashes']) & set(surges))
 	
-	surge1Hash = currentSurge[0]
-	surge2Hash = currentSurge[1]
+	surge1Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-3]
+	surge2Hash = activityData['Response']['2029743966']['activities'][-1]['modifierHashes'][-2]
 	
 	tweetText = ""
 	mediaList = []
@@ -150,18 +145,11 @@ def getLostSector(isTest=False):
 	sectorLocName = sectorLocData['Response']['displayProperties']['name']
 
 	# ツイート用の文章を整形
-	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
+	tweetText = "【 #失われたセクター 情報】" + todayDateStr + "\n本日の失われたセクター(伝説/達人)は" + sectorLocName + "の「" + sectorName + "」です。"
 
-	sectorModifiers = {modifier["activityModifierHash"] for modifier in sectorData['Response']['modifiers']}
-	sectorModifiers -= ignoreMods
-	sectorModifiers -= surges
-	sectorModifiers -= shields
-	sectorModifiers -= champions
-
-	threatHash = list(sectorModifiers & threats)[0]
+	threatHash = sectorData['Response']['modifiers'][10]['activityModifierHash']
 	threatData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(threatHash) + "/?lc=ja", headers=headers).json()
 	threatName = threatData['Response']['displayProperties']['name']
-	sectorModifiers -= threats
 
 	surge1Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge1Hash) + "/?lc=ja", headers=headers).json()
 	surge1Name = surge1Data['Response']['displayProperties']['name']
@@ -169,17 +157,15 @@ def getLostSector(isTest=False):
 	surge2Data = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(surge2Hash) + "/?lc=ja", headers=headers).json()
 	surge2Name = surge2Data['Response']['displayProperties']['name']
 	
-	ocHash = list(sectorModifiers & overcharges)[0]
+	ocHash = sectorData['Response']['modifiers'][20]['activityModifierHash']
 	ocData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(ocHash) + "/?lc=ja", headers=headers).json()
 	ocName = ocData['Response']['displayProperties']['name']
-	sectorModifiers -= overcharges
-
+	
 	tweetText += "\n\n本日の戦闘条件: \n" + threatName + ", " + surge1Name + ", " + surge2Name + "\n" + ocName
 
 	tweetText += "\n\n#Destiny2"
 	
-	print("\n本日の失われたセクター(名人/達人)は" + sectorLocName + "の「" + sectorName + "」です。")
-	print("戦闘条件:\n　" + threatName + ", " + surge1Name + ", " + surge2Name + "\n　" + ocName)
+	print(tweetText + "\n")
 
 	# 画像生成
 	imageURL = sectorData['Response']['pgcrImage']
@@ -203,8 +189,8 @@ def getLostSector(isTest=False):
 		sectorDestName = sectorPlanetName + "、" + sectorLocName
 		draw.text((1238, 605), sectorDestName, fill=(255, 255, 255), font=fontLoc, anchor="rb")
 	
-	draw.multiline_text((28, 405), "＜チャンピオン出現数＞", fill=(255, 255, 255), font=fontB1)
-	draw.text((28, 605), "名人:", fill=(255, 255, 255), font=fontN)
+	draw.multiline_text((28, 405), "＜チャンピオンと敵のシールド出現数＞", fill=(255, 255, 255), font=fontB1)
+	draw.text((28, 605), "伝説:", fill=(255, 255, 255), font=fontN)
 	draw.text((28, 665), "達人:", fill=(255, 255, 255), font=fontN)
 	baseImg.paste(logoImg, (935, 45), logoImg)
 
@@ -217,7 +203,7 @@ def getLostSector(isTest=False):
 		shift_x += 140
 
 	e = 3
-	if sector[sectorRot][3]:
+	if sector[sectorRot][-1]:
 		e += 1
 	if sector[sectorRot][4]:
 		e += 1
@@ -234,8 +220,8 @@ def getLostSector(isTest=False):
 		draw.text((183 + shift_x, 662), "x" + sector[sectorRot][i][1][1], fill=(255, 255, 255), font=fontB2, anchor='mt')
 		shift_x += 140
 
-	if sectorModifiers:
-		modHash = list(sectorModifiers)[0]
+	if not sectorData['Response']['modifiers'][11]['activityModifierHash'] in [1783825372]:
+		modHash = sectorData['Response']['modifiers'][11]['activityModifierHash']
 		modData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyActivityModifierDefinition/" + str(modHash) + "/?lc=ja", headers=headers).json()
 		modName = modData['Response']['displayProperties']['name']
 		modDesc = modData['Response']['displayProperties']['description']
@@ -245,11 +231,9 @@ def getLostSector(isTest=False):
 		draw.text((105, 293), modName, fill=(255, 255, 255), font=fontB1)
 		draw.text((43, 361), modDesc, fill=(255, 255, 255), font=fontN)
 
-	if not isTest:
-		baseImg.convert("RGB").save(resImg1, format='JPEG')
-		mediaList.append(tw.postImage(resImg1.getvalue()))
-	else:
-		baseImg.show()
+	baseImg.convert("RGB").save(resImg1, format='JPEG')
+
+	mediaList.append(tw.postImage(resImg1.getvalue()))
 
 	baseImg = Image.alpha_composite(image, mask)
 	resImg2 = io.BytesIO()
@@ -260,13 +244,50 @@ def getLostSector(isTest=False):
 	shift_y = 0
 
 	draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
-	draw.text((45, 70), "本日のドロップアイテム", fill=(255, 255, 255), font=fontTitle)
+	draw.text((45, 70), "本日のドロップアイテム (1/2)", fill=(255, 255, 255), font=fontTitle)
+	draw.text((65, 190), "防具の部位:", fill=(255, 255, 255), font=fontB2)
+	draw.text((400, 190), armorRot, fill=(255, 255, 255), font=fontB2)
+	draw.text((30, 300), "<セクター限定で本日ドロップするエキゾチック防具>", fill=(255, 255, 255), font=fontB1)
+	draw.text((1240, 680), "＊ ソロでクリア時のみドロップします。", fill=(255, 255, 255), font=fontN, anchor='rb')
+	
+	## 部位アイコン挿入
+	armorIconImg = Image.open("./img/" + armorIcon[totalElapsedDate % 4] + ".png").convert("RGBA").resize((70, 70), 1)
+	baseImg.paste(armorIconImg, (305, 183), armorIconImg)
+	
+	## 防具アイコン挿入
+	for i in range(len(exotics[totalElapsedDate % 4])):
+		eArmorData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyCollectibleDefinition/" + str(exotics[totalElapsedDate % 4][i]) + "/?lc=ja", headers=headers).json()
+		eArmorImgPath = eArmorData['Response']['displayProperties']['icon']
+		eArmorImg = Image.open(io.BytesIO(requests.get("https://www.bungie.net" + eArmorImgPath).content))
+		# リサイズして挿入
+		eArmorImg = eArmorImg.resize((110, 110), 1)
+		baseImg.paste(eArmorImg, (65 + shift_x, 360 + shift_y))
+		
+		shift_x += 130
+		if ((i + 1) % 9 == 0):
+			shift_x = 0
+			shift_y += 130
+			
+	baseImg.convert("RGB").save(resImg2, format='JPEG')
+	mediaList.append(tw.postImage(resImg2.getvalue()))
+
+	baseImg = Image.alpha_composite(image, mask)
+	resImg3 = io.BytesIO()
+	draw = ImageDraw.Draw(baseImg)
+	baseImg.paste(logoImg, (935, 45), logoImg)
+
+	shift_x = 0
+	shift_y = 0
+
+	draw.text((30, 30), "失われたセクター", fill=(255, 255, 255), font=fontB1)
+	draw.text((45, 70), "本日のドロップアイテム (2/2)", fill=(255, 255, 255), font=fontTitle)
 	draw.text((30, 150), "<追加ドロップするレジェンダリー武器>", fill=(255, 255, 255), font=fontB1)
 	draw.text((1240, 680), "＊ ソロでクリア時のみドロップ。達人クリアの場合、パークが複数個つく可能性があります。", fill=(255, 255, 255), font=fontN, anchor='rb')
 		
 	## 武器アイコン挿入
-	for i, lWeaponHash in enumerate(lDrops[totalElapsedDate % 6]):
+	for i in range(4):
 		# データ取得
+		lWeaponHash = lDrops[totalElapsedDate % 4][i]
 		lWeaponData = requests.get("https://www.bungie.net/Platform/Destiny2/Manifest/DestinyInventoryItemDefinition/" + str(lWeaponHash) + "/?lc=ja", headers=headers).json()
 		lWeaponName = lWeaponData['Response']['displayProperties']['name']
 
@@ -318,14 +339,11 @@ def getLostSector(isTest=False):
 			shift_x = 0
 			shift_y += 180
 	
-	if not isTest:
-		baseImg.convert("RGB").save(resImg2, format='JPEG')
-		mediaList.append(tw.postImage(resImg2.getvalue()))
-		
-		content = {"text": tweetText, "media": {"media_ids": mediaList}}
-		tw.makeTweet(content)
-	else:
-		baseImg.show()
+	baseImg.convert("RGB").save(resImg3, format='JPEG')
+	mediaList.append(tw.postImage(resImg3.getvalue()))
+	
+	content = {"text": tweetText, "media": {"media_ids": mediaList}}
+	tw.makeTweet(content)
 
 	print("\n情報取得の全工程完了。")
 	

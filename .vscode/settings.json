@@ -1,0 +1,10 @@
+{
+	"terminal.integrated.cwd": "${workspaceFolder}/v2",
+	"terminal.integrated.defaultProfile.windows": "PowerShell",
+	"terminal.integrated.profiles.windows": {
+		"PowerShell": {
+			"path": "C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe",
+			"cwd": "${workspaceFolder}/v2"
+		}
+	}
+}
