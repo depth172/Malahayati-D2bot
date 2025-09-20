@@ -6,6 +6,7 @@ enum CharacterClass {
 	WARLOCK = 2,
 }
 
+// 指定したキャラクターの情報を取得する関数
 export async function getCharacter(character: CharacterClass, components: DestinyComponentType[]) {
 	const API_KEY = process.env.B_API_KEY;
 	if (!API_KEY) {
@@ -15,7 +16,7 @@ export async function getCharacter(character: CharacterClass, components: Destin
 	const membershipId = process.env.B_MEMBERSHIP_ID;
 	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
 
-	console.log('Fetching character data for characterId:', characterId);
+	console.log(CharacterClass[character] + "のCharacter情報を取得します...");
 
 	if (!membershipType || !membershipId || !characterId) {
 		throw new Error('B_MEMBERSHIP_TYPE, B_MEMBERSHIP_ID, or B_CHARACTER_ID is not set in environment variables');
@@ -35,6 +36,7 @@ export async function getCharacter(character: CharacterClass, components: Destin
 	});
 
 	if (!res.ok) {
+		console.error('Response:', res);
 		throw new Error(`Failed to fetch character data: ${res.status} ${res.statusText}`);
 	}
 

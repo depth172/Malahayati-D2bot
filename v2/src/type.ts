@@ -679,6 +679,547 @@ export type DestinyCurrenciesComponent = {
 	materialRequirementSetStates: DestinyMaterialRequirementSetState[];
 };
 
+export type DestinyActivityRewardDefinition = {
+	rewardText: string;
+	rewardItems: DestinyItemQuantity[];
+};
+
+export type DestinyActivityModifierReferenceDefinition = {
+	activityModifierHash: number;
+}
+
+export type DestinyActivityChallengeDefinition = {
+	objectiveHash: number;
+	dummyRewards: DestinyItemQuantity[];
+};
+
+export type DestinyActivityUnlockStringDefinition = {
+	displayString: string;
+};
+
+export type DestinyActivityRequirementLabel = {
+	displayString: string;
+};
+
+export type DestinyActivityRequirementsBlock = {
+	leaderRequirementLabels: DestinyActivityRequirementLabel[];
+	fireteamRequirementLabels: DestinyActivityRequirementLabel[];
+};
+
+export type DestinyActivitySelectableSkullCollection = {
+	selectableSkullCollectionHash: number;
+	minimumTierRank: number;
+	maximumTierRank: number;
+};
+
+export type DestinyActivityPlaylistItemDefinition = {
+	activityHash: number;
+	directActivityModeHash?: number;
+	directActivityModeType?: DestinyActivityModeType;
+	activityModeHashes: number[];
+	activityModeTypes: DestinyActivityModeType[];
+};
+
+export type DestinyActivityGraphListEntryDefinition = {
+	activityGraphHash: number;
+};
+
+export type DestinyActivityMatchmakingBlockDefinition = {
+	isMatchmade: boolean;
+	minParty: number;
+	maxParty: number;
+	maxPlayers: number;
+	requiresGuardianOath: boolean;
+};
+
+export type DestinyActivityGuidedBlockDefinition = {
+	guidedMaxLobbySize: number;
+	guidedMinLobbySize: number;
+	guidedDisbandCount: number;
+};
+
+export type DestinyActivityLoadoutRequirement = {
+	equipmentSlotHash: number;
+	allowedEquipmentItemHashes: number[];
+	allowedWeaponSubTypes: number[];
+};
+
+export type DestinyActivityLoadoutRequirementSet = {
+	requirements: DestinyActivityLoadoutRequirement[];
+};
+
+export type DestinyActivityInsertionPointDefinition = {
+	phaseHash: number;
+};
+
+export type DestinyEnvironmentLocationMapping = {
+	locationHash: number;
+	activationSource: string;
+	itemHash?: number;
+	objectiveHash?: number;
+	activityHash?: number;
+};
+
+export interface DestinyDefinition {
+	hash: number;
+	index: number;
+	redacted: boolean;
+}
+
+export type DestinyIconSequenceDefinition = {
+	frames: string[];
+};
+
+export type DestinyDisplayPropertiesDefinition = {
+	description: string;
+	name: string;
+	icon: string;
+	hasIcon: boolean;
+	highResIcon?: string;
+	iconHash?: number;
+	iconSequences?: DestinyIconSequenceDefinition[];
+};
+
+export type DestinyActivityDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	originalDisplayProperties: DestinyDisplayPropertiesDefinition;
+	selectionScreenDisplayProperties: DestinyDisplayPropertiesDefinition;
+	releaseIcon: string;
+	releaseTime: number;
+	activityLightLevel: number;
+	destinationHash: number;
+	placeHash: number;
+	activityTypeHash: number;
+	tier: number;
+	pgcrImage: string;
+	rewards: DestinyActivityRewardDefinition[];
+	modifiers: DestinyActivityModifierReferenceDefinition[];
+	isPlaylist: boolean;
+	challenges: DestinyActivityChallengeDefinition[];
+	optionalUnlockStrings: DestinyActivityUnlockStringDefinition[];
+	activityFamilyHashes: number[];
+	traitHashes: number[];
+	requirements: DestinyActivityRequirementsBlock;
+	difficultyTierCollectionHash?: number;
+	selectableSkullCollectionHashes: number[];
+	selectableSkullCollections: DestinyActivitySelectableSkullCollection[];
+	playlistItems: DestinyActivityPlaylistItemDefinition[];
+	activityGraphList: DestinyActivityGraphListEntryDefinition[];
+	matchmaking: DestinyActivityMatchmakingBlockDefinition;
+	guidedGame: DestinyActivityGuidedBlockDefinition;
+	directActivityModeHash?: number;
+	directActivityModeType?: DestinyActivityModeType;
+	loadouts: DestinyActivityLoadoutRequirementSet;
+	activityModeHashes: number[];
+	activityModeTypes: DestinyActivityModeType[];
+	isPvP: boolean;
+	insertionPoints: DestinyActivityInsertionPointDefinition[];
+	activityLocationMappings: DestinyEnvironmentLocationMapping[];
+};
+
+export type DestinyItemTooltipNotification = {
+	displayString: string;
+	displayStyle: string;
+};
+
+export type DestinyItemActionRequiredItemDefinition = {
+	count: number;
+	itemHash: number;
+	deleteOnAction: boolean;
+};
+
+export type DestinyProgressionRewardDefinition = {
+	progressionMappingHash: number;
+	amount: number;
+	applyThrottles: boolean;
+};
+
+export type DestinyItemActionBlockDefinition = {
+	verbName: string;
+	verbDescription: string;
+	isPositive: boolean;
+	overlayScreenName: string;
+	overlayIcon: string;
+	requiredCooldownSeconds: number;
+	requiredItems: DestinyItemActionRequiredItemDefinition[];
+	progressionRewards: DestinyProgressionRewardDefinition[];
+	actionTypeLabel: string;
+	requiredLocation: string;
+	requiredCooldownHash: number;
+	deleteOnAction: boolean;
+	consumeEntireStack: boolean;
+	useOnAcquire: boolean;
+};
+
+export type DestinyItemCraftingBlockBonusPlugDefinition = {
+	socketTypeHash: number;
+	plugItemHash: number;
+};
+
+export type DestinyItemCraftingBlockDefinition = {
+	outputItemHash: number;
+	requiredSocketTypeHashes: number[];
+	failedRequirementStrings: string[];
+	baseMaterialRequirements?: number[];
+	bonusPlugs: DestinyItemCraftingBlockBonusPlugDefinition[];
+};
+
+export type DestinyItemInventoryBlockDefinition = {
+	stackUniqueLabel: string;
+	maxStackSize: number;
+	bucketTypeHash: number;
+	recoveryBucketTypeHash: number;
+	tierTypeHash: number;
+	isInstanceItem: boolean;
+	tierTypeName: string;
+	tierType: number;
+	expirationTooltip: string;
+	expiredInActivityMessage: string;
+	expiredInOrbitMessage: string;
+	suppressExpirationWhenObjectivesComplete: boolean;
+	recipeItemHash?: number;
+};
+
+export type DestinyItemSetBlockEntryDefinition = {
+	trackingValue: number;
+	itemHash: number;
+};
+
+export type DestinyItemSetBlockDefinition = {
+	itemList: DestinyItemSetBlockEntryDefinition[];
+	requiredOrderedSetItemAdd: boolean;
+	setIsFeatured: boolean;
+	setType: string;
+	questLineName: string;
+	questLineDescription: string;
+	questStepSummary: string;
+};
+
+export type DestinyInventoryItemStatDefinition = {
+	statHash: number;
+	value: number;
+	minimum: number;
+	maximum: number;
+	displayMaximum?: number;
+};
+
+export type DestinyItemStatBlockDefinition = {
+	disablePrimaryStatDisplay: boolean;
+	statGroupHash: number;
+	stats: Record<number, DestinyInventoryItemStatDefinition>;
+	hasDisplayableStats: boolean;
+	primaryBaseStatHash: number;
+};
+
+export type DestinyEquippingBlockDefinition = {
+	gearsetItemHash?: number;
+	uniqueLabel: string;
+	uniqueLabelHash: number;
+	equipmentSlotTypeHash: number;
+	attributes: number;
+	ammoType: number;
+	displayStrings: string[];
+	equipableItemSetHash?: number;
+};
+
+export type DestinyGearArtArrangementReference = {
+	classHash: number;
+	artArrangementHash: number;
+};
+
+export type DestinyItemTranslationBlockDefinition = {
+	weaponPatternIdentifier: string;
+	weaponPatternHash: number;
+	defaultDyes: DyeReference[];
+	lockedDyes: DyeReference[];
+	customDyes: DyeReference[];
+	arrangements: DestinyGearArtArrangementReference[];
+	hasGeometry: boolean;
+};
+
+export type DestinyDerivedItemDefinition = {
+	itemHash?: number;
+	itemName: string;
+	itemDetail: string;
+	itemDescription: string;
+	iconPath: string;
+	vendorItemIndex: number;
+};
+
+export type DestinyDerivedItemCategoryDefinition = {
+	categoryDescription: string;
+	items: DestinyDerivedItemDefinition[];
+};
+
+export type DestinyItemPreviewBlockDefinition = {
+	screenStyle: string;
+	previewVendorHash: number;
+	artifactHash?: number;
+	previewActionString: string;
+	derivedItemCategories: DestinyDerivedItemCategoryDefinition[];
+};
+
+export type DestinyItemQualityBlockDefinition = {
+	itemLevels: number[];
+	qualityLevel: number;
+	infusionCategoryName: string;
+	infusionCategoryHash: number;
+	infusionCategoryHashes: number[];
+	progressionLevelRequirementHash: number;
+	currentVersion: number;
+	versions: number[];
+	displayVersionWatermarkIcons: string[];
+};
+
+export type DestinyItemValueBlockDefinition = {
+	itemValue: DestinyItemQuantity[];
+	valueDescription: string;
+};
+
+export type DestinyItemSourceDefinition = {
+	level: number;
+	minQuality: number;
+	maxQuality: number;
+	minLevelRequired: number;
+	maxLevelRequired: number;
+	computedStats: Record<number, DestinyInventoryItemStatDefinition>;
+	sourceHashes: number[];
+};
+
+export type DestinyItemVendorSourceReference = {
+	vendorHash: number;
+	vendorItemIndexes: number[];
+};
+
+export type DestinyItemSourceBlockDefinition = {
+	sourceHashes: number[];
+	sources: DestinyItemSourceDefinition[];
+	exclusive: number;
+	vendorSources: DestinyItemVendorSourceReference[];
+};
+
+export type DestinyObjectiveDisplayProperties = {
+	activityHash?: number;
+	displayOnItemPreviewScreen: boolean;
+};
+
+export type DestinyItemObjectiveBlockDefinition = {
+	objectiveHashes: number[];
+	displayActivityHashes: number[];
+	requireFullObjectiveCompletion: boolean;
+	questlineItemHash: number;
+	narrative: string;
+	objectiveVerbName: string;
+	questTypeIdentifier: string;
+	questTypeHash: number;
+	perObjectiveDisplayProperties: DestinyObjectiveDisplayProperties[];
+	displayAsStatTracker: boolean;
+};
+
+export type DestinyItemMetricBlockDefinition = {
+	availableMetricCategoryNodeHashes: number[];
+};
+
+export type DestinyPlugRuleDefinition = {
+	failureMessage: string;
+};
+
+export type DestinyParentItemOverride = {
+	additionalEquipRequirementsDisplayStrings: string[];
+	pipIcon: string;
+};
+
+export type DestinyEnergyCapacityEntry = {
+	capacityValue: number;
+	energyTypeHash: number;
+	energyType: number;
+};
+
+export type DestinyEnergyCostEntry = {
+	energyCost: number;
+	energyTypeHash: number;
+	energyType: number;
+};
+
+export type DestinyItemPlugDefinition = {
+	insertionRules: DestinyPlugRuleDefinition[];
+	plugCategoryIdentifier: string;
+	plugCategoryHash: number;
+	onActionRecreateSelf: boolean;
+	insertionMaterialRequirementHash: number;
+	previewItemOverrideHash: number;
+	enabledMaterialRequirementHash: number;
+	enabledRules: DestinyPlugRuleDefinition[];
+	uiPlugLabel: string;
+	plugStyle: number;
+	plugAvailability: number;
+	alternateUiPlugLabel: string;
+	alternatePlugStyle: number;
+	isDummyPlug: boolean;
+	parentItemOverride: DestinyParentItemOverride;
+	energyCapacity: DestinyEnergyCapacityEntry;
+	energyCost: DestinyEnergyCostEntry;
+};
+
+export type DestinyItemGearsetBlockDefinition = {
+	trackingValueMax: number;
+	itemList: number[];
+};
+
+export type DestinyItemSackBlockDefinition = {
+	detailAction: string;
+	openAction: string;
+	selectItemCount: number;
+	vendorSackType: string;
+	openOnAcquire: boolean;
+};
+
+export type DestinyItemSocketEntryPlugItemDefinition = {
+	plugItemHash: number;
+};
+
+export type DestinyItemSocketEntryDefinition = {
+	socketTypeHash: number;
+	singleInitialItemHash: number;
+	reusablePlugItems: DestinyItemSocketEntryPlugItemDefinition[];
+	preventInitializationOnVendorPurchase: boolean;
+	hidePerksInItemTooltip: boolean;
+	plugSources: number;
+	reusablePlugSetHash?: number;
+	randomizedPlugSetHash?: number;
+	defaultVisible: boolean;
+};
+
+export type DestinyItemSocketBlockDefinition = {
+	detail: string;
+	socketEntries: DestinyItemSocketEntryDefinition[];
+};
+
+export type DestinyItemSummaryBlockDefinition = {
+	sortPriority: number;
+};
+
+export type DestinyItemTalentGridBlockDefinition = {
+	talentGridHash: number;
+	itemDetailString: string;
+	buildName: string;
+	hudDamageType: number;
+	hudIcon: string;
+};
+
+export type DestinyItemInvestmentStatDefinition = {
+	statTypeHash: number;
+	value: number;
+	isConditionallyActive: boolean;
+};
+
+export type DestinyItemPerkEntryDefinition = {
+	requirementDisplayString: string;
+	perkHash: number;
+	perkVisibility: number;
+};
+
+export type DestinyAnimationReference = {
+	animName: string;
+	animIdentifier: string;
+	path: string;
+};
+
+export type HyperLinkReference = {
+	title: string;
+	url: string;
+};
+
+export type DestinyInventoryItemDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	tooltipNotifications: DestinyItemTooltipNotification[];
+	collectibleHash?: number;
+	iconWatermark: string;
+	iconWatermarkShelved: string;
+	iconWatermarkFeatured: string;
+	secondaryIcon: string;
+	secondaryOverlay: string;
+	secondarySpecial: string;
+	backgroundColor: DestinyColor;
+	isFeaturedItem: boolean;
+	isHolofoil: boolean;
+	isAdept: boolean;
+	screenshot: string;
+	itemTypeDisplayName: string;
+	flavorText: string;
+	uiItemDisplayStyle: string;
+	itemTypeAndTierDisplayName: string;
+	displaySource: string;
+	tooltipStyle: string;
+	action: DestinyItemActionBlockDefinition;
+	crafting: DestinyItemCraftingBlockDefinition;
+	inventory: DestinyItemInventoryBlockDefinition;
+	setData: DestinyItemSetBlockDefinition;
+	stats: DestinyItemStatBlockDefinition;
+	emblemObjectiveHash?: number;
+	equippingBlock?: DestinyEquippingBlockDefinition;
+	translationBlock?: DestinyItemTranslationBlockDefinition;
+	preview: DestinyItemPreviewBlockDefinition;
+	quality: DestinyItemQualityBlockDefinition;
+	value: DestinyItemValueBlockDefinition;
+	sourceData: DestinyItemSourceBlockDefinition;
+	objectives: DestinyItemObjectiveBlockDefinition;
+	metrics: DestinyItemMetricBlockDefinition;
+	plug: DestinyItemPlugDefinition;
+	gearset: DestinyItemGearsetBlockDefinition;
+	sack: DestinyItemSackBlockDefinition;
+	sockets: DestinyItemSocketBlockDefinition;
+	summary: DestinyItemSummaryBlockDefinition;
+	talentGrid: DestinyItemTalentGridBlockDefinition;
+	investmentStats: DestinyItemInvestmentStatDefinition[];
+	perks: DestinyItemPerkEntryDefinition[];
+	loreHash?: number;
+	summaryItemHash?: number;
+	animations: DestinyAnimationReference[];
+	allowActions: boolean;
+	links: HyperLinkReference[];
+	doesPostmasterPullHaveSideEffects: boolean;
+	nonTransferrable: boolean;
+	itemCategoryHashes: number[];
+	specialItemType: number;
+	itemType: number;
+	itemSubType: number;
+	classType: number;
+	breakerType: DestinyBreakerType;
+	breakerTypeHash?: number;
+	equippable: boolean;
+	damageTypeHashes: number[];
+	damageTypes: number[];
+	defaultDamageType: number;
+	defaultDamageTypeHash?: number;
+	seasonHash?: number;
+	isWrapper: boolean;
+	traitIds: string[];
+	traitHashes: number[];
+};
+
+export type DestinySeasonPassImages = {
+	iconImagePath: string;
+	themeBackgroundImagePath: string;
+};
+
+export type DestinySeasonPassDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	rewardProgressionHash: number;
+	prestigeProgressionHash: number;
+	linkRedirectPath: string;
+	color: DestinyColor;
+	images: DestinySeasonPassImages;
+};
+
+export type DestinyDamageTypeDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	transparentIconPath: string;
+	showIcon: boolean;
+	enumValue: number;
+	color: DestinyColor;
+};
+
 type BungieSetting = {
 	identifier: string;
 	isDefault: boolean;

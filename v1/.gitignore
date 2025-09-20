@@ -128,7 +128,5 @@ dmypy.json
 # Pyre type checker
 .pyre/
 
-v1/test.py
-
-# Node modules
-v2/node_modules
+# preview files
+test.py

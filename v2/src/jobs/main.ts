@@ -1,15 +1,31 @@
-// src/jobs/main.ts
-import { inferFocusedWeapons } from '@domain/inferFocused';
+import 'dotenv/config';
+import { getCharacter } from '@api/getCharacter';
+import { getDefinition } from '@api/getDefinition';
+import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from '@domain/inferFocused';
+import { buildPortalCards } from 'front/generateCard';
+import { DestinyComponentType as T } from 'type';
 
 async function run() {
-  // ここは仮。実際は adapters でAPI呼び出し
-  const visibleRewards = [
-    { uiStyle: 'daily_grind_guaranteed', hash: 111 },
-    { uiStyle: 'other', hash: 222 }
-  ];
+	const inputs = await Promise.all([
+		getCharacter(0, [T.CharacterActivities]), // Hunter
+		getCharacter(1, [T.CharacterActivities]), // Titan
+		getCharacter(2, [T.CharacterActivities]), // Warlock
+	]);
 
-  const hashes = inferFocusedWeapons(visibleRewards);
-  console.log('[focused weapons]', hashes);
+	const results = inputs.map(input => {
+		const activities = Object.values(input.activities?.data.availableActivities || {});
+		return inferFocusedGear(activities);
+	});
+
+	const mergedResult = mergeFocusedSets(results);
+
+	const result = await groupFocusedSets(mergedResult, getDefinition);
+	
+	buildPortalCards(result, { mode: "preview", getDef: getDefinition }).then(r => {
+		console.log(r);
+	}).catch(e => {
+		console.error(e);
+	});
 }
 
 run().catch(e => {

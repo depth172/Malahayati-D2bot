@@ -1,0 +1,138 @@
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+body {
+	color: #fff;
+	background-color: #0f0f12;
+	width: 1200px;
+	font-size: 20px;
+}
+
+.card {
+  background-color: #0f0f12;
+  background-image:
+    linear-gradient(to bottom, rgba(15,15,18,0) 50%, rgba(15,15,18,1) 100%),
+    var(--bg-url);
+  background-size:
+    100% calc(1200px / var(--bg-ratio)),
+    100% auto;
+  background-position: top, top;
+  background-repeat: no-repeat, no-repeat;
+	text-shadow: 0 0 7px black;
+
+	display: flex;
+	flex-direction: column;
+	gap: 36px;
+	padding: 36px;
+}
+
+.date {
+	text-shadow: 0 0 3px black;
+}
+
+.card > * {
+	position: relative;
+	z-index: 1;
+}
+
+.header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+
+.header h2 {
+	font-size: 40px;
+}
+
+.content {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 36px;
+}
+
+.itemPortal {
+	background: linear-gradient(rgba(0,0,0,0.5),rgba(0,0,0,0.5)),var(--bg-url);
+	background-position: center;
+	background-size: cover;
+	padding: 25px;
+
+	border: 4px solid #000;
+	border-radius: 16px;
+	overflow: hidden;
+
+}
+
+.itemPortal h3 {
+  font-size: 28px;
+}
+
+.weapons {
+	display: flex;
+	flex-direction: column;
+	margin: 36px 10px;
+	gap: 12px;
+}
+
+.weapon {
+	display: flex;
+	gap: 12px;
+}
+
+.weapon .icon {
+	min-height: 80px;
+	min-width: 80px;
+	position: relative;
+	border: 3px solid #b7b7b7;
+}
+
+.weapon .icon img {
+	height: 100%;
+	width: 100%;
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.weapon .icon img.watermark {
+	top: -1.8px;
+	left: -1.8px;
+}
+
+.damage-type-icon, .ammo-icon {
+  height: 1em;
+}
+
+.info {
+	display: flex;
+	flex-direction: column;
+	justify-content: center;
+}
+
+.info .name {
+	font-weight: bold;
+	text-wrap: nowrap;
+	overflow: hidden;
+}
+
+.info .type {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+
+.footer {
+	text-align: right;
+	padding: 10px 20px;
+	display: flex;
+	justify-content: flex-end;
+	align-items: center;
+}
+
+.footer img {
+	height: 48px;
+	opacity: 0.8;
+}
