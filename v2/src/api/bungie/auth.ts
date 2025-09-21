@@ -81,9 +81,13 @@ async function refreshTokens(refreshToken: string): Promise<BungieTokenPayload> 
   const body = new URLSearchParams({
     grant_type: "refresh_token",
     refresh_token: refreshToken,
-    client_id: process.env.BUNGIE_CLIENT_ID!,
-    client_secret: process.env.BUNGIE_CLIENT_SECRET!,
+    client_id: process.env.B_CLIENT_ID!,
+    client_secret: process.env.B_CLIENT_SECRET!,
   });
+
+	if (!process.env.B_CLIENT_ID || !process.env.B_CLIENT_SECRET) {
+		throw new Error('B_CLIENT_ID or B_CLIENT_SECRET is not set in environment variables');
+	}
 
   const res = await fetch("https://www.bungie.net/Platform/App/OAuth/Token/", {
     method: "POST",

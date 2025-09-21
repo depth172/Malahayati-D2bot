@@ -808,6 +808,7 @@ export interface DestinyDefinition {
 	hash: number;
 	index: number;
 	redacted: boolean;
+	blacklisted: boolean;
 }
 
 export type DestinyIconSequenceDefinition = {
@@ -1480,6 +1481,14 @@ export type DestinyVendorDefinition = DestinyDefinition & {
 	locations: DestinyVendorLocationDefinition[];
 	groups: DestinyVendorGroupReference[];
 	ignoreSaleItemHashes: number[];
+};
+
+export type DestinyStatDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	aggregationType: number;
+	hasComputedBlock: boolean;
+	statCategory: number;
+	interpolate: boolean;
 };
 
 type BungieSetting = {

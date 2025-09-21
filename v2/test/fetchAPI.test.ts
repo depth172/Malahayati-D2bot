@@ -1,5 +1,4 @@
 import { describe, it, expect } from 'vitest';
-import { getCharacter } from '@api/bungie/getCharacter';
 import { getXurViewData } from '@domain/adapter/xur';
 import { getDefinition } from '@api/bungie/getDefinition';
 import { getVendor } from '@api/bungie/getVendor';
@@ -21,6 +20,6 @@ describe.runIf(shouldRun)('getXurViewData (LIVE)', () => {
 		expect(data.vendorDefs).toBeDefined();
 		expect(data.itemDefs).toBeDefined();
 		expect(data.vendorResponses).toBeDefined();
-		expect(Object.keys(data.vendorResponses)).have.members(['2190858386', '537912098', '3751514131']);
+		expect(Object.keys(data.vendorResponses)).members(['2190858386', '537912098', '3751514131']);
   });
 });

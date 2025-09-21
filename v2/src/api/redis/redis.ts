@@ -10,5 +10,5 @@ redis.on("error", (err) => {
 	console.error("Redis error:", err);
 });
 redis.on("connect", () => {
-	console.log("Connected to Redis");
+	console.log("Redisに接続しました");
 });
