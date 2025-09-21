@@ -1,9 +1,9 @@
 // test/inferFocusedGear.test.ts
 import { describe, it, expect } from 'vitest';
 import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from '@domain/inferFocused';
-import { getCharacter } from '@api/getCharacter';
+import { getCharacter } from '@api/bungie/getCharacter';
 import { DestinyComponentType as T } from 'type';
-import { getDefinition } from '@api/getDefinition';
+import { getDefinition } from '@api/bungie/getDefinition';
 
 describe('inferFocused', () => {
   it('アクティビティ一覧から武器とアクティビティのセットを抽出できる', async () => {

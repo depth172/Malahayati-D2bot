@@ -1,5 +1,5 @@
-import { getCommonSettings } from "@api/getCommonSettings";
-import { getDefinition } from "@api/getDefinition";
+import { getCommonSettings } from "@api/bungie/getCommonSettings";
+import { getDefinition } from "@api/bungie/getDefinition";
 import { DestinySeasonPassDefinition } from "type";
 
 export async function getCurrentSeasonPass(): Promise<DestinySeasonPassDefinition | undefined> {

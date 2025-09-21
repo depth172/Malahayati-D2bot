@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "tsx src/jobs/main.ts",
+    "init:bungie": "tsx src/jobs/init.ts",
     "test": "cross-env RUN_LIVE_TESTS=1 vitest",
     "test:watch": "vitest --watch",
     "lint": "eslint .",
@@ -36,6 +37,7 @@
   },
   "dependencies": {
     "image-size": "^2.0.2",
+    "ioredis": "^5.7.0",
     "playwright": "^1.55.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",

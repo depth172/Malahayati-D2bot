@@ -1,6 +1,6 @@
 import 'dotenv/config';
-import { getCharacter } from '@api/getCharacter';
-import { getDefinition } from '@api/getDefinition';
+import { getCharacter } from '@api/bungie/getCharacter';
+import { getDefinition } from '@api/bungie/getDefinition';
 import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from '@domain/inferFocused';
 import { buildPortalCards } from 'front/generateCard';
 import { DestinyComponentType as T } from 'type';

@@ -760,6 +760,50 @@ export type DestinyEnvironmentLocationMapping = {
 	activityHash?: number;
 };
 
+export type DestinyVendorComponent = {
+	canPurchase: boolean;
+	progression: DestinyProgression;
+	vendorLocationIndex: number;
+	seasonalRank?: number;
+	vendorHash: number;
+	nextRefreshDate: string;
+	enabled: boolean;
+};
+
+export type DestinyVendorCategory = {
+	displayCategoryIndex: number;
+	itemIndexes: number[];
+};
+
+export type DestinyVendorCategoriesComponent = {
+	categories: DestinyVendorCategory[];
+};
+
+export type DestinyUnlockStatus = {
+	unlockHash: number;
+	isSet: boolean;
+};
+
+export type DestinyVendorSaleItemComponent = {
+	saleStatus: number;
+	requiredUnlocks: number[];
+	unlockStatuses: DestinyUnlockStatus[];
+	failureIndexes: number[];
+	augments: number;
+	itemValueVisibility: boolean[];
+	vendorItemIndex: number;
+	itemHash: number;
+	overrideStyleItemHash?: number;
+	quantity: number;
+	costs: DestinyItemQuantity[];
+	overrideNextRefreshDate?: string;
+	apiPurchasable: boolean;
+};
+
+export type DestinyStringVariablesComponent = {
+	integerValuesByHash: Record<number, number>;
+};
+
 export interface DestinyDefinition {
 	hash: number;
 	index: number;
@@ -1220,6 +1264,224 @@ export type DestinyDamageTypeDefinition = DestinyDefinition & {
 	color: DestinyColor;
 };
 
+export type DestinyVendorRequirementDisplayEntryDefinition = {
+	icon: string;
+	name: string;
+	source: string;
+	type: string;
+};
+
+export type DestinyVendorDisplayPropertiesDefinition = DestinyDisplayPropertiesDefinition & {
+	largeIcon: string;
+	subtitle: string;
+	originalIcon: string;
+	requirementsDisplay: DestinyVendorRequirementDisplayEntryDefinition[];
+	smallTransparentIcon: string;
+	mapIcon: string;
+	largeTransparentIcon: string;
+};
+
+export type DateRange = {
+	start: string;
+	end: string;
+};
+
+export type DestinyVendorActionDefinition = {
+	name: string;
+	description: string;
+	icon: string;
+	executeSeconds: number;
+	verb: string;
+	isPositive: boolean;
+	actionId: number;
+	actionHash: number;
+	autoPerformAction: boolean;
+};
+
+export type DestinyVendorCategoryOverlayDefinition = {
+	title: string;
+	description: string;
+	icon: string;
+	choiceDescription: string;
+	currencyItemHash?: number;
+};
+
+export type DestinyVendorCategoryEntryDefinition = {
+	categoryIndex: number;
+	sortValue: number;
+	categoryHash: number;
+	quantityAvailable: number;
+	showUnavailableItems: boolean;
+	hideIfNoCurrency: boolean;
+	hideFromRegularPurchase: boolean;
+	buyStringOverride: string;
+	disabledDescription: string;
+	displayTitle: boolean;
+	overlay: DestinyVendorCategoryOverlayDefinition;
+	vendorItemIndexes: number[];
+	isPreview: boolean;
+	isDisplayOnly: boolean;
+	resetIntervalMinutesOverride: number;
+	resetOffsetMinutesOverride: number;
+};
+
+export type DestinyDisplayCategoryDefinition = {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	index: number;
+	identifier: string;
+	displayCategoryHash: number;
+	displayInBanner: boolean;
+	progressionHash?: number;
+	sortOrder: number;
+	displayStyleHash?: number;
+	displayStyleIdentifier: string;
+};
+
+export type DestinyVendorInteractionReplyDefinition = {
+	itemRewardsSelection: number;
+	reply: string;
+	replyType: number;
+};
+
+export type DestinyVendorInteractionSackEntryDefinition = {
+	sackType: number;
+};
+
+export type DestinyVendorInteractionDefinition = {
+	interactionIndex: number;
+	replies: DestinyVendorInteractionReplyDefinition[];
+	vendorCategoryIndex: number;
+	questlineItemHash: number;
+	sackInteractionList: DestinyVendorInteractionSackEntryDefinition[];
+	uiInteractionType: number;
+	interactionType: number;
+	rewardBlockLabel: string;
+	rewardVendorCategoryIndex: number;
+	flavorLineOne: string;
+	flavorLineTwo: string;
+	headerDisplayProperties: DestinyDisplayPropertiesDefinition;
+	instructions: string;
+};
+
+export type DestinyVendorInventoryFlyoutBucketDefinition = {
+	collapsible: boolean;
+	inventoryBucketHash: number;
+	sortItemsBy: number;
+};
+
+export type DestinyVendorInventoryFlyoutDefinition = {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	lockedDescription: string;
+	buckets: DestinyVendorInventoryFlyoutBucketDefinition[];
+	flyoutId: number;
+	suppressNewness: boolean;
+	equipmentSlotHash?: number;
+};
+
+export type DestinyVendorItemQuantity = {
+	itemHash: number;
+	itemInstanceId?: number;
+	quantity: number;
+	hasConditionalVisibility: boolean;
+};
+
+export type DestinyItemCreationEntryLevelDefinition = {
+	level: number;
+};
+
+export type DestinyVendorSaleItemActionBlockDefinition = {
+	executeSeconds: number;
+	isPositive: boolean;
+};
+
+export type DestinyVendorItemSocketOverride = {
+	singleItemHash?: number;
+	randomizedOptionsCount: number;
+	socketTypeHash: number;
+};
+
+export type DestinyVendorItemDefinition = {
+	itemHash: number;
+	quantity: number;
+	vendorItemIndex: number;
+	failureIndexes: number[];
+	currencies: DestinyVendorItemQuantity[];
+	refundPolicy: number;
+	refundTimeLimit: number;
+	creationLevels: DestinyItemCreationEntryLevelDefinition[];
+	displayCategoryIndex: number;
+	categoryIndex: number;
+	originalCategoryIndex: number;
+	minimumLevel: number;
+	maximumLevel: number;
+	action: DestinyVendorSaleItemActionBlockDefinition;
+	displayCategory: string;
+	inventoryBucketHash: number;
+	visibilityScope: number;
+	purchasableScope: number;
+	exclusivity: number;
+	isOffer?: boolean;
+	isCrm?: boolean;
+	sortValue: number;
+	expirationTooltip: string;
+	redirectToSaleIndexes: number[];
+	socketOverrides: Record<number, DestinyVendorItemSocketOverride>;
+	unpurchasable?: boolean;
+};
+
+export type DestinyVendorServiceDefinition = {
+	name: string;
+};
+
+export type DestinyVendorAcceptedItemDefinition = {
+	acceptedInventoryBucketHash: number;
+	destinationInventoryBucketHash: number;
+};
+
+export type DestinyVendorLocationDefinition = {
+	destinationHash: number;
+	backgroundImagePath: string;
+};
+
+export type DestinyVendorGroupReference = {
+	vendorGroupHash: number;
+};
+
+export type DestinyVendorDefinition = DestinyDefinition & {
+	displayProperties: DestinyVendorDisplayPropertiesDefinition;
+	vendorProgressionType: number;
+	buyString: string;
+	sellString: string;
+	displayItemHash: number;
+	inhibitBuying: boolean;
+	inhibitSelling: boolean;
+	factionHash: number;
+	resetIntervalMinutes: number;
+	resetOffsetMinutes: number;
+	failureStrings: string[];
+	unlockRanges: DateRange[];
+	vendorIdentifier: string;
+	vendorPortrait: string;
+	vendorBanner: string;
+	enabled: boolean;
+	visible: boolean;
+	vendorSubcategoryIdentifier: string;
+	consolidateCategories: boolean;
+	actions: DestinyVendorActionDefinition[];
+	categories: DestinyVendorCategoryEntryDefinition[];
+	originalCategories: DestinyVendorCategoryEntryDefinition[];
+	displayCategories: DestinyDisplayCategoryDefinition[];
+	interactions: DestinyVendorInteractionDefinition[];
+	inventoryFlyouts: DestinyVendorInventoryFlyoutDefinition[];
+	itemList: DestinyVendorItemDefinition[];
+	services: DestinyVendorServiceDefinition[];
+	acceptedItems: DestinyVendorAcceptedItemDefinition[];
+	returnWithVendorRequest: boolean;
+	locations: DestinyVendorLocationDefinition[];
+	groups: DestinyVendorGroupReference[];
+	ignoreSaleItemHashes: number[];
+};
+
 type BungieSetting = {
 	identifier: string;
 	isDefault: boolean;
@@ -1459,6 +1721,91 @@ export type DestinyCharacterResponse = {
 	};
 	currencyLookups?: {
 		data: DestinyCurrenciesComponent;
+		privacy: number;
+		disabled?: boolean;
+	}
+};
+
+export type DestinyVendorResponse = {
+	vendor: {
+		data?: DestinyVendorComponent;
+		privacy: number;
+		disabled?: boolean;
+	};
+	categories: {
+		data?: DestinyVendorCategoriesComponent;
+		privacy: number;
+		disabled?: boolean;
+	};
+	sales: {
+		data?: Record<number, DestinyVendorSaleItemComponent>;
+		privacy: number;
+		disabled?: boolean;
+	};
+	itemComponents?: {
+		itemComponents?: {
+			data: Record<number, DestinyItemComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		instances?: {
+			data: Record<number, DestinyItemInstanceComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		renderData?: {
+			data: Record<number, DestinyItemRenderComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		stats?: {
+			data: Record<number, DestinyItemStatsComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		sockets?: {
+			data: Record<number, DestinyItemSocketsComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		reusablePlugs?: {
+			data: Record<number, DestinyItemReusablePlugsComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		plugObjectives?: {
+			data: Record<number, DestinyItemPlugObjectivesComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		talentGrids?: {
+			data: Record<number, DestinyItemTalentGridComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		plugStates?: {
+			data: Record<number, DestinyItemPlugComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		objectives?: {
+			data: Record<number, DestinyItemObjectivesComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+		perks?: {
+			data: Record<number, DestinyItemPerksComponent>;
+			privacy: number;
+			disabled?: boolean;
+		};
+	};
+	currencyLookups: {
+		data?: DestinyCurrenciesComponent;
+		privacy: number;
+		disabled?: boolean;
+	};
+	stringVariables: {
+		data?: DestinyStringVariablesComponent;
 		privacy: number;
 		disabled?: boolean;
 	}

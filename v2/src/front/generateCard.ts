@@ -7,7 +7,7 @@ import { renderPortalHTML } from "./templates/portal";
 import { getCurrentSeasonPass } from "@domain/getCurrentSeasonPass";
 import { request } from "undici";
 import { imageSize } from "image-size";
-import { getCommonSettings } from "@api/getCommonSettings";
+import { getCommonSettings } from "@api/bungie/getCommonSettings";
 
 export async function getImageRatio(url: string) {
   const res = await request(url);

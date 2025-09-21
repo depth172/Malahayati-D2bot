@@ -1,8 +1,9 @@
 import { BungieResponse, DestinyCharacterResponse, DestinyComponentType } from "type";
+import { getValidAccessToken } from "./auth";
 
 enum CharacterClass {
-	HUNTER = 0,
-	TITAN = 1,
+	TITAN = 0,
+	HUNTER = 1,
 	WARLOCK = 2,
 }
 
@@ -15,6 +16,8 @@ export async function getCharacter(character: CharacterClass, components: Destin
 	const membershipType = process.env.B_MEMBERSHIP_TYPE;
 	const membershipId = process.env.B_MEMBERSHIP_ID;
 	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
+
+	const accessToken = await getValidAccessToken();
 
 	console.log(CharacterClass[character] + "のCharacter情報を取得します...");
 
@@ -32,6 +35,7 @@ export async function getCharacter(character: CharacterClass, components: Destin
 			'X-API-Key': API_KEY,
 			'Content-Type': 'application/json',
 			'Accept': 'application/json',
+			'Authorization': `Bearer ${accessToken}`
 		}
 	});
 
