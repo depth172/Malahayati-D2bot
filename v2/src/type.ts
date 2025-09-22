@@ -1491,6 +1491,10 @@ export type DestinyStatDefinition = DestinyDefinition & {
 	interpolate: boolean;
 };
 
+export type DestinyActivityTypeDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+};
+
 type BungieSetting = {
 	identifier: string;
 	isDefault: boolean;

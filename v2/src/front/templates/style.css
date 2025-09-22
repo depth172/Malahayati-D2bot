@@ -44,8 +44,15 @@ body {
 	align-items: center;
 }
 
-.header h2 {
+.header .group {
 	font-size: 40px;
+	display: flex;
+	align-items: center;
+	gap: 28px;
+}
+
+.header .group img {
+	height: 96px;
 }
 
 .content {
@@ -66,8 +73,15 @@ body {
 
 }
 
-.itemPortal h3 {
+.itemPortal .title .name {
+	font-weight: 400;
   font-size: 28px;
+}
+
+.itemPortal .title .type {
+	font-size: 18px;
+	color: #ccc;
+	text-shadow: 0 0 3px black;
 }
 
 .weapons {

@@ -1,21 +1,25 @@
-import { DestinyActivityDefinition, DestinyDamageTypeDefinition, DestinyDisplayPropertiesDefinition, DestinyInventoryItemDefinition } from "type";
+import { DestinyActivityDefinition, DestinyActivityTypeDefinition, DestinyDamageTypeDefinition, DestinyInventoryItemDefinition } from "type";
 import type { GroupedFocusedSets } from "typeOriginal";
 
 export type extendedDestinyInventoryItemDefinition = DestinyInventoryItemDefinition & {
   defaultDamageTypeDef?: DestinyDamageTypeDefinition;
 }
 
+type extendedDestinyActivityDefinition = DestinyActivityDefinition & {
+	activityTypeDef: DestinyActivityTypeDefinition;
+};
+
 export type PortalViewData = {
 	dateISO: string;
   group: "solo" | "fireteam" | "pinnacle" | "crucible";
   activities: Array<{
-    activity: DestinyActivityDefinition;
+    activity: extendedDestinyActivityDefinition;
     weapons: Array<extendedDestinyInventoryItemDefinition>;
   }>;
 };
 
 
-type GetDef = <T>(type: "Activity" | "InventoryItem" | "DamageType", hash: number) => Promise<T>;
+type GetDef = <T>(type: "Activity" | "InventoryItem" | "DamageType" | "ActivityType", hash: number) => Promise<T>;
 
 function normalizeName(name?: string) {
   if (!name) return "";
@@ -26,7 +30,7 @@ function normalizeName(name?: string) {
 }
 
 
-function canonicalKey(a: DestinyActivityDefinition) {
+function canonicalKey(a: extendedDestinyActivityDefinition) {
   // 強い順にキーを積む
   const pgcr = a.pgcrImage ?? "";
   const mode =
@@ -36,13 +40,13 @@ function canonicalKey(a: DestinyActivityDefinition) {
   return JSON.stringify([pgcr, mode, loc, stem]);
 }
 
-function isMatchmade(a: DestinyActivityDefinition) {
+function isMatchmade(a: extendedDestinyActivityDefinition) {
   // 実フィールドは環境差があるので必要に応じて調整
   // 例: a.matchmaking?.isMatchmade / a.directActivityModeHash 等
   return (a as any)?.matchmaking?.isMatchmade ? 1 : 0;
 }
 
-function better(a: DestinyActivityDefinition, b: DestinyActivityDefinition) {
+function better(a: extendedDestinyActivityDefinition, b: extendedDestinyActivityDefinition) {
   const am = isMatchmade(a);
   const bm = isMatchmade(b);
   if (am !== bm) return bm - am;             // マッチメイキング優先
@@ -51,9 +55,9 @@ function better(a: DestinyActivityDefinition, b: DestinyActivityDefinition) {
 }
 
 function dedupeActivities(
-  acts: Array<{ activity: DestinyActivityDefinition; weapons: extendedDestinyInventoryItemDefinition[] }>
+  acts: Array<{ activity: extendedDestinyActivityDefinition; weapons: extendedDestinyInventoryItemDefinition[] }>
 ) {
-  const groups = new Map<string, Array<{ activity: DestinyActivityDefinition; weapons: extendedDestinyInventoryItemDefinition[] }>>();
+  const groups = new Map<string, Array<{ activity: extendedDestinyActivityDefinition; weapons: extendedDestinyInventoryItemDefinition[] }>>();
   for (const row of acts) {
     const key = canonicalKey(row.activity);
     (groups.get(key) ?? (groups.set(key, []), groups.get(key)!)).push(row);
@@ -81,6 +85,11 @@ export async function toPortalViewData(
     const acts = await Promise.all(
       Object.entries(set).map(async ([aHash, wHashes]) => {
         const activity = (await getDef<DestinyActivityDefinition>("Activity", Number(aHash)));
+				const activityTypeDef = await getDef<DestinyActivityTypeDefinition>("ActivityType", activity.activityTypeHash as number);
+				const extendedActivity: extendedDestinyActivityDefinition = {
+					...activity,
+					activityTypeDef
+				};
 
 				const weapons = await Promise.all(
 					wHashes.map(h => getDef<DestinyInventoryItemDefinition>("InventoryItem", h))
@@ -96,7 +105,7 @@ export async function toPortalViewData(
           };
         });
 
-        return { activity, weapons: weaponsWithDamage };
+        return { activity: extendedActivity, weapons: weaponsWithDamage };
       })
     );
 		const deduped = dedupeActivities(acts);
