@@ -1491,6 +1491,14 @@ export type DestinyStatDefinition = DestinyDefinition & {
 	interpolate: boolean;
 };
 
+export type DestinySandboxPerkDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	perkIdentifier: string;
+	isDisplayable: boolean;
+	damageType: number;
+	damageTypeHash?: number;
+};
+
 export type DestinyActivityTypeDefinition = DestinyDefinition & {
 	displayProperties: DestinyDisplayPropertiesDefinition;
 };

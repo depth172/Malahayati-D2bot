@@ -4,6 +4,7 @@ import { getDefinition } from '@api/bungie/getDefinition';
 import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from '@domain/inferFocused';
 import { buildPortalCards } from '@front/jobs/portal';
 import { DestinyComponentType as T } from 'type';
+import { redis } from '@api/redis/redis';
 
 async function run() {
 	const inputs = await Promise.all([
@@ -28,7 +29,11 @@ async function run() {
 	});
 }
 
-run().catch(e => {
-  console.error(e);
-  process.exit(1);
-});
+run()
+	.catch(e => {
+		console.error(e);
+		process.exit(1);
+	})
+	.finally(async () => {
+		try { await redis.quit(); } catch {}
+	});
