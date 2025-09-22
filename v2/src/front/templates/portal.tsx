@@ -1,10 +1,10 @@
-import { paginateActivities } from "front/paginate";
+import { paginateActivities } from "@front/utils";
 import { renderHTML } from "./renderHTML";
 import type { PortalViewData } from "@domain/adapter/portal";
 import { BungieCommonSettings } from "type";
 import { WeaponDisplay } from "./component";
 
-export function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
+function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
   data: { group: PortalViewData["group"]; activities: PortalViewData["activities"] };
 	d2settings: BungieCommonSettings;
 	bgUrl?: string;

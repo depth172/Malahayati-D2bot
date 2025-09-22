@@ -2,7 +2,7 @@ import 'dotenv/config';
 import { getCharacter } from '@api/bungie/getCharacter';
 import { getDefinition } from '@api/bungie/getDefinition';
 import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from '@domain/inferFocused';
-import { buildPortalCards } from 'front/generateCard';
+import { buildPortalCards } from '@front/jobs/portal';
 import { DestinyComponentType as T } from 'type';
 
 async function run() {

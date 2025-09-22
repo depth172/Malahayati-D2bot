@@ -1,5 +1,5 @@
 import { extendedDestinyInventoryItemDefinition } from "@domain/adapter/portal";
-import { BungieCommonSettings, DestinyInventoryItemDefinition } from "type";
+import { BungieCommonSettings } from "type";
 
 export function AmmoIcon (props: { ammoType: number, d2settings: BungieCommonSettings }) {
 	const { ammoType, d2settings } = props;
