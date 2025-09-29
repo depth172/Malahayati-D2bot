@@ -2,10 +2,10 @@ import { paginateActivities } from "@front/utils";
 import { renderHTML } from "./renderHTML";
 import type { PortalViewData } from "@domain/adapter/portal";
 import { BungieCommonSettings } from "type";
-import { WeaponDisplay } from "./component";
+import { ItemDisplay } from "./component";
 
 function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
-  data: { group: PortalViewData["group"]; activities: PortalViewData["activities"] };
+  data: { group: PortalViewData["group"]; activities: PortalViewData["activities"], icon: string; };
 	d2settings: BungieCommonSettings;
 	bgUrl?: string;
 	bgRatio?: number;
@@ -23,19 +23,19 @@ function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
 				</div>
       	<div className="group">
 					<div>{titleMap[data.group]}</div>
-					<img src={`https://www.bungie.net${data.activities[0].activity.displayProperties.icon}`} />
+					<img src={`https://www.bungie.net${data.icon}`} />
 				</div>
 			</div>
-      <div className="content">
+      <div className="contentPortal">
         {data.activities.map(a => (
-          <div className="itemPortal" key={a.activity.hash} style={{"--bg-url": `url("https://www.bungie.net${a.activity.pgcrImage}")`} as any}>
+          <div className="itemPortal" key={a.activity.hash} style={{"--bg-url": `url("https://www.bungie.net${a.activity.backgroundImage}")`} as any}>
             <div className="title">
-							<div className="name">{a.activity.originalDisplayProperties.name}</div>
-							<div className="type">{a.activity.activityTypeDef.displayProperties.name}</div>
+							<div className="name">{a.activity.name}</div>
+							<div className="type">{a.activity.type}</div>
 						</div>
-            <div className="weapons">
+            <div className="items">
 							{a.weapons.map(w => (
-								<WeaponDisplay key={w.hash} weapon={w} d2settings={d2settings} />
+								<ItemDisplay key={w.hash} item={w} d2settings={d2settings} />
 							))}
 						</div>
           </div>

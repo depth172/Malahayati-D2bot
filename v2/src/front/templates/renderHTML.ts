@@ -37,11 +37,11 @@ export function chunkByCount<T>(arr: T[], per: number) {
   return out;
 }
 
-export function nameFor(dateISO: string, group: string, idx: number, total: number, ext: "html" | "png") {
+export function nameFor(dateISO: string, type: string, group: string, idx: number, total: number, ext: "html" | "png") {
   const d = dateISO.replace(/-/g, "");
   const base = total > 1
-    ? `${d}_portal_${group}_p${idx + 1}of${total}`
-    : `${d}_portal_${group}`;
+    ? `${d}_${type}_${group}_p${idx + 1}of${total}`
+    : `${d}_${type}_${group}`;
   return `${base}.${ext}`;
 }
 

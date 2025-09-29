@@ -17,3 +17,19 @@ type activityGroup = "solo" | "fireteam" | "pinnacle" | "crucible" | "other";
 export type GroupedFocusedSets = {
 	[group in activityGroup]: FocusedSet;
 };
+
+export type DisplayableItem = {
+	name: string;
+	icon: string;
+	type: string;
+	watermark?: string;
+	tier?: number;
+	hash: number;
+}
+
+export type DisplayableWeapon = DisplayableItem & {
+	damageType?: number;
+	damageTypeName?: string;
+	damageTypeIcon?: string;
+	ammoType?: number;
+};

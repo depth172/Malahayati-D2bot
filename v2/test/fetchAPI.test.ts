@@ -17,6 +17,10 @@ describe.runIf(shouldRun)('getXurViewData (LIVE)', () => {
 	it('シュールの情報が取得できる', async () => {
     const data = await getXurViewData(getDefinition, getVendor);
 
+
+		expect(data.xurHash).toBeDefined();
+		expect(data.offersHash).toBeDefined();
+		expect(data.gearHash).toBeDefined();
 		expect(data.vendorDefs).toBeDefined();
 		expect(data.itemDefs).toBeDefined();
 		expect(data.vendorResponses).toBeDefined();

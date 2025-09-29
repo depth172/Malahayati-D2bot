@@ -1,6 +1,24 @@
-import { DestinyInventoryItemDefinition, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
+import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
+
+type XurCardCategories = "normal" | "special";
+
+type XurCardData = {
+	indexes: {
+		[key in XurCardCategories]: number[]; // vendorItemIndex の配列
+	};
+	items: {
+		[hash: number]: {
+			name: string;
+			icon: string;
+			watermark: string;
+		}
+	}
+};
 
 export type XurViewData = {
+	xurHash: number;
+	offersHash: number;
+	gearHash: number;
 	vendorResponses: Record<number, DestinyVendorResponse[]>;
 	vendorDefs: Record<number, DestinyVendorDefinition>;
 	itemDefs: Record<number, DestinyInventoryItemDefinition>;
@@ -11,7 +29,7 @@ export type XurViewData = {
 const XUR_VENDOR_HASH = 2190858386;
 
 export const getXurViewData = async (
-	getDef: <T>(type: "Vendor" | "InventoryItem" | "Stat", hash: number) => Promise<T>,
+	getDef: <T>(type: "Vendor" | "InventoryItem" | "Stat" | "SandboxPerk", hash: number) => Promise<T>,
 	getVendor: (character: number, hash: number, components: number[]) => Promise<DestinyVendorResponse>
 ) => {
 	const itemDefs: Record<number, DestinyInventoryItemDefinition> = {};
@@ -26,9 +44,9 @@ export const getXurViewData = async (
 
 	// XurのResponseを先に取得
 	const xurResponses = await Promise.all([
-		getVendor(0, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemStats]),
-		getVendor(1, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemStats]),
-		getVendor(2, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemStats]),
+		getVendor(0, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemInstances, T.ItemStats, T.ItemSockets]),
+		getVendor(1, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemInstances, T.ItemStats, T.ItemSockets]),
+		getVendor(2, XUR_VENDOR_HASH, [T.Vendors, T.VendorSales, T.VendorCategories, T.ItemInstances, T.ItemStats, T.ItemSockets]),
 	]);
 
 	vendorResponses[XUR_VENDOR_HASH] = xurResponses;
@@ -100,19 +118,15 @@ export const getXurViewData = async (
 	}
 
 	// ベンダーの販売アイテムに含まれるStatの定義を集める
-	for (const respArr of Object.values(vendorResponses)) {
-		for (const resp of respArr) {
-			const items = resp.itemComponents?.stats?.data;
-			if (!items) continue;
-			for (const [_, obj] of Object.entries(items)) {
-				const stats = obj.stats;
-				await Promise.all(Object.keys(stats).map(async (hash) => {
-					if (!statDefs[Number(hash)]) return;
-					statDefs[Number(hash)] = await getDef<DestinyStatDefinition>("Stat", Number(hash));
-				}));
-			}
-		}
-	}
+	const statHashes = Object.values(xurResponses)
+		.flatMap(resp => Object.values(resp.itemComponents?.stats?.data ?? {}))
+		.flatMap(stat => Object.keys(stat?.stats ?? {}).map(h => Number(h)))
+		.filter((h, i, arr) => arr.indexOf(h) === i); // 重複排除
+
+	await Promise.all(statHashes.map(async (h) => {
+		if (statDefs[h]) return;
+		statDefs[h] = await getDef<DestinyStatDefinition>("Stat", h);
+	}));
 
 	// ## 装備（武器）に関する定義の収集 ##
 
@@ -130,6 +144,34 @@ export const getXurViewData = async (
 		itemHashes.add(item.itemHash);
 	}
 
+	// ## オファー（雑貨）に関する定義の収集 ##
+
+	// OFFERSの販売アイテムを全てマージ
+	const offersMergedSales: Record<number, DestinyVendorSaleItemComponent> = {
+		...(vendorResponses[OFFERS_VENDOR_HASH][0].sales.data ?? {}),
+		...(vendorResponses[OFFERS_VENDOR_HASH][1].sales.data ?? {}),
+		...(vendorResponses[OFFERS_VENDOR_HASH][2].sales.data ?? {}),
+	};
+	const offersSaleItems = Object.values(offersMergedSales);
+
+	// ベンダーの販売アイテムに含まれるInventoryItemのハッシュを集める
+	for (const item of offersSaleItems) {
+		if (!item.itemHash) continue;
+		itemHashes.add(item.itemHash);
+	}
+
+	// ## その他の定義の収集 ##
+
+	// 通貨となるアイテムを itemHashes に追加
+	const costItemHashes = Object.values(vendorResponses)
+		.flat()
+		.flatMap((resp) => Object.values(resp.sales.data ?? {}))
+		.flatMap((item) => item.costs ?? [])
+		.map((c) => c.itemHash)
+		.filter((h): h is number => typeof h === "number");
+
+	costItemHashes.forEach((h) => itemHashes.add(h));
+
 	// ## 定義の一括取得 ##
 
 	await Promise.all(Array.from(itemHashes).map(async (h) => {
@@ -139,12 +181,58 @@ export const getXurViewData = async (
 
 	// ## 追加取得が必要な定義 ##
 
+	// 防具のアーキタイプを特定
+
+	const archetypeHashes = new Set<number>();	
+	xurSaleItems.forEach(async i => {
+		if (!itemDefs[i.itemHash] || !itemDefs[i.itemHash].sockets) return; // アイテム定義がない場合はスキップ
+
+		// アーキタイプの入るsocketTypeHash(2104613635)がどのインデックスに入っているかを調べる
+		const archetypeSocketIndex = itemDefs[i.itemHash].sockets.socketEntries.findIndex(s => s.socketTypeHash === 2104613635);
+		if (archetypeSocketIndex === -1) return; // アーキタイプのソケットがない場合はスキップ
+
+		// 同じインデックスのDestinyItemSocketsComponentを調べてハッシュを得る
+		const sockets = vendorResponses[XUR_VENDOR_HASH]
+			.flatMap(vr => Object.values(vr.itemComponents?.sockets?.data[i.vendorItemIndex]?.sockets ?? {}))
+		if (sockets) archetypeHashes.add(sockets[archetypeSocketIndex].plugHash);
+	});
+
+	// アーキタイプの定義を取得
+	await Promise.all(Array.from(archetypeHashes).map(async (h) => {
+		if (itemDefs[h]) return;
+		itemDefs[h] = await getDef<DestinyInventoryItemDefinition>("InventoryItem", h);
+	}));
+
 	// 媒体に含まれるSandboxPerkの定義
 
 	const catalystHashes = new Set<number>();
-	// todo: 媒体である可能性のあるインデックスを取得し、一致するインデックスのハッシュを収集
 
+	const catalystIndexes = vendorDefs[GEAR_VENDOR_HASH].categories.find(c => c.categoryHash === 3525849831)?.vendorItemIndexes;
+	if (catalystIndexes !== undefined) {
+		const catalystItems = gearSaleItems.filter(i => catalystIndexes.includes(i.vendorItemIndex));
+		catalystItems.forEach(i => {
+			if (i.itemHash) catalystHashes.add(i.itemHash);
+		});
+	}
 
+	await Promise.all(Array.from(catalystHashes).map(async (h) => {
+		if (!itemDefs[h]) return; // アイテム定義がない場合はスキップ
+		const perks = itemDefs[h].perks;
+		if (!perks) return; // パークがない場合はスキップ
+		perks.map(async (p) => {
+			if (sandboxPerkDefs[p.perkHash]) return; // 既に取得済みの場合はスキップ
+			sandboxPerkDefs[p.perkHash] = await getDef<DestinySandboxPerkDefinition>("SandboxPerk", p.perkHash);
+		});
+	}));
 
-	return { vendorResponses, vendorDefs, itemDefs, statDefs, sandboxPerkDefs };
+	return {
+		xurHash: XUR_VENDOR_HASH,
+		offersHash: OFFERS_VENDOR_HASH,
+		gearHash: GEAR_VENDOR_HASH,
+		vendorResponses,
+		vendorDefs,
+		itemDefs,
+		statDefs,
+		sandboxPerkDefs
+	};
 }

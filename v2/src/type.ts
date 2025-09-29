@@ -1503,6 +1503,20 @@ export type DestinyActivityTypeDefinition = DestinyDefinition & {
 	displayProperties: DestinyDisplayPropertiesDefinition;
 };
 
+export type DestinyInventoryItemConstantsDefinition = DestinyDefinition & {
+	gearTierOverlayImagePaths: string[];
+	watermarkDropShadowPath: string;
+	craftedBackgroundPath: string;
+	featuredItemFlagPath: string;
+	masterworkOverlayPath: string;
+	craftedOverlayPath: string;
+	enhancedItemOverlayPath: string;
+	holofoilBackgroundOverlayPath: string;
+	holofoil900BackgroundOverlayPath: string;
+	holofoil900AnimatedBackgroundOverlayPath: string;
+	universalOrnamentBackgroundOverlayPath: string;
+}
+
 type BungieSetting = {
 	identifier: string;
 	isDefault: boolean;

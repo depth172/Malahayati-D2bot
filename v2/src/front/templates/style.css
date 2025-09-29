@@ -8,7 +8,7 @@ body {
 	color: #fff;
 	background-color: #0f0f12;
 	width: 1200px;
-	font-size: 20px;
+	font-size: 22px;
 }
 
 .card {
@@ -55,9 +55,17 @@ body {
 	height: 96px;
 }
 
-.content {
+.contentPortal {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
+	gap: 24px;
+}
+
+.contentXur {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	grid-template-rows: repeat(3, auto);
+	grid-auto-flow: column;
 	gap: 36px;
 }
 
@@ -84,26 +92,26 @@ body {
 	text-shadow: 0 0 3px black;
 }
 
-.weapons {
+.items {
 	display: flex;
 	flex-direction: column;
 	margin: 36px 10px;
 	gap: 12px;
 }
 
-.weapon {
+.item {
 	display: flex;
-	gap: 12px;
+	gap: 18px;
 }
 
-.weapon .icon {
+.item .icon {
 	min-height: 80px;
 	min-width: 80px;
 	position: relative;
 	border: 3px solid #b7b7b7;
 }
 
-.weapon .icon img {
+.item .icon img {
 	height: 100%;
 	width: 100%;
 	position: absolute;
@@ -111,7 +119,7 @@ body {
 	left: 0;
 }
 
-.weapon .icon img.watermark {
+.item .icon img.watermark {
 	top: -1.8px;
 	left: -1.8px;
 }
@@ -124,6 +132,7 @@ body {
 	display: flex;
 	flex-direction: column;
 	justify-content: center;
+	gap: 4px;
 }
 
 .info .name {
@@ -136,6 +145,85 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+}
+
+.itemSummary {
+	display: flex;
+	position: relative;
+}
+
+.price {
+	position: absolute;
+	right: 0;
+	bottom: 0;
+
+	display: flex;
+	flex-direction: column;
+	justify-content: end;
+}
+
+.cost {
+	display: flex;
+  gap: 8px;	
+  align-items: flex-end;
+}
+
+img.cost-icon {
+	height: 1.5em;
+}
+
+.armor-stats {
+	display: grid;
+	grid-template-columns: max-content max-content 2rem 1fr;
+	gap: 4px;
+	margin: 24px;
+	align-items: center;
+	text-align: right;
+}
+
+.stat-icon {
+	height: 1.5em;
+	margin-top: 4px;
+}
+
+.stat-bar {
+	background: #333;
+	height: 1.1em;
+	width: 100%;
+	overflow: hidden;
+	margin-left: 7px;
+	margin-top: 4px;
+}
+
+.stat-fill {
+	background: #fff;
+	height: 100%;
+	width: 0;
+}
+
+.total {
+	margin-top: 5px;
+}
+
+.stat-value.total {
+	font-weight: bold;
+}
+
+.archetype {
+	display: flex;
+	justify-content: end;
+	align-items: center;
+	margin: 24px 18px;
+	gap: 20px;
+}
+
+.archetype .icon {
+	height: 60px;
+	width: 60px;
+}
+
+.archetype .name {
+	font-weight: bold;
 }
 
 .footer {
