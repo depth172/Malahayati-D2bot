@@ -37,8 +37,7 @@ export async function buildXurCards(
 	
   const data = await getXurViewData(getDef, getVendor);
 
-	const bgUrl = data.vendorDefs[data.xurHash].locations?.[0]?.backgroundImagePath ?? undefined;
-	const bgUrlFull = bgUrl ? `https://www.bungie.net${bgUrl}` : undefined;
+	const bgUrlFull = `https://www.bungie.net${data.background}`;
 
 	const bgRatio = bgUrlFull ? await getImageRatio(bgUrlFull) : undefined;
 
@@ -46,7 +45,7 @@ export async function buildXurCards(
     await fs.mkdir(previewDir, { recursive: true });
     const written: string[] = [];
     for (const p of pages) {
-      const htmls = renderXurHTML(data, settings, constant, bgUrlFull, bgRatio);
+      const htmls = renderXurHTML(data, settings, constant, p, bgUrlFull, bgRatio);
       for (let i = 0; i < htmls.length; i++) {
         const filename = nameFor(dateISO, "xur", p, i, htmls.length, "html");
         const full = path.join(previewDir, filename);
@@ -60,7 +59,7 @@ export async function buildXurCards(
   // prod: PNG buffers を返す
   const groups: { group: "xur" | "gear" | "offers"; images: Buffer[] }[] = [];
   for (const p of pages) {
-    const htmls = renderXurHTML(data, settings, constant, bgUrlFull, bgRatio);
+    const htmls = renderXurHTML(data, settings, constant, p, bgUrlFull, bgRatio);
     const pngs = await htmlPagesToPNGs(htmls, 1200);
     groups.push({ group: p, images: pngs });
   }

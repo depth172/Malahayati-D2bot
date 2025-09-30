@@ -33,3 +33,13 @@ export type DisplayableWeapon = DisplayableItem & {
 	damageTypeIcon?: string;
 	ammoType?: number;
 };
+
+export type DisplayableStats = {
+	stat: {
+		name: string;
+		icon: string;
+		value: number;
+		index?: number;
+	}[]
+	total: number;
+}

@@ -9,39 +9,39 @@ import { redis } from '@api/redis/redis';
 import { buildXurCards } from '@front/jobs/xur';
 
 async function run() {
-	const inputs = await Promise.all([
-		getCharacter(0, [T.CharacterActivities]), // Hunter
-		getCharacter(1, [T.CharacterActivities]), // Titan
-		getCharacter(2, [T.CharacterActivities]), // Warlock
-	]);
+  try {
+    const inputs = await Promise.all([
+      getCharacter(0, [T.CharacterActivities]),
+      getCharacter(1, [T.CharacterActivities]),
+      getCharacter(2, [T.CharacterActivities]),
+    ]);
 
-	const results = inputs.map(input => {
-		const activities = Object.values(input.activities?.data.availableActivities || {});
-		return inferFocusedGear(activities);
-	});
+    const results = inputs.map(input => {
+      const activities = Object.values(input.activities?.data.availableActivities || {});
+      return inferFocusedGear(activities);
+    });
 
-	const mergedResult = mergeFocusedSets(results);
+    const merged = mergeFocusedSets(results);
+    const grouped = await groupFocusedSets(merged, getDefinition);
 
-	const result = await groupFocusedSets(mergedResult, getDefinition);
-	
-	await buildPortalCards(result, { mode: "preview", getDef: getDefinition }).then(r => {
-		console.log(r);
-	}).catch(e => {
-		console.error(e);
-	});
+    const [portalRes, xurRes] = await Promise.allSettled([
+      buildPortalCards(grouped, { mode: "preview", getDef: getDefinition }),
+      buildXurCards({ mode: "preview", getDef: getDefinition, getVendor }),
+    ]);
 
-	await buildXurCards({ mode: "preview", getDef: getDefinition, getVendor }).then(r => {
-		console.log(r);
-	}).catch(e => {
-		console.error(e);
-	});
+    if (portalRes.status === "fulfilled") console.log(portalRes.value);
+    else console.error(portalRes.reason);
+
+    if (xurRes.status === "fulfilled") console.log(xurRes.value);
+    else console.error(xurRes.reason);
+
+  } catch (e) {
+    console.error(e);
+    process.exitCode = 1;        // 明示的な exit() は避ける
+  } finally {
+    try { await redis.quit(); }  // quit は Promise なので await する
+    catch (_) {}
+  }
 }
 
-run()
-	.catch(e => {
-		console.error(e);
-		process.exit(1);
-	})
-	.finally(() => {
-		redis.quit();
-	});
+run();

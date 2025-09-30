@@ -1,29 +1,57 @@
 import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
+import { DisplayableItem, DisplayableStats } from "typeOriginal";
 
-type XurCardCategories = "normal" | "special";
-
-type XurCardData = {
-	indexes: {
-		[key in XurCardCategories]: number[]; // vendorItemIndex の配列
-	};
-	items: {
-		[hash: number]: {
-			name: string;
-			icon: string;
-			watermark: string;
-		}
+type XurArmor = DisplayableItem & {
+	tier: number;
+	archetype: {
+		name: string;
+		icon: string;
 	}
-};
+	stats: DisplayableStats;
+	perk: {
+		name: string;
+		description: string;
+		icon: string;
+	}
+	costs: {
+		name: string;
+		icon: string;
+		quantity: number;
+	}[];
+}
 
 export type XurViewData = {
-	xurHash: number;
-	offersHash: number;
-	gearHash: number;
-	vendorResponses: Record<number, DestinyVendorResponse[]>;
-	vendorDefs: Record<number, DestinyVendorDefinition>;
-	itemDefs: Record<number, DestinyInventoryItemDefinition>;
-	statDefs: Record<number, DestinyStatDefinition>;
-	sandboxPerkDefs: Record<number, DestinySandboxPerkDefinition>;
+	date: string;
+	background: string;
+	xurItems: {
+		basicArmors: {
+			hunter: Array<XurArmor>;
+			titan: Array<XurArmor>;
+			warlock: Array<XurArmor>;
+		}
+		specialItems: (DisplayableItem & {
+			description: string;
+			costs: {
+				name: string;
+				icon: string;
+				quantity: number;
+			}[]
+		})[]
+	}
+}
+
+// シュールの販売期間（土曜～火曜）を「M月D日～M月D日」の形式で取得
+function formatXurDayRange(baseDate = new Date()) {
+	const d = new Date(baseDate.getFullYear(), baseDate.getMonth(), baseDate.getDate());
+	const day = d.getDay();
+	const daysSinceSaturday = (day + 1) % 7; // Sun->1, Mon->2, ..., Sat->0
+	const sat = new Date(d);
+	sat.setDate(d.getDate() - daysSinceSaturday);
+	const tue = new Date(sat);
+	tue.setDate(sat.getDate() + 3);
+
+	const fmt = (dt: Date) => dt.toLocaleDateString("ja-JP", { year: "numeric", month: "numeric", day: "numeric" });
+	return `${fmt(sat)} 〜 ${fmt(tue)}`;
 }
 
 const XUR_VENDOR_HASH = 2190858386;
@@ -69,6 +97,8 @@ export const getXurViewData = async (
 	};
 	const xurSaleItems = Object.values(xurMergedSales);
 	if (xurSaleItems.length === 0) throw new Error("Xur has no sale items");
+
+	xurSaleItems.sort((a, b) => (xurDef.itemList[a.vendorItemIndex].categoryIndex ?? 0) - (xurDef.itemList[b.vendorItemIndex].categoryIndex ?? 0));
 
 	// 「さらなる奇妙なオファー」に含まれるベンダーアイテムのhashを取得
 	const offerStrangeVendorItemHashes = offerStrange.map(index => {
@@ -126,7 +156,7 @@ export const getXurViewData = async (
 	await Promise.all(statHashes.map(async (h) => {
 		if (statDefs[h]) return;
 		statDefs[h] = await getDef<DestinyStatDefinition>("Stat", h);
-	}));
+	}));	
 
 	// ## 装備（武器）に関する定義の収集 ##
 
@@ -197,7 +227,17 @@ export const getXurViewData = async (
 		if (sockets) archetypeHashes.add(sockets[archetypeSocketIndex].plugHash);
 	});
 
-	// アーキタイプの定義を取得
+	// エキゾチック防具の効果を取得
+	const exoticArmorPerkPlugHashes = Object.values(itemDefs)
+		.flatMap(i => i.sockets?.socketEntries)
+		.filter(se => se && se.socketTypeHash === 965959289) // Armor Perk
+		.map(se => se.singleInitialItemHash ?? se.reusablePlugItems?.[0]?.plugItemHash)
+
+	exoticArmorPerkPlugHashes.forEach(h => {
+		if (h) archetypeHashes.add(h);
+	});
+
+	// アーキタイプ / エキゾチック防具効果の定義を取得
 	await Promise.all(Array.from(archetypeHashes).map(async (h) => {
 		if (itemDefs[h]) return;
 		itemDefs[h] = await getDef<DestinyInventoryItemDefinition>("InventoryItem", h);
@@ -225,14 +265,128 @@ export const getXurViewData = async (
 		});
 	}));
 
+	// 表示用データに整形
+	const xurDisplayItems: XurViewData["xurItems"] = {
+		basicArmors: {
+			hunter: [],
+			titan: [],
+			warlock: []
+		},
+		specialItems: []
+	};
+
+	const specialItemCategory = [6, 7]; // Xurの販売アイテムのうち、雑貨に該当するcategoryIndex
+
+	xurSaleItems.forEach(i => {
+		const [idx, hash, def] = [i.vendorItemIndex, i.itemHash, itemDefs[i.itemHash]];
+		if (!hash || !def) return; // アイテム定義がない場合はスキップ
+
+		const instance = vendorResponses[XUR_VENDOR_HASH][0].itemComponents?.instances?.data[idx];
+		
+		// 防具
+		if (def.itemType === 2 /* Armor */) {
+			const archetypeSocketIndex = def.sockets?.socketEntries.findIndex(se => se.socketTypeHash === 2104613635);
+			const archetypeHash = vendorResponses[XUR_VENDOR_HASH][0].itemComponents?.sockets?.data[idx]?.sockets[archetypeSocketIndex].plugHash;
+			const archetypeDef = archetypeHash ? itemDefs[archetypeHash] : undefined;
+
+			// ステータス
+			const statsComp = vendorResponses[XUR_VENDOR_HASH][0].itemComponents?.stats?.data[idx]
+				?? vendorResponses[XUR_VENDOR_HASH][1].itemComponents?.stats?.data[idx]
+				?? vendorResponses[XUR_VENDOR_HASH][2].itemComponents?.stats?.data[idx]
+				?? { stats: {} } as DestinyItemStatsComponent;
+
+			const stats = Object.values(statsComp.stats).map(s => {
+				const def = statDefs[s.statHash];
+				if (!def) throw new Error(`Stat definition not found for hash ${s.statHash}`);
+
+				return {
+					name: def.displayProperties.name,
+					icon: def.displayProperties.icon,
+					value: s.value,
+					index: def.index
+				};
+			})
+			.sort((a, b) => a.index - b.index);
+
+			const statsTotal = stats.reduce((sum, s) => sum + s.value, 0);
+
+			// エキゾチック防具の効果
+			const exoticPerkSocketIndex = def.sockets?.socketEntries.findIndex(se => se && se.socketTypeHash === 965959289);
+			const exoticPerkHash = def.sockets.socketEntries[exoticPerkSocketIndex ?? -1]?.singleInitialItemHash;
+			const exoticPerkDef = exoticPerkHash ? itemDefs[exoticPerkHash] : undefined;
+
+			// コスト
+			const costs = i.costs?.map(c => {
+				if (!c.itemHash) throw new Error("Cost itemHash is undefined");
+				const costDef = itemDefs[c.itemHash];
+				if (!costDef) throw new Error(`Cost item definition not found for hash ${c.itemHash}`);
+				return {
+					name: costDef.displayProperties.name,
+					icon: costDef.displayProperties.icon,
+					quantity: c.quantity
+				};
+			}) ?? [];
+
+			const data = {
+				name: def.displayProperties.name,
+				icon: def.displayProperties.icon,
+				type: def.itemTypeDisplayName,
+				hash: hash,
+				watermark: def.isFeaturedItem ? def.iconWatermarkFeatured : def.iconWatermark,
+				tier: instance?.gearTier ?? 0,
+				archetype: {
+					name: archetypeDef?.displayProperties.name ?? "アーキタイプ不明",
+					icon: archetypeDef?.displayProperties.iconSequences?.[0].frames?.[1] ?? "",
+				},
+				perk: {
+					name: exoticPerkDef?.displayProperties.name ?? "不明",
+					description: exoticPerkDef?.displayProperties.description ?? "",
+					icon: exoticPerkDef?.displayProperties.icon ?? "",
+				},
+				stats: {
+					stat: stats,
+					total: statsTotal
+				},
+				costs
+			}
+
+			switch (def.classType) {
+				case 0: xurDisplayItems.basicArmors.titan.push(data); break;
+				case 1: xurDisplayItems.basicArmors.hunter.push(data); break;
+				case 2: xurDisplayItems.basicArmors.warlock.push(data); break;
+				default: xurDisplayItems.basicArmors.hunter.push(data); break; // クラス不明はハンターに入れる
+			}
+
+		} else if (specialItemCategory.includes(xurDef.itemList[i.vendorItemIndex].categoryIndex)) {
+			// 雑貨
+			const costs = i.costs?.map(c => {
+				if (!c.itemHash) throw new Error("Cost itemHash is undefined");
+				const costDef = itemDefs[c.itemHash];
+				if (!costDef) throw new Error(`Cost item definition not found for hash ${c.itemHash}`);
+				return {
+					name: costDef.displayProperties.name,
+					icon: costDef.displayProperties.icon,
+					quantity: c.quantity
+				};
+			}) ?? [];
+
+			const data = {
+				name: def.displayProperties.name,
+				type: def.itemTypeDisplayName,
+				icon: def.displayProperties.icon,
+				watermark: def.isFeaturedItem ? def.iconWatermarkFeatured : def.iconWatermark,
+				hash: hash,
+				description: def.displayProperties.description,
+				costs
+			}
+
+			xurDisplayItems.specialItems.push(data);
+		}
+	});
+
 	return {
-		xurHash: XUR_VENDOR_HASH,
-		offersHash: OFFERS_VENDOR_HASH,
-		gearHash: GEAR_VENDOR_HASH,
-		vendorResponses,
-		vendorDefs,
-		itemDefs,
-		statDefs,
-		sandboxPerkDefs
+		date: formatXurDayRange(),
+		background: xurDef.locations?.[0]?.backgroundImagePath,
+		xurItems: xurDisplayItems
 	};
 }

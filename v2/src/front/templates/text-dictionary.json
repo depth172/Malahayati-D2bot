@@ -1,0 +1,28 @@
+{
+	"[アーク]": { "className": "arc keys", "title": "アーク", "replacement": "\ue143" },
+	"[ソーラー]": { "className": "solar keys", "title": "ソーラー", "replacement": "\ue140" },
+	"[ボイド]": { "className": "void keys", "title": "ボイド", "replacement": "\ue144" },
+	"[ステイシス]": { "className": "stasis keys", "title": "ステイシス", "replacement": "\ue139" },
+	"[ストランド]": { "className": "strand keys", "title": "ストランド", "replacement": "\uef0e" },
+	"[シールド貫通]": { "className": "barrier antiChampion keys", "title": "バリア", "replacement": "\ue070" },
+	"[怯み]": { "className": "unstoppable antiChampion keys", "title": "アンストッパブル", "replacement": "\ue072" },
+	"[妨害]": { "className": "overload antiChampion keys", "title": "オーバーロード", "replacement": "\ue071" },
+	"[射撃]を": { "replacement": "射撃する" },
+	"[照準モード]を": { "replacement": "ADSをする" },
+	"[リロード]を": { "replacement": "リロードをする" },
+	"[代替武器アクション]を": { "replacement": "リロードを長押しする" },
+	"[空中回避]を": { "replacement": "空中回避を発動する" },
+	"[空中戦術]を": { "replacement": "空中回避を発動する" },
+	"[ダッシュ]を": { "replacement": "ダッシュする" },
+	"[グレネード]を": { "replacement": "グレネードを投げる" },
+	"[近接]を": { "replacement": "近接スキルを放つ" },
+	"[近接]": { "replacement": "近接スキルを放つ" },
+	"[スーパースキル]を": { "replacement": "スーパースキルを発動する" },
+	"[通常攻撃]を": { "replacement": "通常攻撃を放つ" },
+	"[強攻撃]を": { "replacement": "強攻撃を放つ" },
+	"[ブロック]を": { "replacement": "ガードをする" },
+	"[ブロック]": { "replacement": "ガードをする" },
+	
+	"\n": { "replacement": "br" },
+	"\r": { "replacement": "br" }
+}

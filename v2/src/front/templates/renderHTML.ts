@@ -14,12 +14,28 @@ export function renderHTML(children: React.ReactNode) {
 
   const content = renderToStaticMarkup(children);
 
+	const fontPath = path.join(__dirname, "Destiny_Keys.otf");
+	const font = fs.readFileSync(fontPath);
+  const fontBase64 = font.toString("base64");
+
   return `<!doctype html>
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css" integrity="sha512-+n8f3MCd8Yh7p+oz9r+X9g5mZbJ6+q4uF5jOeF2D7v3z6tWjH3yE5fI5c6k6T8K4e4g5F5g5F5g5F5g5F5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <style>${css}</style>
+  <style>
+			@font-face {
+			font-family: "Destiny_Keys";
+			src: url("data:font/otf;base64,${fontBase64}") format("opentype");
+        font-weight: normal;
+        font-style: normal;
+        font-display: block;
+		}
+		.destiny-font {
+			font-family: "Destiny_Keys", sans-serif;
+		}
+${css}
+</style>
 </head>
 <body>
   <div id="root">${content}</div>
@@ -53,6 +69,7 @@ export async function htmlPagesToPNGs(htmls: string[], width = 1200) {
     await page.setContent(html, { waitUntil: "networkidle" });
     const el = await page.$("#card"); // 要素単位でスクショ
     if (!el) throw new Error("#card not found");
+		await page.evaluate(() => (document as any).fonts.ready);
     const buf = await el.screenshot({ type: "png", omitBackground: false }) as Buffer;
     out.push(buf);
   }

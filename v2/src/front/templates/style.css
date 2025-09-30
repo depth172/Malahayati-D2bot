@@ -62,10 +62,8 @@ body {
 }
 
 .contentXur {
-	display: grid;
-	grid-template-columns: repeat(2, 1fr);
-	grid-template-rows: repeat(3, auto);
-	grid-auto-flow: column;
+	display: flex;
+	flex-direction: column;
 	gap: 36px;
 }
 
@@ -147,6 +145,11 @@ body {
 	gap: 8px;
 }
 
+.itemXur {
+	display: grid;
+	grid-template-columns: 1fr 1fr;
+}
+
 .itemSummary {
 	display: flex;
 	position: relative;
@@ -170,6 +173,10 @@ body {
 
 img.cost-icon {
 	height: 1.5em;
+}
+
+.description {
+	margin: 10px;
 }
 
 .armor-stats {
@@ -209,21 +216,40 @@ img.cost-icon {
 	font-weight: bold;
 }
 
-.archetype {
+.archetype,
+.perk-info {
 	display: flex;
-	justify-content: end;
 	align-items: center;
-	margin: 24px 18px;
 	gap: 20px;
 }
 
-.archetype .icon {
+.archetype {
+	justify-content: end;
+	margin: 24px 18px;
+}
+
+.perk-info {
+	justify-content: start;
+	margin: 24px 0;
+}
+
+.archetype .icon,
+.perk-info .icon {
 	height: 60px;
 	width: 60px;
 }
 
-.archetype .name {
+.archetype .name,
+.perk-info .name {
 	font-weight: bold;
+}
+
+.exotic-perk .desc {
+	font-size: 0.9em;
+	opacity: 0.9;
+	margin: 24px;
+	margin-right: 0;
+	word-break: auto-phrase;
 }
 
 .footer {
@@ -232,9 +258,67 @@ img.cost-icon {
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
+	gap: 12px;
+}
+
+.tips {
+	flex-grow: 1;
+	font-size: 0.8em;
+	opacity: 0.7;
 }
 
 .footer img {
 	height: 48px;
 	opacity: 0.8;
+}
+
+/* 記号類 */
+
+.solar {
+  color: #e7601d;
+  font-weight: 400;
+}
+.solar.keys {
+  padding: 0 0.2em;
+}
+
+.arc {
+  color: #81b5e4;
+  font-weight: 400;
+}
+.arc.keys {
+  padding: 0 0.13em;
+}
+
+.void {
+  color: #b07cdb;
+  font-weight: 400;
+}
+.void.keys {
+  padding: 0 0.1em;
+}
+
+.stasis {
+  color: #5e7afd;
+  font-weight: 400;
+}
+.stasis.keys {
+  padding: 0 0.13em;
+}
+
+.strand {
+  color: #37da66;
+  font-weight: 400;
+}
+.strand.keys {
+  padding: 0 0.31em;
+}
+
+.prism {
+  color: #f263a1;
+  font-weight: 400;
+}
+
+.antiChampion {
+  padding: 0.17em 0.2em 0.059em;
 }
