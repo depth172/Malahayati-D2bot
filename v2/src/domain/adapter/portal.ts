@@ -55,8 +55,10 @@ export async function toPortalViewData(
         const activityDef = (await getDef<DestinyActivityDefinition>("Activity", Number(aHash)));
 				const activityTypeDef = await getDef<DestinyActivityTypeDefinition>("ActivityType", activityDef.activityTypeHash);
 
+				const activityName = activityDef.originalDisplayProperties.name.startsWith("クイックプレイ") ? "クイックプレイ" : activityDef.originalDisplayProperties.name;
+
 				const activity = {
-					name: activityDef.originalDisplayProperties.name,
+					name: activityName,
 					icon: activityDef.displayProperties.icon,
 					type: activityTypeDef.displayProperties.name,
 					backgroundImage: activityDef.pgcrImage ?? activityDef.displayProperties.icon ?? "",
