@@ -7,6 +7,7 @@ import { buildPortalCards } from '@front/jobs/portal';
 import { DestinyComponentType as T } from 'type';
 import { redis } from '@api/redis/redis';
 import { buildXurCards } from '@front/jobs/xur';
+import { isXurAvailable } from '@domain/checkXur';
 
 async function run() {
   try {
@@ -26,7 +27,7 @@ async function run() {
 
     const [portalRes, xurRes] = await Promise.allSettled([
       buildPortalCards(grouped, { mode: "preview", getDef: getDefinition }),
-      buildXurCards({ mode: "preview", getDef: getDefinition, getVendor }),
+      await isXurAvailable(getVendor) ? buildXurCards({ mode: "preview", getDef: getDefinition, getVendor }) : Promise.resolve({ mode: "preview", written: [] }),
     ]);
 
     if (portalRes.status === "fulfilled") console.log(portalRes.value);
@@ -37,9 +38,9 @@ async function run() {
 
   } catch (e) {
     console.error(e);
-    process.exitCode = 1;        // 明示的な exit() は避ける
+    process.exitCode = 1;
   } finally {
-    try { await redis.quit(); }  // quit は Promise なので await する
+    try { await redis.quit(); }
     catch (_) {}
   }
 }

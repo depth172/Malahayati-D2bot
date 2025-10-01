@@ -265,7 +265,9 @@ export const getXurViewData = async (
 		});
 	}));
 
-	// 表示用データに整形
+	// ## 表示用データに整形 ##
+
+	// シュール
 	const xurDisplayItems: XurViewData["xurItems"] = {
 		basicArmors: {
 			hunter: [],
