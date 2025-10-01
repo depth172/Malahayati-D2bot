@@ -42,9 +42,8 @@ export async function getVendor(character: CharacterClass, hash: number, compone
 	});
 	const json = await res.json() as BungieResponse<DestinyVendorResponse>;
 
-	if (!res.ok) {
-		console.error('Response:', json);
-		throw new Error(`Failed to fetch vendor data: ${res.status} ${res.statusText}`);
+	if (json.ErrorCode === 1627) {
+		return {} as DestinyVendorResponse; // DestinyVendorNotFound
 	}
 
 	if (json.ErrorCode !== 1) {

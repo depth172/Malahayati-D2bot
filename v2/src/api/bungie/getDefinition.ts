@@ -27,9 +27,6 @@ export async function getDefinition<T>(definitionType: string, hash: number) {
 			'Accept': 'application/json',
 		},
 	});
-	if (!def.ok) {
-		throw new Error(`Failed to fetch definition: ${def.status} ${def.statusText}`);
-	}
 
 	const json = await def.json() as BungieResponse<T>;
 	if (json.ErrorCode !== 1) {

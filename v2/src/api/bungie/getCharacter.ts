@@ -39,11 +39,6 @@ export async function getCharacter(character: CharacterClass, components: Destin
 		}
 	});
 
-	if (!res.ok) {
-		console.error('Response:', res);
-		throw new Error(`Failed to fetch character data: ${res.status} ${res.statusText}`);
-	}
-
 	const json = await res.json() as BungieResponse<DestinyCharacterResponse>;
 	if (json.ErrorCode !== 1) {
 		throw new Error(`Failed to fetch character data: ${json.ErrorStatus} ${json.Message}`);

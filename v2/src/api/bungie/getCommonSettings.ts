@@ -19,9 +19,6 @@ export async function getCommonSettings(): Promise<BungieCommonSettings> {
 			'X-API-Key': API_KEY
 		}
 	});
-	if (!res.ok) {
-		throw new Error(`Failed to fetch common settings: ${res.statusText}`);
-	}
 
 	const json = await res.json() as BungieResponse<BungieCommonSettings>;
 	if (json.ErrorCode !== 1) {
