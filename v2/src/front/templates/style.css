@@ -143,6 +143,7 @@ body {
 	display: flex;
 	align-items: center;
 	gap: 8px;
+	white-space: nowrap;
 }
 
 .itemXur {
@@ -247,8 +248,7 @@ img.cost-icon {
 .exotic-perk .desc {
 	font-size: 0.9em;
 	opacity: 0.9;
-	margin: 24px;
-	margin-right: 0;
+	margin: 28px 0 24px 24px;
 	word-break: auto-phrase;
 }
 
