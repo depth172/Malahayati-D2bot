@@ -1,4 +1,4 @@
-import { isArchetypeSocket, isArmorPerkSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponPerkSocketCategory } from "@domain/typeCheck";
+import { isArchetypeSocket, isArmorPerkSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponFrameSocket, isWeaponPerkSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
 import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemReusablePlugsComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
 
 export type Cost = {
@@ -28,13 +28,15 @@ type GearItem = {
 };
 
 type GearExoticWeapon = GearItem & {
-	perkHash: number;
+	perkHash: number[];
 };
 
 export type GearRandomRollWeapon = GearItem & {
+	index?: number;
 	perks: {
 		[index: number]: number[];
 	}
+	frameHash?: number;
 	masterworkHash?: number;
 };
 
@@ -387,10 +389,11 @@ export const getXurData = async (
 			if (!def) return;
 
 			const perkHash = def.sockets?.socketEntries.find(se => se && isExoticPerkSocket(se.socketTypeHash))?.singleInitialItemHash;
+			const subPerkHash = def.sockets?.socketEntries.find(se => se && isWeaponPerkSocket(se.socketTypeHash))?.singleInitialItemHash;
 
 			gearItems.exotics.weapons.push({
 				hash,
-				perkHash: perkHash ?? 0,
+				perkHash: [perkHash ?? 0, subPerkHash ?? 0].filter(h => h !== 0),
 				costs: i.costs?.map(c => ({
 					hash: c.itemHash,
 					quantity: c.quantity
@@ -444,12 +447,14 @@ export const getXurData = async (
 			if (!def) return;
 
 			const weaponPerkSocketCategories = def.sockets.socketCategories?.find(sc => isWeaponPerkSocketCategory(sc.socketCategoryHash))?.socketIndexes;
+			const frameSocketIndex = def.sockets?.socketEntries.findIndex(se => se && isWeaponFrameSocket(se.socketTypeHash));
 			const masterworkSocketIndex = def.sockets?.socketEntries.findIndex(se => se && isMasterworkSocket(se.socketTypeHash));
 			const killTrackerSocketIndex = def.sockets?.socketEntries.findIndex(se => se && isKillTrackerSocket(se.socketTypeHash));
 
 			// 特性
 			const perks: { [index: number]: number[] } = {};
 			const plugs = gearItemComponents.reusablePlugs[idx]?.plugs;
+			const frameHash = gearItemComponents.sockets[idx]?.sockets[frameSocketIndex ?? -1]?.plugHash;
 			const masterworkHash = gearItemComponents.sockets[idx]?.sockets[masterworkSocketIndex ?? -1]?.plugHash;
 
 			if (plugs) {
@@ -464,11 +469,13 @@ export const getXurData = async (
 
 			gearItems.weapons.weapons.push({
 				hash,
+				index: idx,
 				costs: i.costs?.map(c => ({
 					hash: c.itemHash,
 					quantity: c.quantity
 				})) ?? [],
 				perks,
+				frameHash: frameHash && isWeaponFrameSocket(def.sockets.socketEntries[frameSocketIndex]?.socketTypeHash) ? frameHash : undefined,
 				masterworkHash: masterworkHash && isMasterworkSocket(def.sockets.socketEntries[masterworkSocketIndex]?.socketTypeHash) ? masterworkHash : undefined
 			});
 		}

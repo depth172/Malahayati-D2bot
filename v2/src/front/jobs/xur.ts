@@ -14,7 +14,7 @@ export async function buildXurCards(
     dateISO?: string;                 // 省略時は今日
     mode?: "preview" | "prod";        // 省略時は NODE_ENV / PREVIEW から推定
     previewDir?: string;              // 既定 ".preview"
-		getDef: <T>(type: "InventoryItem" | "Vendor" | "Stat" | "SandboxPerk" | "InventoryItemConstants", hash: number) => Promise<T>              // 必須：定義リゾルバ
+		getDef: <T>(type: "InventoryItem" | "Vendor" | "Stat" | "SandboxPerk" | "PlugSet" | "DamageType" | "InventoryItemConstants", hash: number) => Promise<T>              // 必須：定義リゾルバ
   }
 ): Promise<
   | { mode: "preview"; written: string[] }

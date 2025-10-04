@@ -39,7 +39,7 @@ export default function RecoilStat({ value }: { value: number }) {
   const ySpreadLess = Math.cos(direction - spread);
 
   return (
-    <svg height="12" viewBox="0 0 2 1">
+    <svg height="24" viewBox="0 0 2 1">
       <circle r={1} cx={1} cy={1} fill="#333" />
       {value >= 95 ? (
         <line x1={1 - x} y1={1 + y} x2={1 + x} y2={1 - y} stroke="white" strokeWidth="0.1" />

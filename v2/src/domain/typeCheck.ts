@@ -7,12 +7,20 @@ export function isWeaponPerkSocketCategory(socketCategoryHash: number): boolean 
 }
 
 export function isArchetypeSocket(socketTypeHash: number): boolean {
-	// アーキタイプのソケットタイプハッシュ
+	// 防具アーキタイプのソケットタイプハッシュ
 	const ARCHETYPE_SOCKET_TYPE_HASHES = new Set([
 		2104613635, // Weapon Archetype Socket Type
 		3614673599, // Armor Archetype Socket Type
 	]);
 	return ARCHETYPE_SOCKET_TYPE_HASHES.has(socketTypeHash);
+}
+
+export function isWeaponFrameSocket(socketTypeHash: number): boolean {
+	// 武器フレームのソケットタイプハッシュ
+	const WEAPON_FRAME_SOCKET_TYPE_HASHES = new Set([
+		3956125808, // Weapon Frame Socket Type
+	]);
+	return WEAPON_FRAME_SOCKET_TYPE_HASHES.has(socketTypeHash);
 }
 
 export function isExoticPerkSocket(socketTypeHash: number): boolean {
@@ -22,6 +30,15 @@ export function isExoticPerkSocket(socketTypeHash: number): boolean {
 		965959289, // Exotic Armor Perk Socket Type
 	]);
 	return EXOTIC_PERK_SOCKET_TYPE_HASHES.has(socketTypeHash);
+}
+
+export function isWeaponPerkSocket(socketTypeHash: number): boolean {
+	// 武器パークのソケットタイプハッシュ
+	const WEAPON_PERK_SOCKET_TYPE_HASHES = new Set([
+		1215804696,
+		1215804697, // Weapon Perk Socket Type
+	]);
+	return WEAPON_PERK_SOCKET_TYPE_HASHES.has(socketTypeHash);
 }
 
 export function isArmorPerkSocket(socketTypeHash: number): boolean {

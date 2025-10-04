@@ -1,10 +1,19 @@
 import { Cost, GearRandomRollExoticWeapon, GearRandomRollWeapon, XurData } from "@domain/fetcher/xur";
 import { isKillTrackerSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
-import { DestinyInventoryItemDefinition, DestinyPlugSetDefinition, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
-import { DisplayableItem, DisplayableStats } from "typeOriginal";
-import { X } from "vitest/dist/chunks/reporters.d.BFLkQcL6.js";
+import { DestinyDamageTypeDefinition, DestinyInventoryItemDefinition, DestinyPlugSetDefinition, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
+import { DisplayableItem, DisplayableStats, DisplayableWeapon } from "typeOriginal";
 
-type DisplayableXurItem = DisplayableItem & {
+export type DisplayableXurItem = DisplayableItem & {
+	quantity?: number;
+	description?: string;
+	costs: {
+		name: string;
+		icon: string;
+		quantity: number;
+	}[];
+};
+
+type DisplayableXurWeapon = DisplayableWeapon & {
 	costs: {
 		name: string;
 		icon: string;
@@ -26,15 +35,15 @@ type XurArmor = DisplayableXurItem & {
 	}
 }
 
-type XurExoticWeapon = DisplayableXurItem & {
-	perk: {
+type XurExoticWeapon = DisplayableXurWeapon & {
+	perks: {
 		name: string;
 		description: string;
 		icon: string;
-	}
+	}[];
 };
 
-type XurRandomRollExoticWeapon = DisplayableXurItem & {
+type XurRandomRollExoticWeapon = DisplayableXurWeapon & {
 	exoticPerk: {
 		name: string;
 		description: string;
@@ -42,10 +51,12 @@ type XurRandomRollExoticWeapon = DisplayableXurItem & {
 	}
 	stats: {
 		name: string;
+		hash: number;
 		value: number;
 	}[];
 	baseStats: {
 		name: string;
+		hash: number;
 		value: number;
 	}[];
 	randomPerks: {
@@ -62,8 +73,13 @@ type XurCatalyst = DisplayableXurItem & {
 	}[];
 };
 
-type XurRandomRollWeapon = DisplayableXurItem & {
+type XurRandomRollWeapon = DisplayableXurWeapon & {
+	index?: number;
 	perks: string[][];
+	frame: {
+		name: string;
+		icon: string;
+	}
 	masterwork: {
 		baseIcon: string;
 		watermark: string;
@@ -99,9 +115,7 @@ export type XurViewData = {
 	offerItems: {
 		icon: string;
 		weeklyItems: DisplayableXurItem[];
-		generalItems: (DisplayableXurItem & {
-			description: string;
-		})[];
+		generalItems: DisplayableXurItem[];
 	}
 }
 
@@ -139,11 +153,12 @@ function buildCosts(costs: Cost[], itemDefs: Record<number, DestinyInventoryItem
 
 export const toXurViewData = async (
 	xurData: XurData,
-	getDef: <T>(type: "Vendor" | "InventoryItem" | "Stat" | "SandboxPerk" | "PlugSet", hash: number) => Promise<T>,
+	getDef: <T>(type: "Vendor" | "InventoryItem" | "Stat" | "SandboxPerk" | "DamageType" | "PlugSet", hash: number) => Promise<T>,
 ) => {
 	const itemDefs: Record<number, DestinyInventoryItemDefinition> = {};
 	const vendorDefs: Record<number, DestinyVendorDefinition> = {};
 	const statDefs: Record<number, DestinyStatDefinition> = {};
+	const damageTypeDefs: Record<number, DestinyDamageTypeDefinition> = {};
 	const sandboxPerkDefs: Record<number, DestinySandboxPerkDefinition> = {};
 
 	const itemHashes = new Set<number>();
@@ -204,7 +219,7 @@ export const toXurViewData = async (
 	itemHashes.add(gearItems.weapons.engram.hash);
 	gearItems.exotics.weapons.forEach(i => {
 		itemHashes.add(i.hash);
-		itemHashes.add(i.perkHash);
+		i.perkHash.forEach(ph => itemHashes.add(ph));
 		i.costs.forEach(c => itemHashes.add(c.hash));
 	});
 	gearItems.exotics.catalysts.forEach(i => {
@@ -220,6 +235,7 @@ export const toXurViewData = async (
 	});
 	gearItems.weapons.weapons.forEach(i => {
 		itemHashes.add(i.hash);
+		if (i.frameHash) itemHashes.add(i.frameHash);
 		if (i.masterworkHash) itemHashes.add(i.masterworkHash);
 		i.costs.forEach(c => itemHashes.add(c.hash));
 		Object.values(i.perks).flat().forEach(ph => itemHashes.add(ph));
@@ -252,6 +268,36 @@ export const toXurViewData = async (
 
 
 	// ## 追加取得が必要な定義 ##
+
+	// 武器のDamageTypeの定義
+	const damageTypeHashes = new Set<number>();
+
+	Object.values(gearItems.exotics.weapons).forEach(i => {
+		const itemDef = itemDefs[i.hash];
+		if (!itemDef) return;
+
+		const dmgTypeHash = itemDef.defaultDamageTypeHash;
+		if (dmgTypeHash) damageTypeHashes.add(dmgTypeHash);
+	});
+	Object.values(gearItems.exotics.randomRollWeapons).forEach(i => {
+		const itemDef = itemDefs[i.hash];
+		if (!itemDef) return;
+
+		const dmgTypeHash = itemDef.defaultDamageTypeHash;
+		if (dmgTypeHash) damageTypeHashes.add(dmgTypeHash);
+	});
+	Object.values(gearItems.weapons.weapons).forEach(i => {
+		const itemDef = itemDefs[i.hash];
+		if (!itemDef) return;	
+
+		const dmgTypeHash = itemDef.defaultDamageTypeHash;
+		if (dmgTypeHash) damageTypeHashes.add(dmgTypeHash);
+	});
+
+	await Promise.all(Array.from(damageTypeHashes).map(async (h) => {
+		if (damageTypeDefs[h]) return; // 既に取得済みの場合はスキップ
+		damageTypeDefs[h] = await getDef<DestinyDamageTypeDefinition>("DamageType", h);
+	}));
 
 	// 媒体に含まれるSandboxPerkの定義
 	const catalystHashes = gearItems.exotics.catalysts.map(i => i.hash);
@@ -386,8 +432,16 @@ export const toXurViewData = async (
 	gearItems.exotics.weapons.forEach(i => {
 		const itemDef = itemDefs[i.hash];
 		if (!itemDef) throw new Error(`Item definition not found for hash: ${i.hash}`);
-		const perkDef = itemDefs[i.perkHash];
-		if (!perkDef) throw new Error(`Perk definition not found for hash: ${i.perkHash}`);
+		const perkDefs = i.perkHash.map(ph => {
+			const pd = itemDefs[ph];
+			if (!pd) throw new Error(`Perk definition not found for hash: ${ph}`);
+			return pd;
+		});
+		const perks = perkDefs.map(pd => ({
+			name: pd.displayProperties.name,
+			description: pd.displayProperties.description,
+			icon: pd.displayProperties.icon
+		}));
 		const costs = buildCosts(i.costs, itemDefs);
 		
 		gearDisplayItems.exotics.weapons.push({
@@ -396,11 +450,11 @@ export const toXurViewData = async (
 			icon: itemDef.displayProperties.icon,
 			watermark: itemDef.isFeaturedItem ? itemDef.iconWatermarkFeatured : itemDef.iconWatermark,
 			hash: i.hash,
-			perk: {
-				name: perkDef.displayProperties.name,
-				description: perkDef.displayProperties.description,
-				icon: perkDef.displayProperties.icon
-			},
+			damageType: itemDef.defaultDamageType,
+			damageTypeName: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.name ?? "") : "",
+			damageTypeIcon: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.icon ?? "") : "",
+			ammoType: itemDef.equippingBlock?.ammoType ?? 0,
+			perks,
 			costs
 		});
 	});
@@ -499,7 +553,7 @@ export const toXurViewData = async (
 			const exoticPerkDef = itemDefs[exoticPerkHash];
 			if (!exoticPerkDef) throw new Error(`Exotic perk definition not found for hash: ${exoticPerkHash}`);
 
-			const statRaw = i.stats.map(s => {
+			const stats = i.stats.map(s => {
 				const def = statDefs[s.hash];
 				if (!def) throw new Error(`Stat definition not found for hash: ${s.hash}`);
 				return {
@@ -514,9 +568,7 @@ export const toXurViewData = async (
 				return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
 			});
 
-			const stats = statRaw.map(s => ({ name: s.name, value: s.value }));
-
-			const baseStatRaw = i.stats.map(s => {
+			const baseStats = i.stats.map(s => {
 				const def = statDefs[s.hash];
 				if (!def) throw new Error(`Stat definition not found for hash: ${s.hash}`);
 				return {
@@ -531,14 +583,16 @@ export const toXurViewData = async (
 				return (ai === -1 ? 999 : ai) - (bi === -1 ? 999 : bi);
 			});
 
-			const baseStats = baseStatRaw.map(s => ({ name: s.name, value: s.value }));
-
 			const data = {
 				name: itemDef.displayProperties.name,
 				type: itemDef.itemTypeDisplayName,
 				icon: itemDef.displayProperties.icon,
 				watermark: itemDef.isFeaturedItem ? itemDef.iconWatermarkFeatured : itemDef.iconWatermark,
 				hash: i.hash,
+				damageType: itemDef.defaultDamageType,
+				damageTypeName: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.name ?? "") : "",
+				damageTypeIcon: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.icon ?? "") : "",
+				ammoType: itemDef.equippingBlock?.ammoType ?? 0,
 				exoticPerk: {
 					name: exoticPerkDef.displayProperties.name,
 					description: exoticPerkDef.displayProperties.description,
@@ -553,6 +607,7 @@ export const toXurViewData = async (
 			gearDisplayItems.exotics.randomRollWeapons.push(data);
 
 		} else {
+			const frameDef = i.frameHash ? itemDefs[i.frameHash] : null;
 			const masterworkDef = i.masterworkHash ? itemDefs[i.masterworkHash] : null;
 			const data = {
 				name: itemDef.displayProperties.name,
@@ -560,7 +615,16 @@ export const toXurViewData = async (
 				icon: itemDef.displayProperties.icon,
 				watermark: itemDef.isFeaturedItem ? itemDef.iconWatermarkFeatured : itemDef.iconWatermark,
 				hash: i.hash,
+				index: "index" in i ? i.index : undefined,
+				damageType: itemDef.defaultDamageType,
+				damageTypeName: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.name ?? "") : "",
+				damageTypeIcon: itemDef.defaultDamageTypeHash ? (damageTypeDefs[itemDef.defaultDamageTypeHash]?.displayProperties.icon ?? "") : "",
+				ammoType: itemDef.equippingBlock?.ammoType ?? 0,
 				perks: randomPerks.map(rp => rp.map(p => p.icon)),
+				frame: {
+					name: frameDef ? frameDef.displayProperties.name : "",
+					icon: frameDef ? frameDef.displayProperties.icon : ""
+				},
 				masterwork: {
 					baseIcon: masterworkDef ? masterworkDef.displayProperties.icon : "",
 					watermark: masterworkDef ? (masterworkDef.isFeaturedItem ? masterworkDef.iconWatermarkFeatured : masterworkDef.iconWatermark) : ""
@@ -575,6 +639,7 @@ export const toXurViewData = async (
 
 	await Promise.all(gearItems.exotics.randomRollWeapons.map(i => putRandomRollWeapon(i)));
 	await Promise.all(gearItems.weapons.weapons.map(i => putRandomRollWeapon(i)));
+	gearDisplayItems.weapons.weapons.sort((a, b) => (a.index ?? 0) - (b.index ?? 0));
 
 	// オファー
 	const offerDisplayItems: XurViewData["offerItems"] = {
@@ -590,7 +655,9 @@ export const toXurViewData = async (
 			name: itemDef.displayProperties.name,
 			type: itemDef.itemTypeDisplayName,
 			icon: itemDef.displayProperties.icon,
+			description: itemDef.displayProperties.description,
 			hash: i.hash,
+			quantity: i.quantity,
 			costs
 		};
 		offerDisplayItems.weeklyItems.push(data);

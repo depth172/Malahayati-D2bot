@@ -65,7 +65,7 @@ body {
 .contentXur {
 	display: flex;
 	flex-direction: column;
-	gap: 36px;
+	gap: 48px;
 }
 
 .itemPortal {
@@ -190,6 +190,15 @@ img.cost-icon {
 	text-align: right;
 }
 
+.weapon-stats {
+	display: grid;
+	grid-template-columns: max-content 3rem 1fr;
+	gap: 4px;
+	margin: 24px;
+	align-items: center;
+	text-align: right;
+}
+
 .stat-icon {
 	height: 1.5em;
 	margin-top: 4px;
@@ -197,19 +206,45 @@ img.cost-icon {
 
 .stat-bar {
 	background: #333;
+	position: relative;
 	height: 1.1em;
 	width: 100%;
 	overflow: hidden;
 	margin-left: 7px;
 	margin-top: 4px;
+	text-align: left;
 }
 
-.stat-fill {
+.stat-fill, .stat-fill-cover {
+	position: absolute;
 	background: #fff;
 	height: 100%;
 	width: 0;
 }
 
+.stat-fill {
+	z-index: 1;
+}
+
+.stat-fill-cover {
+	z-index: 2;
+}
+
+.stat-fill.increase {
+	background: #4f4;
+}
+.stat-fill-cover.increase {
+	background: #fff;
+}
+
+.stat-fill.decrease {
+	background: #fff;
+	z-index: 2;
+}
+.stat-fill-cover.decrease {
+	background: #f44;
+	z-index: 1;
+}
 .total {
 	margin-top: 5px;
 }
@@ -253,9 +288,112 @@ img.cost-icon {
 	word-break: auto-phrase;
 }
 
+.exotic-weapon-perk .desc {
+	font-size: 0.9em;
+	opacity: 0.9;
+	word-break: auto-phrase;
+}
+
+.random-perks {
+	margin: 24px 0;
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+
+.random-perk {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.random-perk .icon {
+	height: 48px;
+	width: 48px;
+}
+
+.random-perk .name {
+	font-weight: 500;
+}
+
+.weaponListXur {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 60px;
+}
+
+.weapon {
+	display: flex;
+	flex-direction: column;
+	gap: 18px;
+}
+
+.weapon-info {
+	display: flex;
+	justify-content: space-between;
+}
+
+.frame {
+	display: flex;
+	align-items: center;
+	gap: 16px;
+}
+
+.frame .name {
+	font-size: 1.05em;
+}
+
+.frame .icon {
+	height: 80px;
+	width: 80px;
+}
+
+.masterwork {
+	position: relative;
+	width: 80px;
+	height: 80px;
+}
+
+.masterwork .icon {
+	position: relative;
+}
+
+.masterwork .icon img {
+	height: 80px;
+	width: 80px;
+}
+
+.masterwork .icon img.watermarkMiddle {
+	position: absolute;
+	top: 0;
+	left: 0;
+}
+
+.weapon-perks {
+	display: grid;
+	grid-template-columns: repeat(5, 1fr);
+}
+
+.weapon-perk-row {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 12px;
+}
+
+.weapon-perk-row .icon {
+	height: 80px;
+	width: 80px;
+}
+
+.weapon .desc {
+	font-size: 0.85em;
+	opacity: 0.8;
+	word-break: auto-phrase;
+}
+
 .footer {
 	text-align: right;
-	padding: 10px 20px;
 	display: flex;
 	justify-content: flex-end;
 	align-items: center;
@@ -263,7 +401,6 @@ img.cost-icon {
 }
 
 .tips {
-	flex-grow: 1;
 	font-size: 0.8em;
 	opacity: 0.7;
 }
