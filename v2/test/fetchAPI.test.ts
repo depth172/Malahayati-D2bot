@@ -1,7 +1,8 @@
 import { describe, it, expect } from 'vitest';
-import { getXurViewData } from '@domain/adapter/xur';
+import { toXurViewData } from '@domain/adapter/xur';
 import { getDefinition } from '@api/bungie/getDefinition';
 import { getVendor } from '@api/bungie/getVendor';
+import { getXurData } from '@domain/fetcher/xur';
 
 const hasEnv =
   !!process.env.B_API_KEY &&
@@ -13,17 +14,42 @@ const hasEnv =
 
 const shouldRun = hasEnv && process.env.RUN_LIVE_TESTS === '1';
 
-describe.runIf(shouldRun)('getXurViewData (LIVE)', () => {
+describe.runIf(shouldRun)('getXurData (LIVE)', () => {
 	it('シュールの情報が取得できる', async () => {
-    const data = await getXurViewData(getDefinition, getVendor);
+    const data = await getXurData(getDefinition, getVendor);
+		console.dir(data, {depth: null});
 
-
-		expect(data.xurHash).toBeDefined();
-		expect(data.offersHash).toBeDefined();
-		expect(data.gearHash).toBeDefined();
-		expect(data.vendorDefs).toBeDefined();
-		expect(data.itemDefs).toBeDefined();
-		expect(data.vendorResponses).toBeDefined();
-		expect(Object.keys(data.vendorResponses)).members(['2190858386', '537912098', '3751514131']);
+		expect(data).toHaveProperty('xurItems');
   });
 });
+
+describe.runIf(shouldRun)('getXurViewData (LIVE)', () => {
+	it('シュールの表示用情報が取得できる', async () => {
+    const data = await getXurData(getDefinition, getVendor);
+		const viewData = await toXurViewData(data, getDefinition);
+		
+		console.dir(viewData, {depth: null});
+		expect(viewData).toHaveProperty('xurItems');
+	});
+});
+
+// describe.runIf(shouldRun)('getPortalViewData (LIVE)', () => {
+// 	it('シュールの情報が取得できる', async () => {
+// 		const inputs = await Promise.all([
+// 			getCharacter(0, [T.CharacterActivities]),
+// 			getCharacter(1, [T.CharacterActivities]),
+// 			getCharacter(2, [T.CharacterActivities]),
+// 		]);
+
+// 		const results = inputs.map(input => {
+// 			const activities = Object.values(input.activities?.data.availableActivities || {});
+// 			return inferFocusedGear(activities);
+// 		});
+
+// 		const merged = mergeFocusedSets(results);
+// 		const grouped = await groupFocusedSets(merged, getDefinition);
+
+// 		console.dir(grouped, {depth: null});
+
+//   });
+// });

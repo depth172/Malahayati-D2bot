@@ -507,13 +507,7 @@ export type DestinyKiosksComponent = {
 };
 
 export type DestinyPlugSetsComponent = {
-	plugs: {
-		[plugSetHash: number]: {
-			plugItemHash: number;
-			canInsert: boolean;
-			enabled: boolean;
-		};
-	};
+	plugs: Record<number, number[]>;
 };
 
 export type DestinyPresentationNodeComponent = {
@@ -605,7 +599,11 @@ export type DestinyItemSocketsComponent = {
 };
 
 export type DestinyItemReusablePlugsComponent = {
-	[itemIndex: number]: DestinyPlugSetsComponent;
+	plugs: Record<number, {
+		plugItemHash: number;
+		canInsert: boolean;
+		enabled: boolean;
+	}[]>;
 };
 
 export type DestinyItemPlugObjectivesComponent = {
@@ -1135,9 +1133,22 @@ export type DestinyItemSocketEntryDefinition = {
 	defaultVisible: boolean;
 };
 
+export type DestinyItemIntrinsicSocketEntryDefinition = {
+	plugItemHash: number;
+	socketTypeHash: number;
+	defaultVisible: boolean;
+};
+
+export type DestinyItemSocketCategoryDefinition = {
+	socketCategoryHash: number;
+	socketIndexes: number[];
+};
+
 export type DestinyItemSocketBlockDefinition = {
 	detail: string;
 	socketEntries: DestinyItemSocketEntryDefinition[];
+	intrinsicSockets: DestinyItemIntrinsicSocketEntryDefinition[];
+	socketCategories: DestinyItemSocketCategoryDefinition[];
 };
 
 export type DestinyItemSummaryBlockDefinition = {
@@ -1501,6 +1512,28 @@ export type DestinySandboxPerkDefinition = DestinyDefinition & {
 
 export type DestinyActivityTypeDefinition = DestinyDefinition & {
 	displayProperties: DestinyDisplayPropertiesDefinition;
+};
+
+export type DestinyPlugItemCraftingUnlockRequirement = {
+	failureDescription: string;
+};
+
+export type DestinyPlugItemCraftingRequirements = {
+	unlockRequirements: DestinyPlugItemCraftingUnlockRequirement[];
+	requiredLevel?: number;
+	materialRequirementHashes: number[];
+};
+
+export type DestinyItemSocketEntryPlugItemRandomizedDefinition = {
+	craftingRequirements: DestinyPlugItemCraftingRequirements;
+	currentlyCanRoll: boolean;
+	plugItemHash: number;
+};
+
+export type DestinyPlugSetDefinition = DestinyDefinition & {
+	displayProperties: DestinyDisplayPropertiesDefinition;
+	reusablePlugItems: DestinyItemSocketEntryPlugItemRandomizedDefinition[];
+	isFakePlugSet: boolean;
 };
 
 export type DestinyInventoryItemConstantsDefinition = DestinyDefinition & {

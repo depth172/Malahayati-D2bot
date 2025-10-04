@@ -3,17 +3,18 @@ import path from "node:path";
 import { htmlPagesToPNGs, nameFor } from "@front/templates/renderHTML";
 import { getCommonSettings } from "@api/bungie/getCommonSettings";
 import { getImageRatio } from "@front/utils";
-import { getXurViewData } from "@domain/adapter/xur";
+import { toXurViewData } from "@domain/adapter/xur";
 import { renderXurHTML } from "@front/templates/xur";
 import { DestinyInventoryItemConstantsDefinition, DestinyVendorResponse } from "type";
+import { XurData } from "@domain/fetcher/xur";
 
 export async function buildXurCards(
+	xurData: XurData,
   opts?: {
     dateISO?: string;                 // 省略時は今日
     mode?: "preview" | "prod";        // 省略時は NODE_ENV / PREVIEW から推定
     previewDir?: string;              // 既定 ".preview"
 		getDef: <T>(type: "InventoryItem" | "Vendor" | "Stat" | "SandboxPerk" | "InventoryItemConstants", hash: number) => Promise<T>              // 必須：定義リゾルバ
-		getVendor: (character: number, hash: number, components: number[]) => Promise<DestinyVendorResponse>  // 必須：ベンダーリクエスタ
   }
 ): Promise<
   | { mode: "preview"; written: string[] }
@@ -25,17 +26,15 @@ export async function buildXurCards(
   const mode = opts?.mode ?? (process.env.PREVIEW ? "preview" : (process.env.NODE_ENV === "development" ? "preview" : "prod"));
   const previewDir = opts?.previewDir ?? ".preview";
   const getDef = opts?.getDef;
-	const getVendor = opts?.getVendor;
 
   if (!getDef) throw new Error("getDef is required");
-	if (!getVendor) throw new Error("getVendor is required");
 
 	const settings = await getCommonSettings();
 	if (!settings) throw new Error("destiny2 settings not found");
 
 	const constant = await getDef<DestinyInventoryItemConstantsDefinition>("InventoryItemConstants", 1);
-	
-  const data = await getXurViewData(getDef, getVendor);
+
+  const data = await toXurViewData(xurData, getDef);
 
 	const bgUrlFull = `https://www.bungie.net${data.background}`;
 

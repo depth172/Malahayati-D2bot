@@ -23,7 +23,13 @@ export function renderHTML(children: React.ReactNode) {
 <head>
   <meta charset="utf-8" />
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/modern-normalize/1.1.0/modern-normalize.min.css" integrity="sha512-+n8f3MCd8Yh7p+oz9r+X9g5mZbJ6+q4uF5jOeF2D7v3z6tWjH3yE5fI5c6k6T8K4e4g5F5g5F5g5F5g5F5g==" crossorigin="anonymous" referrerpolicy="no-referrer" />
-  <style>
+  <link rel="preconnect" href="https://www.bungie.net" />
+	<meta name="viewport" content="width=device-width, initial-scale=2" />
+	<link rel="preconnect" href="https://fonts.googleapis.com">
+	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
+	<title>Document</title>
+	<style>
 			@font-face {
 			font-family: "Destiny_Keys";
 			src: url("data:font/otf;base64,${fontBase64}") format("opentype");

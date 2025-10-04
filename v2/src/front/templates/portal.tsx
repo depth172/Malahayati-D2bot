@@ -12,7 +12,14 @@ function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
 }) {
   const titleMap = { solo: "ソロ", fireteam: "ファイアチーム", pinnacle: "最高峰", crucible: "クルーシブル" } as const;
 	const date = new Date();
-	const dateStr = date.toLocaleDateString();
+	const fmt = (dt: Date) => {
+		const y = dt.getFullYear();
+		const m = String(dt.getMonth() + 1).padStart(2, "0");
+		const d = String(dt.getDate()).padStart(2, "0");
+		return `${y}/${m}/${d}`;
+	};
+
+	const dateStr = fmt(date);
 
   return (
     <div className="card" style={{ ["--bg-url" as any]: `url("${bgUrl}")`, ["--bg-ratio" as any]: bgRatio }}>
