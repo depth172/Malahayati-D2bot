@@ -18,8 +18,6 @@ export async function getDefinition<T>(definitionType: string, hash: number) {
 		return definitionCache.get(cacheKey) as T;
 	}
 
-	console.log(`Destiny${definitionType}Definition: ${hash} の静的データを取得します...`);
-
 	const def = await fetch(`https://www.bungie.net/Platform/Destiny2/Manifest/Destiny${definitionType}Definition/${hash}/?lc=ja`, {
 		headers: {
 			'X-API-Key': API_KEY,

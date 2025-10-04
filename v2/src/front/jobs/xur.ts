@@ -58,9 +58,13 @@ export async function buildXurCards(
   // prod: PNG buffers を返す
   const groups: { group: "xur" | "gear" | "offers"; images: Buffer[] }[] = [];
   for (const p of pages) {
-    const htmls = renderXurHTML(data, settings, constant, p, bgUrlFull, bgRatio);
-    const pngs = await htmlPagesToPNGs(htmls, 1200);
-    groups.push({ group: p, images: pngs });
+		try {
+			const htmls = renderXurHTML(data, settings, constant, p, bgUrlFull, bgRatio);
+			const pngs = await htmlPagesToPNGs(htmls, 1200);
+			groups.push({ group: p, images: pngs });
+		} catch (e) {
+			console.error(`Error generating Xur page ${p}:`, e);
+		}
   }
   return { mode: "prod", groups };
 }

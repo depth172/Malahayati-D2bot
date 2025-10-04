@@ -6,7 +6,11 @@ import type { BungieTokenPayload } from "../typeOriginal";
 async function run() {
 	const code = process.argv[2];
 	if (!code) {
-		throw new Error("Authorization code is required as the first argument.");
+		// リセットモード
+		await redis.del("portal_data_hash");
+		// await redis.del("xur_data_hash");
+		console.log("Reset portal_data_hash and xur_data_hash in Redis.");
+		return;
 	}
 
   const data = await exchangeCodeForTokens(code);

@@ -5,13 +5,12 @@
   "main": "index.js",
   "type": "module",
   "scripts": {
-    "dev": "tsx src/jobs/main.ts",
+		"dev": "tsx src/jobs/dev.ts",
     "init:bungie": "tsx src/jobs/init.ts",
     "test": "cross-env RUN_LIVE_TESTS=1 vitest",
     "test:watch": "vitest --watch",
     "lint": "eslint .",
-    "build": "tsc -p tsconfig.build.json",
-    "start": "node dist/jobs/main.js"
+    "start": "tsx src/jobs/main.ts"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +29,7 @@
     "eslint-config-prettier": "^10.1.8",
     "eslint-plugin-import": "^2.32.0",
     "prettier": "^3.6.2",
+    "tsconfig-paths": "^4.2.0",
     "tsx": "^4.20.5",
     "typescript": "^5.9.2",
     "vite-tsconfig-paths": "^5.1.4",
@@ -41,6 +41,7 @@
     "playwright": "^1.55.0",
     "react": "^19.1.1",
     "react-dom": "^19.1.1",
+    "twitter-api-v2": "^1.27.0",
     "undici": "^7.16.0"
   }
 }

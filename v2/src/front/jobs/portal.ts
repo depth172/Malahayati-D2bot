@@ -56,9 +56,13 @@ export async function buildPortalCards(
   // prod: PNG buffers を返す
   const groups: { group: PortalViewData["group"]; images: Buffer[] }[] = [];
   for (const v of views) {
-    const htmls = renderPortalHTML(v, settings, bgUrlFull, bgRatio);
-    const pngs = await htmlPagesToPNGs(htmls, 1200);
-    groups.push({ group: v.group, images: pngs });
+		try {
+			const htmls = renderPortalHTML(v, settings, bgUrlFull, bgRatio);
+			const pngs = await htmlPagesToPNGs(htmls, 1200);
+			groups.push({ group: v.group, images: pngs });
+		} catch (e) {
+			console.error("Failed to generate images for group", v.group, e);
+		}
   }
   return { mode: "prod", groups };
 }

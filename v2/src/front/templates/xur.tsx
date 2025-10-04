@@ -3,6 +3,9 @@ import type { XurViewData } from "@domain/adapter/xur";
 import { BungieCommonSettings, DestinyInventoryItemConstantsDefinition } from "type";
 import { ArmorStatsDisplay, ItemDisplay, WeaponStatsDisplay } from "./component";
 import { TextToIcon } from "./text-replacement";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
 
 function XurBasicCard({ data, d2settings, constant, classType, bgUrl, bgRatio }: {
   data: XurViewData;
@@ -12,6 +15,13 @@ function XurBasicCard({ data, d2settings, constant, classType, bgUrl, bgRatio }:
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+	
 	if (!data.xurItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 
   return (
@@ -63,7 +73,7 @@ function XurBasicCard({ data, d2settings, constant, classType, bgUrl, bgRatio }:
 				<div className="tips">
 					＊アーキタイプ / ステータス配分はゴーストの改造パーツによって変化する可能性があります。
 				</div>
-				<img src="../src/assets/logo_full.png" />
+				<img src={`data:image/png;base64,${logoFullPngBase64}`} />
 			</div>
     </div>
   );
@@ -76,6 +86,13 @@ function XurSpecialCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
 	if (!data.xurItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 
   return (
@@ -108,7 +125,7 @@ function XurSpecialCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 					</div>
 				))}
       </div>
-      <div className="footer"><img src="../src/assets/logo_full.png" /></div>
+      <div className="footer"><img src={`data:image/png;base64,${logoFullPngBase64}`} /></div>
     </div>
   );
 }
@@ -120,6 +137,13 @@ function GearExoticWeaponCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
 	if (!data.gearItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 	const items = data.gearItems;
 
@@ -213,7 +237,7 @@ function GearExoticWeaponCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 				))}
       </div>
       <div className="footer">
-				<img src="../src/assets/logo_full.png" />
+				<img src={`data:image/png;base64,${logoFullPngBase64}`} />
 			</div>
     </div>
   );
@@ -226,6 +250,13 @@ function GearCatalystCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
 	if (!data.gearItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 	const items = data.gearItems;
 
@@ -269,7 +300,7 @@ function GearCatalystCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 				))}
       </div>
       <div className="footer">
-				<img src="../src/assets/logo_full.png" />
+				<img src={`data:image/png;base64,${logoFullPngBase64}`} />
 			</div>
     </div>
   );
@@ -285,6 +316,13 @@ function GearLegendaryWeaponsCard({ data, d2settings, range, pageNumber, pageMax
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
 	if (!data.gearItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 	const items = data.gearItems;
 
@@ -361,7 +399,7 @@ function GearLegendaryWeaponsCard({ data, d2settings, range, pageNumber, pageMax
 				</div>
       </div>
       <div className="footer">
-				<img src="../src/assets/logo_full.png" />
+				<img src={`data:image/png;base64,${logoFullPngBase64}`} />
 			</div>
     </div>
   );
@@ -374,6 +412,13 @@ function OffersCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
 	if (!data.offerItems) return <div className="card">シュールの販売アイテムが見つかりません。</div>;
 	const items = data.offerItems;
 
@@ -430,14 +475,15 @@ function OffersCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 				</div>
       </div>
       <div className="footer">
-				<img src="../src/assets/logo_full.png" />
+				<img src={`data:image/png;base64,${logoFullPngBase64}`} />
 			</div>
     </div>
   );
 }
 
-export function renderXurHTML(data: XurViewData, d2settings: BungieCommonSettings, constant: DestinyInventoryItemConstantsDefinition, page: string, bgUrl?: string, bgRatio?: number, per=6) {
-	const pages = ["xur", "gear", "offers"] as const;
+const pages = ["xur", "gear", "offers"] as const;
+
+export function renderXurHTML(data: XurViewData, d2settings: BungieCommonSettings, constant: DestinyInventoryItemConstantsDefinition, page: typeof pages[number], bgUrl?: string, bgRatio?: number, per=6) {
 	const classes = ["hunter", "titan", "warlock"] as const;
 	const legendaryWeaponCount = data.gearItems?.weapons.weapons.length || 0;
 

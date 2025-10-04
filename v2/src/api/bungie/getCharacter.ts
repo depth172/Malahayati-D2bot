@@ -26,8 +26,6 @@ export async function getCharacter(character: CharacterClass, components: Destin
 
 	const accessToken = await getValidAccessToken();
 
-	console.log(CharacterClass[character] + "のCharacterLive情報を取得します...");
-
 	if (!membershipType || !membershipId || !characterId) {
 		throw new Error('B_MEMBERSHIP_TYPE, B_MEMBERSHIP_ID, or B_CHARACTER_ID is not set in environment variables');
 	};

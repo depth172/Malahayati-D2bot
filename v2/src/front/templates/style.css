@@ -412,6 +412,10 @@ img.cost-icon {
 
 /* 記号類 */
 
+.keys {
+	font-family: 'Destiny_Keys', sans-serif;
+}
+
 .solar {
   color: #e7601d;
   font-weight: 400;

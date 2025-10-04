@@ -37,9 +37,6 @@ export function renderHTML(children: React.ReactNode) {
         font-style: normal;
         font-display: block;
 		}
-		.destiny-font {
-			font-family: "Destiny_Keys", sans-serif;
-		}
 ${css}
 </style>
 </head>
@@ -67,18 +64,47 @@ export function nameFor(dateISO: string, type: string, group: string, idx: numbe
   return `${base}.${ext}`;
 }
 
+let globalBrowser: any = null;
+
 export async function htmlPagesToPNGs(htmls: string[], width = 1200) {
-  const browser = await chromium.launch();
-  const page = await browser.newPage({ viewport: { width, height: 10 } });
+  // ブラウザを使い回し
+  if (!globalBrowser) {
+    globalBrowser = await chromium.launch({ headless: true });
+  }
+  
+  const page = await globalBrowser.newPage({ 
+    viewport: { width, height: 10 },
+    // 不要な機能を無効化
+    javascript: false
+  });
+
   const out: Buffer[] = [];
   for (const html of htmls) {
-    await page.setContent(html, { waitUntil: "networkidle" });
-    const el = await page.$("#card"); // 要素単位でスクショ
-    if (!el) throw new Error("#card not found");
-		await page.evaluate(() => (document as any).fonts.ready);
-    const buf = await el.screenshot({ type: "png", omitBackground: false }) as Buffer;
+    await page.setContent(html, { 
+      waitUntil: "domcontentloaded", // networkidleより軽量
+      timeout: 10000 // タイムアウト設定
+    });
+    
+    const el = await page.$("#root");
+    if (!el) throw new Error("#root not found");
+    
+    await page.evaluate(() => document.fonts.ready);
+    const buf = await el.screenshot({ 
+      type: "png", 
+      omitBackground: false,
+      clip: await el.boundingBox() // 必要部分のみ
+    }) as Buffer;
     out.push(buf);
   }
-  await browser.close();
+  
+  await page.close(); // ページのみクローズ
   return out;
+}
+
+// アプリ終了時にブラウザを閉じる
+export async function closeBrowser() {
+  if (globalBrowser) {
+    await globalBrowser.close();
+    globalBrowser = null;
+  }
 }

@@ -3,6 +3,9 @@ import { renderHTML } from "./renderHTML";
 import type { PortalViewData } from "@domain/adapter/portal";
 import { BungieCommonSettings } from "type";
 import { ItemDisplay } from "./component";
+import { fileURLToPath } from 'url';
+import path from 'path';
+import fs from 'fs';
 
 function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
   data: { group: PortalViewData["group"]; activities: PortalViewData["activities"], icon: string; };
@@ -10,6 +13,13 @@ function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
 	bgUrl?: string;
 	bgRatio?: number;
 }) {
+	const __filename = fileURLToPath(import.meta.url);
+	const __dirname = path.dirname(__filename);
+
+	// ロゴをBase64で読み込む
+	const logoPath = path.join(__dirname, "../../assets/logo_full.png");
+	const logoFullPngBase64 = fs.readFileSync(logoPath).toString("base64");
+
   const titleMap = { solo: "ソロ", fireteam: "ファイアチーム", pinnacle: "最高峰", crucible: "クルーシブル" } as const;
 	const date = new Date();
 	const fmt = (dt: Date) => {
@@ -48,7 +58,7 @@ function PortalCard({ data, d2settings, bgUrl, bgRatio }: {
           </div>
         ))}
       </div>
-      <div className="footer"><img src="../src/assets/logo_full.png" /></div>
+      <div className="footer"><img src={`data:image/png;base64,${logoFullPngBase64}`} /></div>
     </div>
   );
 }

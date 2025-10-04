@@ -12,8 +12,6 @@ export async function getCommonSettings(): Promise<BungieCommonSettings> {
 		throw new Error('B_API_KEY is not set in environment variables');
 	}
 
-	console.log("共通設定を取得します...");
-	
 	const res = await fetch('https://www.bungie.net/Platform/Settings/?lc=ja', {
 		headers: {
 			'X-API-Key': API_KEY,
