@@ -16,7 +16,9 @@ export async function getCommonSettings(): Promise<BungieCommonSettings> {
 	
 	const res = await fetch('https://www.bungie.net/Platform/Settings/?lc=ja', {
 		headers: {
-			'X-API-Key': API_KEY
+			'X-API-Key': API_KEY,
+			'Content-Type': 'application/json',
+			'Accept': 'application/json'
 		}
 	});
 

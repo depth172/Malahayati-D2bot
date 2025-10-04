@@ -7,6 +7,8 @@ enum CharacterClass {
 	WARLOCK = 2,
 }
 
+const cache = new Map<string, DestinyVendorResponse>();
+
 // 指定したキャラクターにおけるベンダーの情報を取得する関数
 // character は取得するキャラクターのクラス（0: Hunter, 1: Titan, 2: Warlock）
 // hash はベンダーのハッシュ値
@@ -18,6 +20,11 @@ export async function getVendor(character: CharacterClass, hash: number, compone
 	const membershipType = process.env.B_MEMBERSHIP_TYPE;
 	const membershipId = process.env.B_MEMBERSHIP_ID;
 	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
+
+	const cacheKey = `${character}:${hash}:${components.join(",")}`;
+	if (cache.has(cacheKey)) {
+		return cache.get(cacheKey)!;
+	}
 
 	const accessToken = await getValidAccessToken();
 
@@ -49,6 +56,7 @@ export async function getVendor(character: CharacterClass, hash: number, compone
 	if (json.ErrorCode !== 1) {
 		throw new Error(`Failed to fetch vendor data: ${json.ErrorStatus} ${json.Message}`);
 	}
-	
+
+	cache.set(cacheKey, json.Response);
 	return json.Response;
 };

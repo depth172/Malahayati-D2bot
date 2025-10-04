@@ -7,6 +7,8 @@ enum CharacterClass {
 	WARLOCK = 2,
 }
 
+const cache = new Map<string, DestinyCharacterResponse>();
+
 // 指定したキャラクターの情報を取得する関数
 export async function getCharacter(character: CharacterClass, components: DestinyComponentType[]) {
 	const API_KEY = process.env.B_API_KEY;
@@ -16,6 +18,11 @@ export async function getCharacter(character: CharacterClass, components: Destin
 	const membershipType = process.env.B_MEMBERSHIP_TYPE;
 	const membershipId = process.env.B_MEMBERSHIP_ID;
 	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
+
+	const cacheKey = `${character}:${characterId}:${components.join(",")}`;
+	if (cache.has(cacheKey)) {
+		return cache.get(cacheKey)!;
+	}
 
 	const accessToken = await getValidAccessToken();
 
@@ -44,5 +51,6 @@ export async function getCharacter(character: CharacterClass, components: Destin
 		throw new Error(`Failed to fetch character data: ${json.ErrorStatus} ${json.Message}`);
 	}
 	
+	cache.set(cacheKey, json.Response);
 	return json.Response;
 };
