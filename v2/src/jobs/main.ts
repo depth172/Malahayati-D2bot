@@ -61,13 +61,13 @@ async function run() {
     const lastPortalHash = await redis.get('portal_data_hash');
 
     const portalChanged = portalHash !== lastPortalHash;
-		if (portalChanged) console.log("ポータルのデータに変更があります。ツイートを準備します。");
+		if (portalChanged) console.log("ポータルのデータに変更があります。");
 
     const xurHash = isXur && xurData ? createDataHash(xurData) : undefined;
     const lastXurHash = isXur ? await redis.get('xur_data_hash') : undefined;
 
     const xurChanged = isXur ? (xurHash !== lastXurHash) : false;
-		if (xurChanged) console.log("シュールのデータに変更があります。ツイートを準備します。");
+		if (xurChanged) console.log("シュールのデータに変更があります。");
 		
 		// 表示用定義リゾルバ
     const [portalRes, xurRes] = await Promise.allSettled([
@@ -82,8 +82,8 @@ async function run() {
       const tweetPromises: Promise<any>[] = [];
 
       if (portalChanged) {
-				console.log("ポータルのツイートを投稿します...");
-        const portalPayload: { text: string, images: Buffer[] } = { text: `【${dateStr}】本日のポータルフォーカスアクティビティ情報をお知らせします。#Destiny2 #BungieAPIDev`, images: [] };
+				console.log("ポータルのツイートを準備します...");
+        const portalPayload: { text: string, images: Buffer[] } = { text: `【 #ボーナスフォーカス 】${dateStr}\n本日のポータルでのボーナスフォーカス対象アクティビティ情報をお知らせします。#Destiny2 #BungieAPIDev`, images: [] };
         if (portalRes.status === "fulfilled" && portalRes.value.mode === "prod") {
           const groupMap = new Map<string, typeof portalRes.value.groups[0]>();
           for (const group of portalRes.value.groups) {
@@ -98,12 +98,13 @@ async function run() {
           }
           portalPayload.images.push(...images);
         }
-        
+				
+				console.log("ポータルのツイートを投稿します...");
         const portalPromise = makeThread([portalPayload]).then((threadId) => {
-          console.log("Posted portal thread:", threadId);
+          console.log("ポータルのツイートに成功:", threadId);
           return { type: 'portal', hash: portalHash };
         }).catch((e) => {
-          console.error("Failed to post portal thread:", e);
+          console.error("ポータルのツイートに失敗:", e);
           throw e;
         });
         
@@ -111,7 +112,7 @@ async function run() {
       }
       
       if (xurChanged) {
-				console.log("シュールのツイートを投稿します...");
+				console.log("シュールのツイートを準備します...");
         const xurPayloads: { text: string, images: Buffer[] }[] = [];
         if (xurRes.status === "fulfilled" && xurRes.value.mode === "prod") {
           const groupMap = new Map<string, typeof xurRes.value.groups[0]>();
@@ -124,7 +125,7 @@ async function run() {
             if (!group) continue;
             if (group.group === "xur") {
               xurPayloads.push({
-                text: `【${dateStr}】本日は土曜日です。タワーに #シュール が来訪しています。#Destiny2 #BungieAPIDev\n\n今週取り扱っているエキゾチック装備と雑貨は以下の通りです。`,
+                text: `【 #シュール 】${dateStr}\n本日は土曜日です。タワーにシュールが来訪しています。\n\n今週取り扱っているエキゾチック装備と雑貨の情報をお知らせします。#Destiny2 #BungieAPIDev`,
                 images: group.images
               });
             } else if (group.group === "gear") {
@@ -141,11 +142,12 @@ async function run() {
           }
         }
 
+				console.log("シュールのツイートを投稿します...");
         const xurPromise = makeThread(xurPayloads).then((threadId) => {
-          console.log("Posted xur thread:", threadId);
+          console.log("シュールのツイートに成功:", threadId);
           return { type: 'xur', hash: xurHash! };
         }).catch((e) => {
-          console.error("Failed to post xur thread:", e);
+          console.error("シュールのツイートに失敗:", e);
           throw e;
         });
         

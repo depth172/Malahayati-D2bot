@@ -28,7 +28,7 @@ export function renderHTML(children: React.ReactNode) {
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@100..900&display=swap" rel="stylesheet">
-	<title>Document</title>
+	<title>Preview</title>
 	<style>
 			@font-face {
 			font-family: "Destiny_Keys";
@@ -74,30 +74,40 @@ export async function htmlPagesToPNGs(htmls: string[], width = 1200) {
   
   const page = await globalBrowser.newPage({ 
     viewport: { width, height: 10 },
-    // 不要な機能を無効化
-    javascript: false
   });
 
   const out: Buffer[] = [];
-  for (const html of htmls) {
-    await page.setContent(html, { 
-      waitUntil: "domcontentloaded", // networkidleより軽量
-      timeout: 10000 // タイムアウト設定
-    });
-    
-    const el = await page.$("#root");
-    if (!el) throw new Error("#root not found");
-    
-    await page.evaluate(() => document.fonts.ready);
-    const buf = await el.screenshot({ 
-      type: "png", 
-      omitBackground: false,
-      clip: await el.boundingBox() // 必要部分のみ
-    }) as Buffer;
-    out.push(buf);
-  }
+	for (const html of htmls) {
+		await page.setContent(html, { 
+			waitUntil: "networkidle"
+		});
+
+		// 画像のロード完了まで待機
+		await page.evaluate(async () => {
+			const imgs = Array.from(document.images);
+			await Promise.all(imgs.map(img => {
+				if (img.complete) return Promise.resolve();
+				return new Promise(resolve => {
+					img.addEventListener("load", resolve, { once: true });
+					img.addEventListener("error", resolve, { once: true });
+				});
+			}));
+			// フォントのロード完了まで待機
+			await (document as any).fonts.ready;
+		});
+
+		const el = await page.$("#root");
+		if (!el) throw new Error("#root not found");
+
+		const buf = await el.screenshot({ 
+			type: "png", 
+			omitBackground: false,
+			clip: await el.boundingBox()
+		}) as Buffer;
+		out.push(buf);
+	}
   
-  await page.close(); // ページのみクローズ
+  await page.close();
   return out;
 }
 
