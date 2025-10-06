@@ -8,9 +8,9 @@ import { getDefinition } from '@api/bungie/getDefinition';
 describe('inferFocused', () => {
   it('アクティビティ一覧から武器とアクティビティのセットを抽出できる', async () => {
 		const inputs = await Promise.all([
-			getCharacter(0, [T.CharacterActivities]), // Hunter
-			getCharacter(1, [T.CharacterActivities]), // Titan
-			getCharacter(2, [T.CharacterActivities]), // Warlock
+			getCharacter("main", 0, [T.CharacterActivities]), // Hunter
+			getCharacter("main", 1, [T.CharacterActivities]), // Titan
+			getCharacter("main", 2, [T.CharacterActivities]), // Warlock
 		]);
 
     const results = inputs.map(input => {

@@ -12,21 +12,21 @@ const cache = new Map<string, DestinyVendorResponse>();
 // 指定したキャラクターにおけるベンダーの情報を取得する関数
 // character は取得するキャラクターのクラス（0: Hunter, 1: Titan, 2: Warlock）
 // hash はベンダーのハッシュ値
-export async function getVendor(character: CharacterClass, hash: number, components: DestinyComponentType[]) {
+export async function getVendor(account: "main" | "sub" = "main", character: CharacterClass, hash: number, components: DestinyComponentType[]) {
 	const API_KEY = process.env.B_API_KEY;
 	if (!API_KEY) {
 		throw new Error('B_API_KEY is not set in environment variables');
 	}
 	const membershipType = process.env.B_MEMBERSHIP_TYPE;
-	const membershipId = process.env.B_MEMBERSHIP_ID;
-	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}`];
+	const membershipId = process.env[`B_MEMBERSHIP_ID_${account.toUpperCase()}`];
+	const characterId = process.env[`B_CHARACTER_ID_${CharacterClass[character]}_${account.toUpperCase()}`];
 
-	const cacheKey = `${character}:${hash}:${components.join(",")}`;
+	const cacheKey = `${account}:${character}:${hash}:${components.join(",")}`;
 	if (cache.has(cacheKey)) {
 		return cache.get(cacheKey)!;
 	}
 
-	const accessToken = await getValidAccessToken();
+	const accessToken = await getValidAccessToken(account);
 
 	if (!membershipType || !membershipId || !characterId) {
 		throw new Error('B_MEMBERSHIP_TYPE, B_MEMBERSHIP_ID, or B_CHARACTER_ID is not set in environment variables');

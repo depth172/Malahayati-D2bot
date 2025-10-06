@@ -2,7 +2,8 @@
 import { redis } from "@api/redis/redis";
 import type { BungieTokenPayload } from "../../typeOriginal";
 
-const TOKENS_KEY = "bungie:tokens";
+const TOKENS_KEY_MAIN = "bungie:tokens:main";
+const TOKENS_KEY_SUB = "bungie:tokens:sub";
 const REFRESH_LOCK_KEY = "bungie:refresh:lock";
 const SKEW_MS = 90 * 1000; // 90秒の余裕
 
@@ -10,13 +11,13 @@ function now() {
   return Date.now();
 }
 
-export async function getTokens(): Promise<BungieTokenPayload | null> {
-  const raw = await redis.get(TOKENS_KEY);
+export async function getTokens(account: "main" | "sub" = "main"): Promise<BungieTokenPayload | null> {
+  const raw = await redis.get(account === "main" ? TOKENS_KEY_MAIN : TOKENS_KEY_SUB);
   return raw ? (JSON.parse(raw) as BungieTokenPayload) : null;
 }
 
-export async function setTokens(tokens: BungieTokenPayload) {
-  await redis.set(TOKENS_KEY, JSON.stringify(tokens));
+export async function setTokens(tokens: BungieTokenPayload, account: "main" | "sub" = "main") {
+  await redis.set(account === "main" ? TOKENS_KEY_MAIN : TOKENS_KEY_SUB, JSON.stringify(tokens));
 }
 
 function isAccessValid(t: BungieTokenPayload) {
@@ -39,8 +40,8 @@ async function releaseRefreshLock() {
 /**
  * これだけ呼べば常に「使える access_token」が返る
  */
-export async function getValidAccessToken(): Promise<string> {
-  let tokens = await getTokens();
+export async function getValidAccessToken(account: "main" | "sub" = "main"): Promise<string> {
+  let tokens = await getTokens(account);
   if (!tokens) throw new Error("No Bungie tokens saved in Redis.");
 
   if (isAccessValid(tokens)) {
@@ -57,7 +58,7 @@ export async function getValidAccessToken(): Promise<string> {
   if (!locked) {
     // 誰かが更新中 → 少し待ってから再読込
     await new Promise((r) => setTimeout(r, 1500));
-    tokens = await getTokens();
+    tokens = await getTokens(account);
     if (!tokens) throw new Error("Tokens disappeared during refresh.");
     if (!isAccessValid(tokens)) throw new Error("Access token still invalid after wait.");
     return tokens.access_token;
@@ -65,7 +66,7 @@ export async function getValidAccessToken(): Promise<string> {
 
   try {
     const newTokens = await refreshTokens(tokens.refresh_token);
-    await setTokens(newTokens);
+    await setTokens(newTokens, account);
     return newTokens.access_token;
   } finally {
     await releaseRefreshLock();

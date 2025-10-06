@@ -1,11 +1,11 @@
 import { groupFocusedSets, inferFocusedGear, mergeFocusedSets } from "@domain/inferFocused";
 import { DestinyCharacterResponse, DestinyComponentType as T } from "type";
 
-export async function getPortalData(getCharacter: (characterId: number, components: T[]) => Promise<DestinyCharacterResponse>, getDefinition: <T>(type: string, hash: number) => Promise<T>) {
+export async function getPortalData(getCharacter: (account: "main" | "sub", characterId: number, components: T[]) => Promise<DestinyCharacterResponse>, getDefinition: <T>(type: string, hash: number) => Promise<T>) {
 	const inputs = await Promise.all([
-		getCharacter(0, [T.CharacterActivities]),
-		getCharacter(1, [T.CharacterActivities]),
-		getCharacter(2, [T.CharacterActivities]),
+		getCharacter("main", 0, [T.CharacterActivities]),
+		getCharacter("main", 1, [T.CharacterActivities]),
+		getCharacter("main", 2, [T.CharacterActivities]),
 	]);
 
 	const results = inputs.map(input => {

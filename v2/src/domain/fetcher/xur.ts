@@ -92,7 +92,7 @@ const XUR_VENDOR_HASH = 2190858386;
 
 export const getXurData = async (
 	getDef: <T>(type: "Vendor" | "InventoryItem", hash: number) => Promise<T>,
-	getVendor: (character: number, hash: number, components: number[]) => Promise<DestinyVendorResponse>
+	getVendor: (account: "main" | "sub", character: number, hash: number, components: number[]) => Promise<DestinyVendorResponse>
 ): Promise<XurData> => {
 	const itemDefs: Record<number, DestinyInventoryItemDefinition> = {};
 	const vendorDefs: Record<number, DestinyVendorDefinition> = {};
@@ -103,7 +103,7 @@ export const getXurData = async (
 	// ## 全ベンダーのResponseを取得 ##
 
 	// XurのResponseを先に取得
-	const xurResponses = await Promise.all([0, 1, 2].map(c => getVendor(c, XUR_VENDOR_HASH, [T.VendorSales, T.VendorCategories, T.ItemInstances, T.ItemStats, T.ItemSockets])));
+	const xurResponses = await Promise.all([0, 1, 2].map(c => getVendor("sub", c, XUR_VENDOR_HASH, [T.VendorSales, T.VendorCategories, T.ItemInstances, T.ItemStats, T.ItemSockets])));
 
 	vendorResponses[XUR_VENDOR_HASH] = xurResponses;
 
@@ -146,7 +146,7 @@ export const getXurData = async (
 
 	// previewVendorHashからベンダー情報を取得
 	const offerResponses = await Promise.all(offerStrangeVendorItemHashes.map(h => Promise.all([0, 1, 2].map(
-		c => getVendor(c, itemDefs[h].preview.previewVendorHash, [T.VendorSales, T.VendorCategories, T.ItemStats, T.ItemReusablePlugs, T.ItemSockets])
+		c => getVendor("sub", c, itemDefs[h].preview.previewVendorHash, [T.VendorSales, T.VendorCategories, T.ItemStats, T.ItemReusablePlugs, T.ItemSockets])
 	))));
 
 	offerStrangeVendorItemHashes.forEach((h, i) => {
