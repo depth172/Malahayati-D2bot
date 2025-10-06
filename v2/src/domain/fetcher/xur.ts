@@ -1,10 +1,6 @@
-import { isArchetypeSocket, isArmorPerkSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponFrameSocket, isWeaponPerkSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
-import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemReusablePlugsComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
-
-export type Cost = {
-	hash: number;
-	quantity: number;
-}
+import { isArchetypeSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponFrameSocket, isWeaponPerkSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
+import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemReusablePlugsComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
+import { Cost, GearItem, GearRandomRollWeapon } from "typeOriginal";
 
 type XurArmor = {
 	hash: number;
@@ -21,23 +17,8 @@ type XurArmor = {
 	costs: Cost[];
 };
 
-type GearItem = {
-	hash: number;
-	quantity?: number;
-	costs: Cost[];
-};
-
 type GearExoticWeapon = GearItem & {
 	perkHash: number[];
-};
-
-export type GearRandomRollWeapon = GearItem & {
-	index?: number;
-	perks: {
-		[index: number]: number[];
-	}
-	frameHash?: number;
-	masterworkHash?: number;
 };
 
 export type GearRandomRollExoticWeapon = GearRandomRollWeapon & {

@@ -8,6 +8,8 @@ import { buildXurCards } from '@front/jobs/xur';
 import { isXurAvailable } from '@domain/checkXur';
 import { getXurData } from '@domain/fetcher/xur';
 import { getPortalData } from '@domain/fetcher/portal';
+import { getBansheeFocusItemData, getBansheeSellWeaponData } from '@domain/fetcher/banshee';
+import { buildBansheeFocusCards, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
 
 async function run() {
   try {
@@ -15,15 +17,19 @@ async function run() {
 
 		// データ取得
 		console.log("データの取得を行います...");
-    const [portalData, xurData] = await Promise.all([
+    const [portalData, xurData, bansheeSellData, bansheeFocusData] = await Promise.all([
       getPortalData(getCharacter, getDefinition),
       isXur ? getXurData(getDefinition, getVendor) : Promise.resolve(null),
+      getBansheeSellWeaponData(getDefinition, getVendor),
+			getBansheeFocusItemData(getDefinition, getVendor)
     ]);
 		
 		// 表示用定義リゾルバ
-    const [portalRes, xurRes] = await Promise.allSettled([
+    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes] = await Promise.allSettled([
       buildPortalCards(portalData, { mode: "preview", getDef: getDefinition }),
       isXur ? buildXurCards(xurData!, { mode: "preview", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
+      buildBansheeSellWeaponCards(bansheeSellData, { mode: "preview", getDef: getDefinition }),
+      buildBansheeFocusCards(bansheeFocusData, { mode: "preview", getDef: getDefinition })
     ]);
 
 		// 結果の処理
@@ -33,9 +39,17 @@ async function run() {
 		if (xurRes.status === "rejected") {
 			throw xurRes.reason;
 		}
+		if (bansheeSellRes.status === "rejected") {
+			throw bansheeSellRes.reason;
+		}
+		if (bansheeFocusRes.status === "rejected") {
+			throw bansheeFocusRes.reason;
+		}
 
 		if (portalRes.status === "fulfilled") console.log(portalRes.value);
 		if (xurRes.status === "fulfilled") console.log(xurRes.value);
+		if (bansheeSellRes.status === "fulfilled") console.log(bansheeSellRes.value);
+		if (bansheeFocusRes.status === "fulfilled") console.log(bansheeFocusRes.value);
 
   } catch (e) {
     console.error("run() でエラーが発生:", e);

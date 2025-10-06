@@ -1,8 +1,7 @@
-import { DisplayableXurItem } from "@domain/adapter/xur";
 import RecoilStat from "@front/recoil-direction-component";
 import React from "react";
-import { BungieCommonSettings, DestinyInventoryItemConstantsDefinition, DestinyItemStatBlockDefinition, DestinyItemStatsComponent, DestinyStat, DestinyStatDefinition } from "type";
-import { DisplayableItem, DisplayableStats, DisplayableWeapon } from "typeOriginal";
+import { BungieCommonSettings, DestinyInventoryItemConstantsDefinition } from "type";
+import { DisplayableItem, DisplayableStats, DisplayableVendorItem, DisplayableWeapon } from "typeOriginal";
 
 export function AmmoIcon (props: { ammoType: number, d2settings: BungieCommonSettings }) {
 	const { ammoType, d2settings } = props;
@@ -25,13 +24,13 @@ function isDisplayableWeapon(item: DisplayableItem | DisplayableWeapon): item is
 
 export function ItemDisplay(
 	props: {
-		item: DisplayableItem | DisplayableWeapon | DisplayableXurItem,
+		item: DisplayableItem | DisplayableWeapon | DisplayableVendorItem,
 		d2settings?: BungieCommonSettings,
 		constant?: DestinyInventoryItemConstantsDefinition
 	}
 ) {
 	const i = props.item;
-	const quantity = (i as DisplayableXurItem).quantity;
+	const quantity = (i as DisplayableVendorItem).quantity;
 
 	return (
 		<div className="item">

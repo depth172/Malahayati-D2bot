@@ -1,121 +1,39 @@
-import { Cost, GearRandomRollExoticWeapon, GearRandomRollWeapon, XurData } from "@domain/fetcher/xur";
+import buildCosts from "@domain/buildCostData";
+import { GearRandomRollExoticWeapon, XurData } from "@domain/fetcher/xur";
 import { isKillTrackerSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
-import { DestinyDamageTypeDefinition, DestinyInventoryItemDefinition, DestinyPlugSetDefinition, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
-import { DisplayableItem, DisplayableStats, DisplayableWeapon } from "typeOriginal";
-
-export type DisplayableXurItem = DisplayableItem & {
-	quantity?: number;
-	description?: string;
-	costs: {
-		name: string;
-		icon: string;
-		quantity: number;
-	}[];
-};
-
-type DisplayableXurWeapon = DisplayableWeapon & {
-	costs: {
-		name: string;
-		icon: string;
-		quantity: number;
-	}[];
-};
-
-type XurArmor = DisplayableXurItem & {
-	tier: number;
-	archetype: {
-		name: string;
-		icon: string;
-	}
-	stats: DisplayableStats;
-	perk: {
-		name: string;
-		description: string;
-		icon: string;
-	}
-}
-
-type XurExoticWeapon = DisplayableXurWeapon & {
-	perks: {
-		name: string;
-		description: string;
-		icon: string;
-	}[];
-};
-
-type XurRandomRollExoticWeapon = DisplayableXurWeapon & {
-	exoticPerk: {
-		name: string;
-		description: string;
-		icon: string;
-	}
-	stats: {
-		name: string;
-		hash: number;
-		value: number;
-	}[];
-	baseStats: {
-		name: string;
-		hash: number;
-		value: number;
-	}[];
-	randomPerks: {
-		name: string;
-		icon: string;
-	}[][];
-};
-
-type XurCatalyst = DisplayableXurItem & {
-	perks: {
-		name: string;
-		description: string;
-		icon: string;
-	}[];
-};
-
-type XurRandomRollWeapon = DisplayableXurWeapon & {
-	index?: number;
-	perks: string[][];
-	frame: {
-		name: string;
-		icon: string;
-	}
-	masterwork: {
-		baseIcon: string;
-		watermark: string;
-	}
-};
+import { DestinyDamageTypeDefinition, DestinyInventoryItemDefinition, DestinyPlugSetDefinition, DestinySandboxPerkDefinition, DestinyStatDefinition, DestinyVendorDefinition } from "type";
+import { DisplayableStats, DisplayableVendorArmor, DisplayableVendorCatalyst, DisplayableVendorExoticWeapon, DisplayableVendorItem, DisplayableVendorRandomRollExoticWeapon, DisplayableVendorRandomRollWeapon, GearRandomRollWeapon } from "typeOriginal";
 
 export type XurViewData = {
 	date: string;
 	background: string;
 	xurItems: {
 		basicArmors: {
-			hunter: XurArmor[];
-			titan: XurArmor[];
-			warlock: XurArmor[];
+			hunter: DisplayableVendorArmor[];
+			titan: DisplayableVendorArmor[];
+			warlock: DisplayableVendorArmor[];
 		}
-		specialItems: (DisplayableXurItem & {
+		specialItems: (DisplayableVendorItem & {
 			description: string;
 		})[]
 	}
 	gearItems: {
 		icon: string;
 		exotics: {
-			engram: DisplayableXurItem;
-			weapons: XurExoticWeapon[];
-			catalysts: XurCatalyst[];
-			randomRollWeapons: XurRandomRollExoticWeapon[];
+			engram: DisplayableVendorItem;
+			weapons: DisplayableVendorExoticWeapon[];
+			catalysts: DisplayableVendorCatalyst[];
+			randomRollWeapons: DisplayableVendorRandomRollExoticWeapon[];
 		}
 		weapons: {
-			engram: DisplayableXurItem;
-			weapons: XurRandomRollWeapon[];
+			engram: DisplayableVendorItem;
+			weapons: DisplayableVendorRandomRollWeapon[];
 		}
 	}
 	offerItems: {
 		icon: string;
-		weeklyItems: DisplayableXurItem[];
-		generalItems: DisplayableXurItem[];
+		weeklyItems: DisplayableVendorItem[];
+		generalItems: DisplayableVendorItem[];
 	}
 }
 
@@ -136,19 +54,6 @@ function formatXurDayRange(baseDate = new Date()) {
 		return `${y}/${m}/${d}`;
 	};
 	return `${fmt(sat)} 〜 ${fmt(tue)}`;
-}
-
-function buildCosts(costs: Cost[], itemDefs: Record<number, DestinyInventoryItemDefinition>): { name: string; icon: string; quantity: number }[] {
-	return costs.map(c => {
-		const itemDef = itemDefs[c.hash];
-		if (!itemDef) throw new Error(`Cost item definition not found for hash: ${c.hash}`);
-
-		return {
-			name: itemDef.displayProperties.name,
-			icon: itemDef.displayProperties.icon,
-			quantity: c.quantity
-		};
-	});
 }
 
 export const toXurViewData = async (
@@ -397,7 +302,7 @@ export const toXurViewData = async (
 	// 装備
 	const exoticEngramDef = itemDefs[gearItems.exotics.engram.hash];
 	if (!exoticEngramDef) throw new Error(`Item definition not found for hash: ${gearItems.exotics.engram.hash}`);
-	const exoticEngram: DisplayableXurItem = {
+	const exoticEngram: DisplayableVendorItem = {
 		name: exoticEngramDef.displayProperties.name,
 		type: exoticEngramDef.itemTypeDisplayName,
 		icon: exoticEngramDef.displayProperties.icon,
@@ -407,7 +312,7 @@ export const toXurViewData = async (
 
 	const weaponEngramDef = itemDefs[gearItems.weapons.engram.hash];
 	if (!weaponEngramDef) throw new Error(`Item definition not found for hash: ${gearItems.weapons.engram.hash}`);
-	const weaponEngram: DisplayableXurItem = {
+	const weaponEngram: DisplayableVendorItem = {
 		name: weaponEngramDef.displayProperties.name,
 		type: weaponEngramDef.itemTypeDisplayName,
 		icon: weaponEngramDef.displayProperties.icon,

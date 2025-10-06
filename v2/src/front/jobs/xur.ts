@@ -5,7 +5,7 @@ import { getCommonSettings } from "@api/bungie/getCommonSettings";
 import { getImageRatio } from "@front/utils";
 import { toXurViewData } from "@domain/adapter/xur";
 import { renderXurHTML } from "@front/templates/xur";
-import { DestinyInventoryItemConstantsDefinition, DestinyVendorResponse } from "type";
+import { DestinyInventoryItemConstantsDefinition } from "type";
 import { XurData } from "@domain/fetcher/xur";
 
 export async function buildXurCards(

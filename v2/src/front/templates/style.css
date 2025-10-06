@@ -62,7 +62,8 @@ body {
 	gap: 24px;
 }
 
-.contentXur {
+.contentXur,
+.contentBanshee {
 	display: flex;
 	flex-direction: column;
 	gap: 48px;
@@ -316,11 +317,32 @@ img.cost-icon {
 	font-weight: 500;
 }
 
-.weaponListXur {
+.weaponListXur,
+.weaponListBanshee {
 	display: grid;
 	grid-template-columns: repeat(2, 1fr);
 	gap: 60px;
 }
+
+.lite-weapon-list {
+	display: grid;
+	grid-template-columns: repeat(2, 1fr);
+	gap: 16px;
+}
+
+.weapon-group .group-name {
+	background: var(--bg-url);
+	background-position: left;
+	background-repeat: no-repeat;
+	padding: 25px;
+	margin-bottom: 12px;
+
+	width: 100%;
+	overflow: hidden;
+
+	font-size: 1.2em;
+}
+
 
 .weapon {
 	display: flex;

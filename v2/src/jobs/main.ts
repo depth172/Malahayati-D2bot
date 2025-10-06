@@ -8,9 +8,11 @@ import { buildXurCards } from '@front/jobs/xur';
 import { isXurAvailable } from '@domain/checkXur';
 import { getXurData } from '@domain/fetcher/xur';
 import { getPortalData } from '@domain/fetcher/portal';
-import { makeThread } from '@api/twitter/tweet';
+import { makeThread, makeTweetWithImages } from '@api/twitter/tweet';
 import createDataHash from '@domain/createHash';
 import { closeBrowser } from '@front/templates/renderHTML';
+import { getBansheeFocusItemData, getBansheeSellWeaponData } from '@domain/fetcher/banshee';
+import { buildBansheeFocusCards, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
 
 // 指定時間待機する関数
 function sleep(ms: number): Promise<void> {
@@ -51,9 +53,11 @@ async function run() {
 
 		// データ取得
 		console.log("データの取得を行います...");
-    const [portalData, xurData] = await Promise.all([
+    const [portalData, xurData, bansheeSellData, bansheeFocusData] = await Promise.all([
       getPortalData(getCharacter, getDefinition),
       isXur ? getXurData(getDefinition, getVendor) : Promise.resolve(null),
+      getBansheeSellWeaponData(getDefinition, getVendor),
+      getBansheeFocusItemData(getDefinition, getVendor)
     ]);
 
     // 差分検知
@@ -68,14 +72,28 @@ async function run() {
 
     const xurChanged = isXur ? (xurHash !== lastXurHash) : false;
 		if (xurChanged) console.log("シュールのデータに変更があります。");
+
+		const bansheeSellHash = createDataHash(bansheeSellData);
+		const lastBansheeSellHash = await redis.get('banshee_sell_data_hash');
+
+		const bansheeSellChanged = bansheeSellHash !== lastBansheeSellHash;
+		if (bansheeSellChanged) console.log("バンシーの販売武器データに変更があります。");
+
+		const bansheeFocusHash = createDataHash(bansheeFocusData);
+		const lastBansheeFocusHash = await redis.get('banshee_focus_data_hash');
+
+		const bansheeFocusChanged = bansheeFocusHash !== lastBansheeFocusHash;
+		if (bansheeFocusChanged) console.log("バンシーの集束化解読データに変更があります。");
 		
 		// 表示用定義リゾルバ
-    const [portalRes, xurRes] = await Promise.allSettled([
+    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes] = await Promise.allSettled([
       portalChanged ? buildPortalCards(portalData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
       xurChanged ? buildXurCards(xurData!, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
+			bansheeSellChanged ? buildBansheeSellWeaponCards(bansheeSellData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
+			bansheeFocusChanged ? buildBansheeFocusCards(bansheeFocusData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] })
     ]);
 
-    if (portalChanged || xurChanged) {
+    if (portalChanged || xurChanged || bansheeSellChanged || bansheeFocusChanged) {
       const today = new Date();
       const dateStr = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,"0")}/${String(today.getDate()).padStart(2,"0")}`;
 
@@ -100,7 +118,7 @@ async function run() {
         }
 				
 				console.log("ポータルのツイートを投稿します...");
-        const portalPromise = makeThread([portalPayload]).then((threadId) => {
+        const portalPromise = makeTweetWithImages(portalPayload).then((threadId) => {
           console.log("ポータルのツイートに成功:", threadId);
           return { type: 'portal', hash: portalHash };
         }).catch((e) => {
@@ -110,7 +128,45 @@ async function run() {
         
         tweetPromises.push(portalPromise);
       }
-      
+
+			if (bansheeSellChanged) {
+				console.log("バンシーの販売ツイートを準備します...");
+        const bansheeSellPayload: { text: string, images: Buffer[] } = { text: `【 #バンシー44 】${dateStr}\n今週のバンシー44の販売武器情報をお知らせします。#Destiny2 #BungieAPIDev`, images: [] };
+        if (bansheeSellRes.status === "fulfilled" && bansheeSellRes.value.mode === "prod") {
+          bansheeSellPayload.images.push(...bansheeSellRes.value.images);
+        }
+
+				console.log("バンシーの販売ツイートを投稿します...");
+        const bansheeSellPromise = makeTweetWithImages(bansheeSellPayload).then((threadId) => {
+          console.log("バンシーの販売ツイートに成功:", threadId);
+          return { type: 'bansheeSell', hash: bansheeSellHash };
+        }).catch((e) => {
+          console.error("バンシーの販売ツイートに失敗:", e);
+          throw e;
+        });
+
+        tweetPromises.push(bansheeSellPromise);
+      }
+
+			if (bansheeFocusChanged) {
+				console.log("バンシーの集束化解読ツイートを準備します...");
+        const bansheeFocusPayload: { text: string, images: Buffer[] } = { text: `【 #バンシー44 】${dateStr}\n本日のバンシー44の集束化解読対象武器情報をお知らせします。#Destiny2 #BungieAPIDev`, images: [] };
+        if (bansheeFocusRes.status === "fulfilled" && bansheeFocusRes.value.mode === "prod") {
+          bansheeFocusPayload.images.push(...bansheeFocusRes.value.images);
+        }
+
+				console.log("バンシーの集束化解読ツイートを投稿します...");
+        const bansheeFocusPromise = makeTweetWithImages(bansheeFocusPayload).then((threadId) => {
+          console.log("バンシーの集束化解読ツイートに成功:", threadId);
+          return { type: 'bansheeFocus', hash: bansheeFocusHash };
+        }).catch((e) => {
+          console.error("バンシーの集束化解読ツイートに失敗:", e);
+          throw e;
+        });
+
+        tweetPromises.push(bansheeFocusPromise);
+      }
+
       if (xurChanged) {
 				console.log("シュールのツイートを準備します...");
         const xurPayloads: { text: string, images: Buffer[] }[] = [];
@@ -166,6 +222,10 @@ async function run() {
                 await redis.set('portal_data_hash', result.value.hash);
               } else if (result.value.type === 'xur') {
                 await redis.set('xur_data_hash', result.value.hash);
+              } else if (result.value.type === 'bansheeSell') {
+                await redis.set('banshee_sell_data_hash', result.value.hash);
+              } else if (result.value.type === 'bansheeFocus') {
+                await redis.set('banshee_focus_data_hash', result.value.hash);
               }
             }
           }
