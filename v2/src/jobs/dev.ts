@@ -9,7 +9,9 @@ import { isXurAvailable } from '@domain/checkXur';
 import { getXurData } from '@domain/fetcher/xur';
 import { getPortalData } from '@domain/fetcher/portal';
 import { getBansheeFocusItemData, getBansheeSellWeaponData } from '@domain/fetcher/banshee';
-import { buildBansheeFocusCards, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
+import { buildBansheeFocusCard, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
+import { getEververseData } from '@domain/fetcher/eververse';
+import { buildEververseCard } from '@front/jobs/eververse';
 
 async function run() {
   try {
@@ -17,19 +19,21 @@ async function run() {
 
 		// データ取得
 		console.log("データの取得を行います...");
-    const [portalData, xurData, bansheeSellData, bansheeFocusData] = await Promise.all([
+    const [portalData, xurData, bansheeSellData, bansheeFocusData, eververseData] = await Promise.all([
       getPortalData(getCharacter, getDefinition),
       isXur ? getXurData(getDefinition, getVendor) : Promise.resolve(null),
       getBansheeSellWeaponData(getDefinition, getVendor),
-			getBansheeFocusItemData(getDefinition, getVendor)
+			getBansheeFocusItemData(getDefinition, getVendor),
+			getEververseData(getDefinition, getVendor)
     ]);
 		
 		// 表示用定義リゾルバ
-    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes] = await Promise.allSettled([
+    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes, eververseRes] = await Promise.allSettled([
       buildPortalCards(portalData, { mode: "preview", getDef: getDefinition }),
       isXur ? buildXurCards(xurData!, { mode: "preview", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
       buildBansheeSellWeaponCards(bansheeSellData, { mode: "preview", getDef: getDefinition }),
-      buildBansheeFocusCards(bansheeFocusData, { mode: "preview", getDef: getDefinition })
+      buildBansheeFocusCard(bansheeFocusData, { mode: "preview", getDef: getDefinition }),
+			buildEververseCard(eververseData, { mode: "preview", getDef: getDefinition }),
     ]);
 
 		// 結果の処理
@@ -45,11 +49,15 @@ async function run() {
 		if (bansheeFocusRes.status === "rejected") {
 			throw bansheeFocusRes.reason;
 		}
+		if (eververseRes.status === "rejected") {
+			throw eververseRes.reason;
+		}
 
 		if (portalRes.status === "fulfilled") console.log(portalRes.value);
 		if (xurRes.status === "fulfilled") console.log(xurRes.value);
 		if (bansheeSellRes.status === "fulfilled") console.log(bansheeSellRes.value);
 		if (bansheeFocusRes.status === "fulfilled") console.log(bansheeFocusRes.value);
+		if (eververseRes.status === "fulfilled") console.log(eververseRes.value);
 
   } catch (e) {
     console.error("run() でエラーが発生:", e);

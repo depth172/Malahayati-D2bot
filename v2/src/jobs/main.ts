@@ -12,7 +12,9 @@ import { makeThread, makeTweetWithImages } from '@api/twitter/tweet';
 import createDataHash from '@domain/createHash';
 import { closeBrowser } from '@front/templates/renderHTML';
 import { getBansheeFocusItemData, getBansheeSellWeaponData } from '@domain/fetcher/banshee';
-import { buildBansheeFocusCards, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
+import { buildBansheeFocusCard, buildBansheeSellWeaponCards } from '@front/jobs/banshee';
+import { getEververseData } from '@domain/fetcher/eververse';
+import { buildEververseCard } from '@front/jobs/eververse';
 
 // 指定時間待機する関数
 function sleep(ms: number): Promise<void> {
@@ -53,47 +55,50 @@ async function run() {
 
 		// データ取得
 		console.log("データの取得を行います...");
-    const [portalData, xurData, bansheeSellData, bansheeFocusData] = await Promise.all([
+    const [portalData, xurData, bansheeSellData, bansheeFocusData, eververseData] = await Promise.all([
       getPortalData(getCharacter, getDefinition),
       isXur ? getXurData(getDefinition, getVendor) : Promise.resolve(null),
       getBansheeSellWeaponData(getDefinition, getVendor),
-      getBansheeFocusItemData(getDefinition, getVendor)
+      getBansheeFocusItemData(getDefinition, getVendor),
+      getEververseData(getDefinition, getVendor)
     ]);
 
     // 差分検知
     const portalHash = createDataHash(portalData);
     const lastPortalHash = await redis.get('portal_data_hash');
-
     const portalChanged = portalHash !== lastPortalHash;
 		if (portalChanged) console.log("ポータルのデータに変更があります。");
 
     const xurHash = isXur && xurData ? createDataHash(xurData) : undefined;
     const lastXurHash = isXur ? await redis.get('xur_data_hash') : undefined;
-
     const xurChanged = isXur ? (xurHash !== lastXurHash) : false;
 		if (xurChanged) console.log("シュールのデータに変更があります。");
 
 		const bansheeSellHash = createDataHash(bansheeSellData);
 		const lastBansheeSellHash = await redis.get('banshee_sell_data_hash');
-
 		const bansheeSellChanged = bansheeSellHash !== lastBansheeSellHash;
 		if (bansheeSellChanged) console.log("バンシーの販売武器データに変更があります。");
 
 		const bansheeFocusHash = createDataHash(bansheeFocusData);
 		const lastBansheeFocusHash = await redis.get('banshee_focus_data_hash');
-
 		const bansheeFocusChanged = bansheeFocusHash !== lastBansheeFocusHash;
 		if (bansheeFocusChanged) console.log("バンシーの集束化解読データに変更があります。");
+
+		const eververseHash = createDataHash(eververseData);
+		const lastEververseHash = await redis.get('eververse_data_hash');
+		const eververseChanged = eververseHash !== lastEververseHash;
+		if (eververseChanged) console.log("エバーバースのデータに変更があります。");
 		
 		// 表示用定義リゾルバ
-    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes] = await Promise.allSettled([
+    const [portalRes, xurRes, bansheeSellRes, bansheeFocusRes, eververseRes] = await Promise.allSettled([
       portalChanged ? buildPortalCards(portalData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
       xurChanged ? buildXurCards(xurData!, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
 			bansheeSellChanged ? buildBansheeSellWeaponCards(bansheeSellData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
-			bansheeFocusChanged ? buildBansheeFocusCards(bansheeFocusData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] })
+			bansheeFocusChanged ? buildBansheeFocusCard(bansheeFocusData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] }),
+			eververseChanged ? buildEververseCard(eververseData, { mode: "prod", getDef: getDefinition }) : Promise.resolve({ mode: "preview" as const, written: [] })
     ]);
 
-    if (portalChanged || xurChanged || bansheeSellChanged || bansheeFocusChanged) {
+    if (portalChanged || xurChanged || bansheeSellChanged || bansheeFocusChanged || eververseChanged) {
       const today = new Date();
       const dateStr = `${today.getFullYear()}/${String(today.getMonth()+1).padStart(2,"0")}/${String(today.getDate()).padStart(2,"0")}`;
 
@@ -167,6 +172,25 @@ async function run() {
         tweetPromises.push(bansheeFocusPromise);
       }
 
+			if (eververseChanged) {
+				console.log("エバーバースのツイートを準備します...");
+				const everversePayload: { text: string, images: Buffer[] } = { text: `【 #エバーバース 】${dateStr}\n今週のエバーバースの販売アイテム情報をお知らせします。#Destiny2 #BungieAPIDev`, images: [] };
+				if (eververseRes.status === "fulfilled" && eververseRes.value.mode === "prod") {
+					everversePayload.images.push(...eververseRes.value.images);
+				}
+
+				console.log("エバーバースのツイートを投稿します...");
+				const everversePromise = makeTweetWithImages(everversePayload).then((threadId) => {
+					console.log("エバーバースのツイートに成功:", threadId);
+					return { type: 'eververse', hash: eververseHash };
+				}).catch((e) => {
+					console.error("エバーバースのツイートに失敗:", e);
+					throw e;
+				});
+
+				tweetPromises.push(everversePromise);
+			}
+
       if (xurChanged) {
 				console.log("シュールのツイートを準備します...");
         const xurPayloads: { text: string, images: Buffer[] }[] = [];
@@ -226,7 +250,9 @@ async function run() {
                 await redis.set('banshee_sell_data_hash', result.value.hash);
               } else if (result.value.type === 'bansheeFocus') {
                 await redis.set('banshee_focus_data_hash', result.value.hash);
-              }
+              } else if (result.value.type === 'eververse') {
+								await redis.set('eververse_data_hash', result.value.hash);
+							}
             }
           }
         } catch (e) {

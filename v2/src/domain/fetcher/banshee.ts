@@ -68,12 +68,12 @@ export const getBansheeSellWeaponData = async (
 	const weeklyWeaponCategoryIndex = bansheeDef.displayCategories.findIndex(c => c.identifier === "category_weapon_meta");
 
 	// 週刊武器カテゴリに含まれるitemIndexes
-	const weeklyWeaponItemIndexes = new Set([
+	const weeklyWeaponItemIndexes = Array.from(new Set([
 		...bansheeResponses[0].categories.data?.categories.find(c => c.displayCategoryIndex === weeklyWeaponCategoryIndex)?.itemIndexes ?? [],
 		...bansheeResponses[1].categories.data?.categories.find(c => c.displayCategoryIndex === weeklyWeaponCategoryIndex)?.itemIndexes ?? [],
 		...bansheeResponses[2].categories.data?.categories.find(c => c.displayCategoryIndex === weeklyWeaponCategoryIndex)?.itemIndexes ?? []
-	]);
-	if (weeklyWeaponItemIndexes.size === 0) throw new Error("Banshee's weekly weapon category not found");
+	]));
+	if (weeklyWeaponItemIndexes.length === 0) throw new Error("Banshee's weekly weapon category not found");
 
 	// ベンダーの販売アイテムに含まれるInventoryItemのハッシュを集める
 	for (const item of bansheeVendorSaleItems) {

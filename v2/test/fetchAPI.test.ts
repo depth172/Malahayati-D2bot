@@ -3,8 +3,10 @@ import { toXurViewData } from '@domain/adapter/xur';
 import { getDefinition } from '@api/bungie/getDefinition';
 import { getVendor } from '@api/bungie/getVendor';
 import { getXurData } from '@domain/fetcher/xur';
-import { getBansheeData } from '@domain/fetcher/banshee';
-import { toBansheeViewData } from '@domain/adapter/banshee';
+import { getEververseData } from '@domain/fetcher/eververse';
+import { toEververseViewData } from '@domain/adapter/eververse';
+import { DestinyInventoryItemDefinition } from 'type';
+import { getAllDefinition } from '@api/bungie/getAllDefinition';
 
 const hasEnv =
   !!process.env.B_API_KEY &&
@@ -16,26 +18,49 @@ const hasEnv =
 
 const shouldRun = hasEnv && process.env.RUN_LIVE_TESTS === '1';
 
-describe.runIf(shouldRun)('getBansheeData (LIVE)', () => {
-	it('バンシーの情報が取得できる', async () => {
-    const data = await getBansheeData(getDefinition, getVendor);
+describe.runIf(false)('getEververseData (LIVE)', () => {
+	it('エバーバースの情報が取得できる', async () => {
+    const data = await getEververseData(getDefinition, getVendor);
 		console.dir(data, {depth: null});
 
-		expect(data).toHaveProperty('bansheeHash');
-		expect(data).toHaveProperty('focusedDecodingHash');
-		expect(data).toHaveProperty('focusItems');
-		expect(data).toHaveProperty('sellWeapons');
-  });
+		expect(data).toHaveProperty('vendorHash');
+		expect(data).toHaveProperty('itemGroups');
+		expect(data.itemGroups).toBeInstanceOf(Array);
+		expect(data.itemGroups[0]).toHaveProperty('groupIndex');
+		expect(data.itemGroups[0]).toHaveProperty('items');
+		expect(data.itemGroups[0].items).toBeInstanceOf(Array);
+	});
 });
 
-describe.runIf(shouldRun)('toBansheeViewData (LIVE)', () => {
-	it('バンシーの表示用情報が取得できる', async () => {
-    const data = await getBansheeData(getDefinition, getVendor);
-		const viewData = await toBansheeViewData(data, getDefinition);
+describe.runIf(false)('toEververseViewData (LIVE)', () => {
+	it('エバーバースの表示用情報が取得できる', async () => {
+    const data = await getEververseData(getDefinition, getVendor);
+		const viewData = await toEververseViewData(data, getDefinition);
 
 		console.dir(viewData, {depth: null});
 		expect(viewData).toHaveProperty('date');
-		expect(viewData).toHaveProperty('focusItems');
-		expect(viewData).toHaveProperty('sellWeapons');
+		expect(viewData).toHaveProperty('itemGroups');
+		expect(viewData.itemGroups).toBeInstanceOf(Array);
+		expect(viewData.itemGroups[0]).toHaveProperty('name');
+		expect(viewData.itemGroups[0]).toHaveProperty('items');
+		expect(viewData.itemGroups[0].items).toBeInstanceOf(Array);
+		expect(viewData.itemGroups[0].items[0]).toHaveProperty('name');
+		expect(viewData.itemGroups[0].items[0]).toHaveProperty('icon');
+		expect(viewData.itemGroups[0].items[0]).toHaveProperty('background');
+		expect(viewData.itemGroups[0].items[0]).toHaveProperty('type');
+		expect(viewData.itemGroups[0].items[0]).toHaveProperty('costs');
+	});
+});
+
+describe.runIf(shouldRun)('getDefinition', () => {
+	it('DestinyInventoryItemLiteDefinitionの確認', async () => {
+		const itemDefs = await getAllDefinition<DestinyInventoryItemDefinition>("InventoryItemLite", i => {
+			return i.itemType === 3 // Weapon
+		});
+
+		const itemDef = itemDefs[1331482397]; // MIDA Multi-Tool
+
+		console.dir(itemDef, {depth: null});
+		expect(itemDef).toBeDefined();
 	});
 });

@@ -144,6 +144,28 @@ export enum DestinyBreakerType {
 	Stagger = 3
 }
 
+export type GearAssetDataBaseDefinition = {
+	version: number;
+	path: string;
+};
+
+export type ImagePyramidEntry = {
+	name: string;
+	factor: number;
+};
+
+export type DestinyManifest = {
+	version: string;
+	mobileAssetContentPath: string;
+	mobileGearAssetDataBases: GearAssetDataBaseDefinition[];
+	mobileWorldContentPaths: Record<string, string>;
+	jsonWorldContentPaths: Record<string, string>;
+	jsonWorldComponentContentPaths: Record<string, Record<string, string>>;
+	mobileClanBannerDatabasePath: string;
+	mobileGearCDN: Record<string, string>;
+	iconImagePyramidInfo: ImagePyramidEntry[];
+};
+
 export type DestinyColor = {
 	red: number;
 	green: number;

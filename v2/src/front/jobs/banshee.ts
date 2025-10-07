@@ -62,7 +62,7 @@ export async function buildBansheeSellWeaponCards(
 	}
 }
 
-export async function buildBansheeFocusCards(
+export async function buildBansheeFocusCard(
 	bansheeData: BansheeFocusItemData,
   opts?: {
     dateISO?: string;                 // 省略時は今日
