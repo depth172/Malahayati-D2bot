@@ -2,11 +2,11 @@ import { DestinyActivity, DestinyActivityDefinition, DestinyActivityRewardItem }
 import { FocusedSet, GroupedFocusedSets } from "typeOriginal";
 import { activityGroups } from "assets/activityGroups";
 
-const DAILY_GRIND_STYLE = "daily_grind_guaranteed" as const;
+const DAILY_GRIND_STYLE = "daily_grind" as const;
 
 // 報酬アイテムがボーナスフォーカスによるものかどうか
 export function isFocusedRewardItem(item: DestinyActivityRewardItem) {
-  return item.uiStyle === DAILY_GRIND_STYLE;
+  return item.uiStyle.startsWith(DAILY_GRIND_STYLE);
 }
 
 // アクティビティがボーナスフォーカス対象かどうか
