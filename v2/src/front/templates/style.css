@@ -294,6 +294,21 @@ img.cost-icon {
 	word-break: auto-phrase;
 }
 
+.exotic-weapon-stats {
+	display: flex;
+	flex-direction: column;
+	margin: 10px;
+}
+
+.exotic-weapon-stats .stat {
+	display: flex;
+	gap: 8px;
+}
+
+.exotic-weapon-stats .stat .value {
+	font-weight: bold;
+}
+
 .random-perks {
 	margin: 24px 0;
 	display: flex;
