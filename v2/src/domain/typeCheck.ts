@@ -40,6 +40,14 @@ export function isExoticPerkSocket(socketTypeHash: number): boolean {
 	return EXOTIC_PERK_SOCKET_TYPE_HASHES.has(socketTypeHash);
 }
 
+export function isAeonArmor(socketTypeHash: number): boolean {
+	// イーオン防具のソケットタイプハッシュ
+	const AEON_ARMOR_SOCKET_TYPE_HASHES = new Set([
+		1486702312, // Aeon Armor Socket Type
+	]);
+	return AEON_ARMOR_SOCKET_TYPE_HASHES.has(socketTypeHash);
+}
+
 export function isWeaponPerkSocket(socketTypeHash: number): boolean {
 	// 武器パークのソケットタイプハッシュ
 	const WEAPON_PERK_SOCKET_TYPE_HASHES = new Set([
