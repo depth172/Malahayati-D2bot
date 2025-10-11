@@ -127,6 +127,11 @@ export type DisplayableVendorRandomRollExoticWeapon = DisplayableVendorWeapon & 
 };
 
 export type DisplayableVendorCatalyst = DisplayableVendorItem & {
+	stats?: {
+		name: string;
+		hash: number;
+		value: number;
+	}[];
 	perks: {
 		name: string;
 		description: string;

@@ -204,13 +204,18 @@ export const toXurViewData = async (
 		damageTypeDefs[h] = await getDef<DestinyDamageTypeDefinition>("DamageType", h);
 	}));
 
-	// 媒体に含まれるSandboxPerkの定義
+	// 媒体に含まれるStatとSandboxPerkの定義
 	const catalystHashes = gearItems.exotics.catalysts.map(i => i.hash);
 
 	await Promise.all(catalystHashes.map(async (h) => {
 		if (!itemDefs[h]) return; // アイテム定義がない場合はスキップ
+		const stats = itemDefs[h].investmentStats;
 		const perks = itemDefs[h].perks;
-		if (!perks) return; // パークがない場合はスキップ
+		if (!stats && !perks) return; // パークがない場合はスキップ
+		await Promise.all(stats.map(async (s) => {
+			if (statDefs[s.statTypeHash]) return; // 既に取得済みの場合はスキップ
+			statDefs[s.statTypeHash] = await getDef<DestinyStatDefinition>("Stat", s.statTypeHash);
+		}));
 		await Promise.all(perks.map(async (p) => {
 			if (sandboxPerkDefs[p.perkHash]) return; // 既に取得済みの場合はスキップ
 			sandboxPerkDefs[p.perkHash] = await getDef<DestinySandboxPerkDefinition>("SandboxPerk", p.perkHash);
@@ -369,6 +374,16 @@ export const toXurViewData = async (
 		if (!itemDef) throw new Error(`Item definition not found for hash: ${i.hash}`);
 		const costs = buildCosts(i.costs, itemDefs);
 
+		const stats = itemDef.investmentStats?.map(s => {
+			const def = statDefs[s.statTypeHash];
+			if (!def) throw new Error(`Stat definition not found for hash: ${s.statTypeHash}`);
+			return {
+				name: def.displayProperties.name,
+				hash: s.statTypeHash,
+				value: s.value
+			};
+		}) ?? [];
+
 		const perks = itemDef.perks.map(p => {
 			const perkDef = sandboxPerkDefs[p.perkHash];
 			if (!perkDef) throw new Error(`SandboxPerk definition not found for hash: ${p.perkHash}`);
@@ -384,6 +399,7 @@ export const toXurViewData = async (
 			type: itemDef.itemTypeDisplayName,
 			icon: itemDef.displayProperties.icon,
 			hash: i.hash,
+			stats: stats.length > 0 ? stats : undefined,
 			perks,
 			costs
 		});

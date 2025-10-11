@@ -287,6 +287,16 @@ function GearCatalystCard({ data, d2settings, constant, bgUrl, bgRatio }: {
 							</div>
 						</div>
 						<div />
+						{item.stats && (
+							<ul className="exotic-weapon-stats">
+								{item.stats.map((stat) => (
+									<li key={stat.hash} className="stat">
+										<div className="name">{stat.name}:</div>
+										<div className="value">{stat.value > 0 ? `+${stat.value}` : stat.value}</div>
+									</li>
+								))}
+							</ul>
+						)}
 						{item.perks.map((perk) => (
 							<div key={perk.name} className="exotic-weapon-perk">
 								<div className="perk-info">
