@@ -1,4 +1,4 @@
-import { isArchetypeSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponFrameSocket, isWeaponPerkSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
+import { isAeonArmor, isArchetypeSocket, isCatalystCategory, isExoticEngramCategory, isExoticPerkSocket, isExoticWeaponCategory, isKillTrackerSocket, isMasterworkSocket, isRandomRollExoticCategory, isWeaponCategory, isWeaponEngramCategory, isWeaponFrameSocket, isWeaponPerkSocket, isWeaponPerkSocketCategory } from "@domain/typeCheck";
 import { DestinyInventoryItemDefinition, DestinyItemInstanceComponent, DestinyItemReusablePlugsComponent, DestinyItemSocketsComponent, DestinyItemStatsComponent, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
 import { Cost, GearItem, GearRandomRollWeapon } from "typeOriginal";
 
@@ -279,7 +279,8 @@ export const getXurData = async (
 			const statsTotal = stats.reduce((sum, s) => sum + s.value, 0);
 
 			// エキゾチック防具の効果
-			const perkHash = def.sockets.socketEntries.find(se => se && isExoticPerkSocket(se.socketTypeHash))?.singleInitialItemHash;
+			const perkHash = def.sockets.socketEntries.find(se => se && isExoticPerkSocket(se.socketTypeHash))?.singleInitialItemHash
+				?? def.sockets.socketEntries.find(se => se && isAeonArmor(se.socketTypeHash))?.singleInitialItemHash;
 
 			// コスト
 			const costs = i.costs?.map(c => ({
