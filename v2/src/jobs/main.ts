@@ -8,7 +8,7 @@ import { buildXurCards } from '@front/jobs/xur';
 import { isXurAvailable } from '@domain/checkXur';
 import { getXurData } from '@domain/fetcher/xur';
 import { getPortalData } from '@domain/fetcher/portal';
-import { makeThread, makeTweetWithImages } from '@api/twitter/tweet';
+import { deleteTweet, makeThread, makeTweet, makeTweetWithImages, pinTweet } from '@api/twitter/tweet';
 import createDataHash from '@domain/createHash';
 import { closeBrowser } from '@front/templates/renderHTML';
 import { getBansheeFocusItemData, getBansheeSellWeaponData } from '@domain/fetcher/banshee';
@@ -123,9 +123,9 @@ async function run() {
         }
 				
 				console.log("ポータルのツイートを投稿します...");
-        const portalPromise = makeTweetWithImages(portalPayload).then((threadId) => {
-          console.log("ポータルのツイートに成功:", threadId);
-          return { type: 'portal', hash: portalHash };
+        const portalPromise = makeTweetWithImages(portalPayload).then((tweetId) => {
+          console.log("ポータルのツイートに成功:", tweetId);
+          return { type: 'portal', hash: portalHash, id: tweetId };
         }).catch((e) => {
           console.error("ポータルのツイートに失敗:", e);
           throw e;
@@ -142,9 +142,9 @@ async function run() {
         }
 
 				console.log("バンシーの販売ツイートを投稿します...");
-        const bansheeSellPromise = makeTweetWithImages(bansheeSellPayload).then((threadId) => {
-          console.log("バンシーの販売ツイートに成功:", threadId);
-          return { type: 'bansheeSell', hash: bansheeSellHash };
+        const bansheeSellPromise = makeTweetWithImages(bansheeSellPayload).then((tweetId) => {
+          console.log("バンシーの販売ツイートに成功:", tweetId);
+          return { type: 'bansheeSell', hash: bansheeSellHash, id: tweetId };
         }).catch((e) => {
           console.error("バンシーの販売ツイートに失敗:", e);
           throw e;
@@ -161,9 +161,9 @@ async function run() {
         }
 
 				console.log("バンシーの集束化解読ツイートを投稿します...");
-        const bansheeFocusPromise = makeTweetWithImages(bansheeFocusPayload).then((threadId) => {
-          console.log("バンシーの集束化解読ツイートに成功:", threadId);
-          return { type: 'bansheeFocus', hash: bansheeFocusHash };
+        const bansheeFocusPromise = makeTweetWithImages(bansheeFocusPayload).then((tweetId) => {
+          console.log("バンシーの集束化解読ツイートに成功:", tweetId);
+          return { type: 'bansheeFocus', hash: bansheeFocusHash, id: tweetId };
         }).catch((e) => {
           console.error("バンシーの集束化解読ツイートに失敗:", e);
           throw e;
@@ -180,9 +180,9 @@ async function run() {
 				}
 
 				console.log("エバーバースのツイートを投稿します...");
-				const everversePromise = makeTweetWithImages(everversePayload).then((threadId) => {
-					console.log("エバーバースのツイートに成功:", threadId);
-					return { type: 'eververse', hash: eververseHash };
+				const everversePromise = makeTweetWithImages(everversePayload).then((tweetId) => {
+					console.log("エバーバースのツイートに成功:", tweetId);
+					return { type: 'eververse', hash: eververseHash, id: tweetId };
 				}).catch((e) => {
 					console.error("エバーバースのツイートに失敗:", e);
 					throw e;
@@ -225,7 +225,7 @@ async function run() {
 				console.log("シュールのツイートを投稿します...");
         const xurPromise = makeThread(xurPayloads).then((threadId) => {
           console.log("シュールのツイートに成功:", threadId);
-          return { type: 'xur', hash: xurHash! };
+          return { type: 'xur', hash: xurHash!, id: threadId };
         }).catch((e) => {
           console.error("シュールのツイートに失敗:", e);
           throw e;
@@ -244,14 +244,19 @@ async function run() {
             if (result.status === 'fulfilled') {
               if (result.value.type === 'portal') {
                 await redis.set('portal_data_hash', result.value.hash);
+                await redis.set('portal_data_tweet_id', result.value.id);
               } else if (result.value.type === 'xur') {
                 await redis.set('xur_data_hash', result.value.hash);
+                await redis.set('xur_data_tweet_id', result.value.id);
               } else if (result.value.type === 'bansheeSell') {
                 await redis.set('banshee_sell_data_hash', result.value.hash);
+                await redis.set('banshee_sell_data_tweet_id', result.value.id);
               } else if (result.value.type === 'bansheeFocus') {
                 await redis.set('banshee_focus_data_hash', result.value.hash);
+								await redis.set('banshee_focus_data_tweet_id', result.value.id);
               } else if (result.value.type === 'eververse') {
 								await redis.set('eververse_data_hash', result.value.hash);
+								await redis.set('eververse_data_tweet_id', result.value.id);
 							}
             }
           }
@@ -260,6 +265,49 @@ async function run() {
           throw e; // ハッシュ更新失敗もリトライ対象にする
         } 
       }
+
+			// ハブツイートの作成
+			if (bansheeSellChanged || eververseChanged || xurChanged) {
+				const hubPayload: { text: string } = { text: "" };
+				const bansheeSellTweetID = await redis.get('banshee_sell_data_tweet_id') || null;
+				const eververseTweetID = await redis.get('eververse_data_tweet_id') || null;
+				if (xurChanged) {
+					const xurTweetID = await redis.get('xur_data_tweet_id') || null;
+					hubPayload.text = `【毎週更新】\n今週のDestiny 2の世界はこちら。リンクから詳細を確認できます。\n\n\u{1F4A0}シュールの販売アイテム\nhttps://www.x.com/MalahayatiD2bot/status/${xurTweetID}\n\n\u{1F4A0}バンシー44の販売武器\nhttps://www.x.com/MalahayatiD2bot/status/${bansheeSellTweetID}\n\n\u{1F4A0}エバーバースの販売アイテム\nhttps://www.x.com/MalahayatiD2bot/status/${eververseTweetID}\n\n#Destiny2 #BungieAPIDev`;
+				} else {
+					hubPayload.text = `【【毎週更新】\n今週のDestiny 2の世界はこちら。リンクから詳細を確認できます。\n\n\u{1F4A0}バンシー44の販売武器\nhttps://www.x.com/MalahayatiD2bot/status/${bansheeSellTweetID}\n\n\u{1F4A0}エバーバースの販売アイテム\nhttps://www.x.com/MalahayatiD2bot/status/${eververseTweetID}\n\n#Destiny2 #BungieAPIDev`;
+				}
+				// ハブツイートを投稿
+				console.log("ハブツイートを投稿します...");
+				const hubPromise = makeTweet(hubPayload).then((tweetId) => {
+					console.log("ハブツイートに成功:", tweetId);
+					return { type: 'hub', id: tweetId };
+				}).catch((e) => {
+					console.error("ハブツイートに失敗:", e);
+					throw e;
+				});
+
+				// ハブツイートを固定
+				const hubTweetResult = await hubPromise;
+				pinTweet(hubTweetResult.id).then(() => {
+					console.log("ハブツイートの固定に成功");
+				}).catch((e) => {
+					console.error("ハブツイートの固定に失敗:", e);
+				});
+
+				// 古いハブツイートを削除
+				const lastHubTweetID = await redis.get('hub_tweet_id');
+				if (lastHubTweetID) {
+					deleteTweet(lastHubTweetID).then(() => {
+						console.log("古いハブツイートの削除に成功");
+					}).catch((e) => {
+						console.error("古いハブツイートの削除に失敗:", e);
+					});
+				}
+
+				// 新しいハブツイートIDを保存
+				await redis.set('hub_tweet_id', hubTweetResult.id);
+			}
     } else {
       console.log("更新がないため、ツイートはスキップされました。");
     }

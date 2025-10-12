@@ -40,6 +40,7 @@ export async function makeTweetWithImages(payload: { text: string, images: Buffe
 // スレッド投稿
 export async function makeThread(payloads: { text: string, images?: Buffer[] }[]) {
   const client = await getTwitterClient();
+	let threadId: string | undefined;
   let lastTweetId: string | undefined;
   for (const payload of payloads) {
     const mediaIds: string[] = [];
@@ -54,7 +55,29 @@ export async function makeThread(payloads: { text: string, images?: Buffer[] }[]
       media: mediaIds.length > 0 ? { media_ids: mediaIds as [string] } : undefined,
       reply: lastTweetId ? { in_reply_to_tweet_id: lastTweetId } : undefined,
     });
+		if (!threadId) threadId = tweet.data.id;
     lastTweetId = tweet.data.id;
   }
-  return lastTweetId;
+  return threadId;
+}
+
+// ツイート固定
+export async function pinTweet(tweetId: string) {
+	const client = await getTwitterClient();
+	const response = await client.v1.post('account/pin_tweet.json', { id: tweetId });
+	return response;
+}
+
+// ツイート削除
+export async function deleteTweet(tweetId: string) {
+	const client = await getTwitterClient();
+	const response = await client.v2.deleteTweet(tweetId);
+	return response;
+}
+
+// 固定ツイート解除
+export async function unpinTweet() {
+	const client = await getTwitterClient();
+	const response = await client.v1.post('account/unpin_tweet.json');
+	return response;
 }
