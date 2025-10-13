@@ -1,5 +1,5 @@
 import { getAllDefinition } from "@api/bungie/getAllDefinition";
-import { inferWeaponOrnament } from "@domain/inferOrnament";
+import { inferOrnament } from "@domain/inferOrnament";
 import { DestinyInventoryItemDefinition, DestinyVendorDefinition, DestinyVendorResponse, DestinyVendorSaleItemComponent, DestinyComponentType as T } from "type";
 import { Cost } from "typeOriginal";
 import { b } from "vitest/dist/chunks/suite.d.FvehnV49.js";
@@ -71,32 +71,40 @@ export const getEververseData = async (
 	// ## 追加取得が必要な定義 ##
 
 	// 武器装飾が存在する場合、対象となる武器を特定
-	let hasWeaponOrnaments = false;
-	let isExotic = false;
-	let isLegendary = false;
+	const weapons = {
+		hasOrnaments: false,
+		isExotic: false,
+		isLegendary: false
+	}
+
+	let hasArmorOrnaments = false;
 
 	for (const item of Object.values(itemDefs)) {
 		if (item.traitIds?.[0] === "item.ornament.weapon") {
-			hasWeaponOrnaments = true;
+			weapons.hasOrnaments = true;
 			// 装飾の品質から対象武器の品質を判定
 			if (item.inventory?.tierType === 6) { // エキゾチック
-				isExotic = true;
+				weapons.isExotic = true;
 			} else if (item.inventory?.tierType === 5) { // レジェンダリー
-				isLegendary = true;
+				weapons.isLegendary = true;
 			}
+		}
+
+		if (item.traitIds?.[0] === "item.ornament.armor" && item.inventory?.tierType === 6) {
+			hasArmorOrnaments = true;
 		}
 	}
 
 	const ornamentMatchList: Record<number, number[]> = {}; // ornamentHash -> weaponHash[]
 	// 武器装飾が存在する場合、対応するレアリティの全武器を取得
-	if (hasWeaponOrnaments) {
-		console.log(`武器装飾が検出されました。${isExotic ? "エキゾチック" : ""}${isLegendary ? (isExotic ? "、" : "") + "レジェンダリー" : ""}の全武器を取得します...`);
+	if (weapons.hasOrnaments) {
+		console.log(`武器装飾が検出されました。${weapons.isExotic ? "エキゾチック" : ""}${weapons.isLegendary ? (weapons.isExotic ? "、" : "") + "レジェンダリー" : ""}の全武器を取得します...`);
 		const allWeaponLiteDefs = await getAllDefinition<DestinyInventoryItemDefinition>("InventoryItemLite", def => {
 			// 武器のみ
 			if (def.itemType !== 3) return false
 			// 対象のレアリティのみ
-			if (isExotic && def.inventory?.tierType === 6) return true;
-			if (isLegendary && def.inventory?.tierType === 5) return true;
+			if (weapons.isExotic && def.inventory?.tierType === 6) return true;
+			if (weapons.isLegendary && def.inventory?.tierType === 5) return true;
 			return false;
 		});
 
@@ -111,8 +119,33 @@ export const getEververseData = async (
 		// 全武器の中から、装飾が付けられる武器を推論
 		for (const item of Object.values(itemDefs)) {
 			if (item.traitIds?.[0] === "item.ornament.weapon") {
-				const matchWeapons = await inferWeaponOrnament(item.hash, allWeaponDefs, getDef);
+				const matchWeapons = await inferOrnament(item.hash, allWeaponDefs, getDef);
 				ornamentMatchList[item.hash] = matchWeapons;
+			}
+		}
+	}
+
+	if (hasArmorOrnaments) {
+		console.log(`エキゾチックの防具装飾が検出されました。エキゾチックの全防具を取得します...`);
+		const allArmorLiteDefs = await getAllDefinition<DestinyInventoryItemDefinition>("InventoryItemLite", def => {
+			// エキゾチック防具のみ
+			if (def.itemType === 2 && def.inventory?.tierType === 6) return true;
+			else return false;
+		});
+
+		const hashes = Object.keys(allArmorLiteDefs).map(h => parseInt(h));
+
+		const allArmorDefs: Record<number, DestinyInventoryItemDefinition> = {};
+		await Promise.all(hashes.map(async (h) => {
+			if (allArmorDefs[h]) return;
+			allArmorDefs[h] = await getDef<DestinyInventoryItemDefinition>("InventoryItem", h);
+		}));
+
+		// 全防具の中から、装飾が付けられる防具を推論
+		for (const item of Object.values(itemDefs)) {
+			if (item.traitIds?.[0] === "item.ornament.armor" && item.inventory?.tierType === 6) {
+				const matchArmors = await inferOrnament(item.hash, allArmorDefs, getDef);
+				ornamentMatchList[item.hash] = matchArmors;
 			}
 		}
 	}

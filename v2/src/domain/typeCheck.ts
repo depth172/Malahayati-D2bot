@@ -6,12 +6,13 @@ export function isWeaponPerkSocketCategory(socketCategoryHash: number): boolean 
 	return WEAPON_PERK_SOCKET_CATEGORY_HASHES.has(socketCategoryHash);
 }
 
-export function isWeaponOrnamentSocketCategory(socketCategoryHash: number): boolean {
-	// 武器装飾のソケットカテゴリハッシュ
-	const WEAPON_ORNAMENT_SOCKET_CATEGORY_HASHES = new Set([
+export function isOrnamentSocketCategory(socketCategoryHash: number): boolean {
+	// 装備装飾のソケットカテゴリハッシュ
+	const ORNAMENT_SOCKET_CATEGORY_HASHES = new Set([
 		2048875504, // Weapon Ornaments
+		1831672085, // Armor Ornaments
 	]);
-	return WEAPON_ORNAMENT_SOCKET_CATEGORY_HASHES.has(socketCategoryHash);
+	return ORNAMENT_SOCKET_CATEGORY_HASHES.has(socketCategoryHash);
 }
 
 export function isArchetypeSocket(socketTypeHash: number): boolean {
