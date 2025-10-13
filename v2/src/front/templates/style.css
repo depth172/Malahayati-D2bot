@@ -292,6 +292,7 @@ img.cost-icon {
 	font-size: 0.9em;
 	opacity: 0.9;
 	word-break: auto-phrase;
+	margin-right: 18px;
 }
 
 .exotic-weapon-stats {
