@@ -53,7 +53,10 @@ export function inferFocusedGear(activities: DestinyActivity[]): FocusedSet {
   }
 
 	const result: FocusedSet = {};
-  for (const [actHash, set] of acc) result[actHash] = Array.from(set);
+  for (const [actHash, set] of acc) {
+		if (set.size === 0) continue;
+		result[actHash] = Array.from(set);
+	}
   return result;
 }
 
