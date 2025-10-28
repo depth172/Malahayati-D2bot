@@ -4,6 +4,14 @@ import { activityGroups } from "assets/activityGroups";
 
 const DAILY_GRIND_STYLE = "daily_grind" as const;
 
+// 例外アイテムでないか
+export function isNotException(item: DestinyActivityRewardItem) {
+  const exceptions = new Set<number>([
+		1077454211, // 死者の祭りボーナスドロップ
+	]);
+	return !exceptions.has(item.itemQuantity.itemHash as number);
+}
+
 // 報酬アイテムがボーナスフォーカスによるものかどうか
 export function isFocusedRewardItem(item: DestinyActivityRewardItem) {
   return item.uiStyle.startsWith(DAILY_GRIND_STYLE);
@@ -19,7 +27,7 @@ export function extractFocusedGearFromActivity(activity: DestinyActivity): numbe
   const out: number[] = [];
   activity.visibleRewards.forEach(reward => {
     reward.rewardItems.forEach(item => {
-      if (isFocusedRewardItem(item)) {
+      if (isFocusedRewardItem(item) && isNotException(item)) {
         const hash = item.itemQuantity.itemHash;
         if (typeof hash === "number") out.push(hash);
       }
